@@ -24,7 +24,7 @@ public class LoginView extends BasicWindow {
 
         Panel panel = new Panel().setLayoutManager(new GridLayout(2).setTopMarginSize(1).setVerticalSpacing(1))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
-        panel.addComponent(new Label("User:"));
+        panel.addComponent(new Label("Mail :"));
         txtPseudo = new TextBox().addTo(panel);
         panel.addComponent(new Label("Password:"));
         txtPassword = new TextBox().setMask('*').addTo(panel);
@@ -34,7 +34,9 @@ public class LoginView extends BasicWindow {
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         btnLogin = new Button("Login", this::login).addTo(buttons);
+        btnSignup = new Button("signup", this::login).addTo(buttons);
         Button btnExit = new Button("Exit", this::exit).addTo(buttons);
+        btnLoginAsGuest = new Button("Login as Guest", this::login).addTo(buttons);
 
         new EmptySpace().addTo(root);
 
