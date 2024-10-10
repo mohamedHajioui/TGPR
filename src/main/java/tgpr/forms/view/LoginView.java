@@ -40,7 +40,9 @@ public class LoginView extends BasicWindow {
         btnLogin = new Button("Login", this::login).addTo(buttons);
         //btnSignup = new Button("signup", this::signup).addTo(buttons);
         btnExit = new Button("Exit", this::exit).addTo(buttons);
-        btnLoginAsGuest = new Button("Login as Guest", this::loginasguest).addTo(buttons);
+        btnLoginAsGuest = new Button("Login as Guest", this::loginAsGuest).addTo(buttons);
+        btnLoginAsGuest.addTo(buttons);
+
 
         new EmptySpace().addTo(root);
 
@@ -71,10 +73,10 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsDefaultAdmin() {
-        controller.login(Configuration.get("default.admin.pseudo"), Configuration.get("default.admin.password"));
+        controller.login(Configuration.get("default.admin.mail"), Configuration.get("default.admin.password"));
     }
 
-    private void loginasguest() {
-        controller.login(Configuration.get("guest.fullname"), Configuration.get("guest.password"));
+    private void loginAsGuest() {
+        controller.login(Configuration.get("default.user.mail"), Configuration.get("default.user.password"));
     }
 }

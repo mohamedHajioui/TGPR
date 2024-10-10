@@ -31,12 +31,18 @@ public abstract class UserValidator {
     }
 
     public static Error isValidPassword(String password) {
-        if (password == null || password.isBlank())
+        if (password == null || password.isBlank()) {
             return new Error("password required", User.Fields.Password);
-        if (!Pattern.matches("[a-zA-Z0-9]{3,}", password))
-            return new Error("invalid password", User.Fields.Password);
+        }
+
+        // Nouvelle expression régulière pour accepter les lettres, chiffres et certains caractères spéciaux
+        if (!Pattern.matches("[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>]{3,}", password)) {
+            return new Error("invalid password (must contain at least 3 characters including letters, digits, or special characters)", User.Fields.Password);
+        }
+
         return Error.NOERROR;
     }
+
 
     public static List<Error> validate(User user) {
         var errors = new ErrorList();
