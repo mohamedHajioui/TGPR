@@ -51,9 +51,9 @@ public class LoginView extends BasicWindow {
         Button btnSeedData = new Button("Reset Database", this::seedData);
         Panel debug = Panel.verticalPanel(LinearLayout.Alignment.Center,
                 new Button("Login as default admin", this::logAsDefaultAdmin),
-                new Button("Login as xavierpigeolet@epfc.eu", () -> loginAs("xavierpigeolet@epfc.eu")),
-                new Button("Login as penelle@epfc.eu", () -> loginAs("penelle@epfc.eu")),
-                new Button("Login as mamich@epfc.eu", () -> loginAs("mamich@epfc.eu")),
+                new Button("Login as xapigeolet@epfc.eu", () -> loginAs("xapigeolet@epfc.eu")),
+                new Button("Login as bepenelle@epfc.eu", () -> loginAs("bepenelle@epfc.eu")),
+                new Button("Login as mamichel@epfc.eu", () -> loginAs("mamichel@epfc.eu")),
                 btnSeedData
         );
         debug.withBorder(Borders.singleLine(" For debug purpose ")).addTo(root);
