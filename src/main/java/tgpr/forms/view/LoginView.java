@@ -42,8 +42,13 @@ public class LoginView extends BasicWindow {
         btnLogin = new Button("Login", this::login).addTo(buttons);
         btnSignup = new Button("Signup", this::signup).addTo(buttons);
         btnExit = new Button("Exit", this::exit).addTo(buttons);
+
+        new EmptySpace().addTo(root);
+
+        buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
+                .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         btnLoginAsGuest = new Button("Login as Guest", this::loginAsGuest).addTo(buttons);
-        btnLoginAsGuest.addTo(buttons);
+
 
 
         new EmptySpace().addTo(root);
