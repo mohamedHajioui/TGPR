@@ -6,13 +6,15 @@ import tgpr.forms.controller.LoginController;
 
 import java.util.List;
 
+import static tgpr.forms.model.User.Role.User;
+
 public class LoginView extends BasicWindow {
 
     private final LoginController controller;
     private final TextBox txtMail;
     private final TextBox txtPassword;
     private final Button btnLogin;
-
+    private final Button btnSignup;
     private final Button btnExit;
     private final Button btnLoginAsGuest;
 
@@ -38,7 +40,7 @@ public class LoginView extends BasicWindow {
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         btnLogin = new Button("Login", this::login).addTo(buttons);
-        //btnSignup = new Button("signup", this::signup).addTo(buttons);
+        btnSignup = new Button("Signup", this::signup).addTo(buttons);
         btnExit = new Button("Exit", this::exit).addTo(buttons);
         btnLoginAsGuest = new Button("Login as Guest", this::loginAsGuest).addTo(buttons);
         btnLoginAsGuest.addTo(buttons);
@@ -49,6 +51,9 @@ public class LoginView extends BasicWindow {
         Button btnSeedData = new Button("Reset Database", this::seedData);
         Panel debug = Panel.verticalPanel(LinearLayout.Alignment.Center,
                 new Button("Login as default admin", this::logAsDefaultAdmin),
+                new Button("Login as xavierpigeolet@epfc.eu", () -> loginAs("xavierpigeolet@epfc.eu")),
+                new Button("Login as penelle@epfc.eu", () -> loginAs("penelle@epfc.eu")),
+                new Button("Login as mamich@epfc.eu", () -> loginAs("mamich@epfc.eu")),
                 btnSeedData
         );
         debug.withBorder(Borders.singleLine(" For debug purpose ")).addTo(root);
@@ -79,4 +84,15 @@ public class LoginView extends BasicWindow {
     private void loginAsGuest() {
         controller.login(Configuration.get("default.user.mail"), Configuration.get("default.user.password"));
     }
+    private void loginAs(String email) {
+        controller.login(email, Configuration.get("default.user.password"));
+    }
+    private void signup() {
+        controller.navigateToSignup();
+    }
+
+
+
+
+
 }
