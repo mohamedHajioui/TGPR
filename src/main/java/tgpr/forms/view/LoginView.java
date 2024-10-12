@@ -1,5 +1,6 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import tgpr.framework.Configuration;
 import tgpr.forms.controller.LoginController;
@@ -7,6 +8,7 @@ import tgpr.forms.controller.LoginController;
 import java.util.List;
 
 import static tgpr.forms.model.User.Role.User;
+
 
 public class LoginView extends BasicWindow {
 
@@ -31,9 +33,15 @@ public class LoginView extends BasicWindow {
         Panel panel = new Panel().setLayoutManager(new GridLayout(2).setTopMarginSize(1).setVerticalSpacing(1))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         panel.addComponent(new Label("Mail :"));
-        txtMail = new TextBox().addTo(panel);
+        txtMail = new TextBox(new TerminalSize(19,1)).addTo(panel);
         panel.addComponent(new Label("Password:"));
-        txtPassword = new TextBox().setMask('*').addTo(panel);
+        txtPassword = new TextBox(new TerminalSize(19,1)).setMask('*').addTo(panel);
+        panel = new Panel();
+        panel.setLayoutManager(new GridLayout(2));
+
+
+
+
 
         new EmptySpace().addTo(root);
 
@@ -43,7 +51,7 @@ public class LoginView extends BasicWindow {
         btnSignup = new Button("Signup", this::signup).addTo(buttons);
         btnExit = new Button("Exit", this::exit).addTo(buttons);
 
-        new EmptySpace().addTo(root);
+
 
         buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
