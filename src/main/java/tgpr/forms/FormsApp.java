@@ -17,7 +17,7 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         } else {
             try {
-                // Utiliser DefaultTerminalFactory pour créer le terminal
+                // Utilise DefaultTerminalFactory pour créer le terminal
                 DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
                 Terminal terminal = terminalFactory.createTerminal();
 
