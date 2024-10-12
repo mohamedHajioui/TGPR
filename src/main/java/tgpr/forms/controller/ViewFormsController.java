@@ -4,6 +4,7 @@ import com.googlecode.lanterna.screen.Screen;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.User;
 import tgpr.forms.view.ViewFormsView;
+
 import java.util.List;
 
 public class ViewFormsController {
@@ -19,15 +20,20 @@ public class ViewFormsController {
 
     public void loadForms() {
         // Charger les formulaires accessibles à l'utilisateur actuel
-        List<Form> forms = Form.getAll();
+        List<Form> forms = currentUser.getMyForms("", 0, 10);  // Par défaut, on récupère les 10 premiers formulaires sans filtre
 
         // Afficher les formulaires dans la vue
         view.displayForms(forms);
     }
 
-    /*public void onOpenForm(Form form) {
-        // Logique pour ouvrir le formulaire en mode réponse (si des questions existent)
-        if (form.getQuestions()) {
+    // Ajout d'un getter pour récupérer l'utilisateur courant
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void onOpenForm(Form form) {
+        // Logique pour ouvrir le formulaire en mode réponse
+        if (!form.getQuestions().isEmpty()) {
             System.out.println("Opening form: " + form.getTitle());
             // Exemple : Logique pour passer à la vue d'édition d'une instance du formulaire
             // new ViewEditInstanceController(form, currentUser).show();
@@ -38,7 +44,7 @@ public class ViewFormsController {
 
     public void onManageForm(Form form) {
         // Logique pour ouvrir le formulaire en mode édition si l'utilisateur a les droits
-        if (form.isEditableBy(currentUser)) {
+        if (form.hasEditAccess(currentUser)) {
             System.out.println("Managing form: " + form.getTitle());
             // Exemple : Logique pour passer à la vue de gestion du formulaire
             // new ViewFormController(form, currentUser).show();
@@ -46,7 +52,7 @@ public class ViewFormsController {
             System.out.println("You do not have the rights to manage this form.");
         }
     }
-*/
+
     public void createNewForm() {
         // Logique pour créer un nouveau formulaire
         System.out.println("Creating a new form...");

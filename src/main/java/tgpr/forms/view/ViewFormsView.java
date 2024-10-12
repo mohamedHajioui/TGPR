@@ -5,6 +5,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.gui2.table.Table;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Form;
+import tgpr.forms.model.User;
 
 import java.util.List;
 
@@ -28,8 +29,21 @@ public class ViewFormsView {
 
         for (Form form : forms) {
             String description = form.getDescription().isEmpty() ? "No description" : form.getDescription();
-            String status = form.getDescription();
             String creator = form.getOwner().getFullName();
+
+            // Accéder à l'utilisateur courant via le contrôleur
+            User currentUser = controller.getCurrentUser();
+
+            // Statut de l'instance (Not Started, In Progress, etc.)
+            String status;
+            var instance = form.getMostRecentInstance(currentUser);
+            if (instance == null) {
+                status = "Not Started";
+            } else if (instance.isCompleted()) {
+                status = "Completed on " + instance.getCompleted();
+            } else {
+                status = "In Progress";
+            }
 
             table.getTableModel().addRow(form.getTitle(), description, creator, status);
         }
