@@ -3,6 +3,9 @@ package tgpr.forms.view;
 // View/EditInstanceView.java
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.gui2.Button;
+import tgpr.forms.controller.EditInstanceController;
+
 
 public class EditInstanceView {
     private Screen screen;
@@ -12,8 +15,6 @@ public class EditInstanceView {
         this.screen = screen;
     }
 
-    // Modification de View/EditInstanceView.java
-import com.googlecode.lanterna.gui2.Button;
 
     public void display(EditInstanceController controller) {
         Window window = new BasicWindow("Edit Instance");
@@ -36,6 +37,17 @@ import com.googlecode.lanterna.gui2.Button;
         screen.startScreen();
         screen.setWindow(window);
     }
+
+
+    public void showNextQuestion() {
+        // Logique pour afficher la question suivante en utilisant l'index
+    }
+
+    public void showPreviousQuestion() {
+        // Logique pour afficher la question précédente
+    }
+
+
 
 }
 
