@@ -1,6 +1,5 @@
 package tgpr.forms.controller;
 
-// Controller/EditInstanceController.java
 public class EditInstanceController {
     private FormInstance instance;
     private EditInstanceView view;
@@ -13,4 +12,15 @@ public class EditInstanceController {
     public void start() {
         view.display(); // Affiche la vue
     }
+
+    public void nextQuestion() {
+        // Logique pour passer à la question suivante
+        view.showNextQuestion();
+    }
+
+    public void previousQuestion() {
+        // Logique pour revenir à la question précédente
+        view.showPreviousQuestion();
+    }
+
 }
