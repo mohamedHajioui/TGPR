@@ -6,6 +6,10 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.gui2.Button;
 import tgpr.forms.controller.EditInstanceController;
 
+import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.IOException;
+
 
 public class EditInstanceView {
     private Screen screen;
@@ -15,16 +19,16 @@ public class EditInstanceView {
         this.screen = screen;
     }
 
-
     public void display(EditInstanceController controller) {
+        // Crée la fenêtre
         Window window = new BasicWindow("Edit Instance");
         mainPanel = new Panel();
         mainPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
-        // Affiche la première question (placeholder pour le moment)
-        mainPanel.addComponent(new Label("Question 1"));
+        // Placeholder pour afficher la question actuelle
+        mainPanel.addComponent(new Label("Formulaire en cours de création..."));
 
-        // Ajouter les boutons
+        // Ajouter les boutons de navigation et de soumission
         Button nextButton = new Button("Next", controller::nextQuestion);
         Button previousButton = new Button("Previous", controller::previousQuestion);
         Button submitButton = new Button("Submit", controller::submitInstance);
@@ -34,9 +38,12 @@ public class EditInstanceView {
         mainPanel.addComponent(submitButton);
 
         window.setComponent(mainPanel);
-        screen.startScreen();
-        screen.setWindow(window);
+
+        // Crée un text GUI pour gérer l'affichage de la fenêtre
+        MultiWindowTextGUI gui = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace());
+        gui.addWindowAndWait(window);
     }
+
 
 
     public void showNextQuestion() {
