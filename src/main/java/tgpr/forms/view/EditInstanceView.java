@@ -6,24 +6,19 @@ import com.googlecode.lanterna.screen.Screen;
 
 public class EditInstanceView {
     private Screen screen;
+    private Panel mainPanel;
 
     public EditInstanceView(Screen screen) {
         this.screen = screen;
     }
 
     public void display() {
-        // Initialisation de la fenêtre
         Window window = new BasicWindow("Edit Instance");
-        Panel mainPanel = new Panel();
+        mainPanel = new Panel();
         mainPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
-        // Placeholder pour les composants (questions, boutons, etc.)
+        // Placeholder pour les composants de la vue
         mainPanel.addComponent(new Label("Formulaire en cours de création..."));
-
-        // Ajouter les boutons de navigation
-        mainPanel.addComponent(new Button("Next"));
-        mainPanel.addComponent(new Button("Previous"));
-        mainPanel.addComponent(new Button("Submit"));
 
         window.setComponent(mainPanel);
         screen.startScreen();
