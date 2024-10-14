@@ -14,10 +14,28 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     public ViewFormsController(User user) {
         this.currentUser = user;
         this.view = new ViewFormsView(this);
+        showUserForms();
     }
 
     @Override
     public ViewFormsView getView() {
         return view;
     }
+
+    public List<Form> getForms() {
+        return currentUser.getForms();
+    }
+
+    public List<Form> getUserForms() {
+        return currentUser.getForms();
+    }
+
+    public void showUserForms(){
+        List<Form> forms = getUserForms();
+        view.displayForms(forms);
+    }
+
+
+
+
 }

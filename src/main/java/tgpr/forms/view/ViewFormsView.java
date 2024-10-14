@@ -2,7 +2,8 @@ package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import tgpr.forms.controller.*;
+import tgpr.forms.controller.ViewFormsController;
+import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 
@@ -18,11 +19,17 @@ public class ViewFormsView extends BasicWindow {
     private final Button lastButton = new Button("Last");
     private final ViewFormsController controller;
 
+    // Déclaration du mainPanel et du formsPanel
+    private Panel mainPanel;
+    private Panel formsPanel;
+
     public ViewFormsView(ViewFormsController controller) {
         this.controller = controller;
         String email = Security.getLoggedUser().getEmail();
 
-        setTitle("MyForms" + email);
+        // Initialisation de mainPanel
+        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        setTitle("MyForms (" + email + ")");
         setHints(List.of(Hint.CENTERED, Hint.MODAL));
         setCloseWindowWithEscape(true);
 
@@ -37,7 +44,7 @@ public class ViewFormsView extends BasicWindow {
         Panel centerPanel = new Panel(new GridLayout(1));
         centerPanel.addComponent(openButton);
         centerPanel.addComponent(manageButton);
-        centerPanel.setPreferredSize(new TerminalSize(90, 30));
+        centerPanel.setPreferredSize(new TerminalSize(90, 10));  // Limiter la hauteur du panneau central
 
         // Panneau de navigation en bas
         Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
@@ -57,16 +64,29 @@ public class ViewFormsView extends BasicWindow {
 
         bottomPanel.addComponent(navigationPanel);
 
-        // Panneau principal
-        Panel mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        // Initialisation du formsPanel avec une taille préférée
+        formsPanel = new Panel(new GridLayout(1));
+        formsPanel.setPreferredSize(new TerminalSize(50, 10));  // Définir une taille plus petite pour les formulaires
 
-        // Ajouter le panneau supérieur (topPanel) en premier
-        mainPanel.addComponent(topPanel);  // Boutons "File" et "Parameters"
-
-        // Ajouter les autres panneaux
-        mainPanel.addComponent(centerPanel);  // Panneau central
-        mainPanel.addComponent(bottomPanel);  // Panneau de navigation
+        // Ajouter les panneaux à mainPanel
+        mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
+        mainPanel.addComponent(centerPanel);    // Panneau central (Open/Manage)
+        mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
+        mainPanel.addComponent(bottomPanel);    // Panneau de navigation avec "Create a new form"
 
         setComponent(mainPanel);
+    }
+
+    // Méthode pour afficher les formulaires
+    public void displayForms(List<Form> forms) {
+        formsPanel.removeAllComponents();  // Supprimer les anciens composants s'il y en a
+
+        // Ajouter chaque formulaire sous forme de label dans formsPanel
+        for (Form form : forms) {
+            formsPanel.addComponent(new Label(form.getTitle()));  // Affiche le titre de chaque formulaire
+        }
+
+        // Mettre à jour le composant principal
+        this.setComponent(mainPanel);
     }
 }
