@@ -1,64 +1,72 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.gui2.table.Table;
-import tgpr.forms.controller.ViewFormsController;
-import tgpr.forms.model.Form;
+import tgpr.forms.controller.*;
+import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 
 import java.util.List;
 
-public class ViewFormsView {
+public class ViewFormsView extends BasicWindow {
+    private final Button openButton = new Button("Open");
+    private final Button manageButton = new Button("Manage");
+    private final Button createNewFormButton = new Button("Create a new form");
+    private final Button firstButton = new Button("First");
+    private final Button previousButton = new Button("Previous");
+    private final Button nextButton = new Button("Next");
+    private final Button lastButton = new Button("Last");
+    private final ViewFormsController controller;
 
-    private ViewFormsController controller;
-    private Screen screen;
-
-    public ViewFormsView(ViewFormsController controller, Screen screen) {
+    public ViewFormsView(ViewFormsController controller) {
         this.controller = controller;
-        this.screen = screen;
-    }
+        String email = Security.getLoggedUser().getEmail();
 
-    public void displayForms(List<Form> forms) {
-        // Créer la fenêtre principale
-        MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
-        BasicWindow window = new BasicWindow("Forms");
+        setTitle("MyForms" + email);
+        setHints(List.of(Hint.CENTERED, Hint.MODAL));
+        setCloseWindowWithEscape(true);
 
-        // Créer une table pour afficher les formulaires sous forme de carte
-        Table<String> table = new Table<>("Title", "Description", "Creator", "Status");
+        // Ajouter les boutons "File" et "Parameters" en haut à gauche
+        Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Button fileButton = new Button("File");
+        Button parametersButton = new Button("Parameters");
+        topPanel.addComponent(fileButton);
+        topPanel.addComponent(parametersButton);
 
-        for (Form form : forms) {
-            String description = form.getDescription().isEmpty() ? "No description" : form.getDescription();
-            String creator = form.getOwner().getFullName();
+        // Panneau central avec les boutons Open et Manage
+        Panel centerPanel = new Panel(new GridLayout(1));
+        centerPanel.addComponent(openButton);
+        centerPanel.addComponent(manageButton);
+        centerPanel.setPreferredSize(new TerminalSize(90, 30));
 
-            // Accéder à l'utilisateur courant via le contrôleur
-            User currentUser = controller.getCurrentUser();
+        // Panneau de navigation en bas
+        Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        bottomPanel.addComponent(createNewFormButton);
+        bottomPanel.addComponent(new EmptySpace(new TerminalSize(50, 1)));
 
-            // Statut de l'instance (Not Started, In Progress, etc.)
-            String status;
-            var instance = form.getMostRecentInstance(currentUser);
-            if (instance == null) {
-                status = "Not Started";
-            } else if (instance.isCompleted()) {
-                status = "Completed on " + instance.getCompleted();
-            } else {
-                status = "In Progress";
-            }
+        Panel navigationPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        navigationPanel.addComponent(firstButton);
+        navigationPanel.addComponent(previousButton);
 
-            table.getTableModel().addRow(form.getTitle(), description, creator, status);
-        }
+        // Texte de pagination entre Previous et Next
+        Label pageLabel = new Label("Page 1 of 2 ");
+        navigationPanel.addComponent(pageLabel);
 
-        // Ajouter la table à la fenêtre
-        Panel contentPanel = new Panel();
-        contentPanel.addComponent(table);
+        navigationPanel.addComponent(nextButton);
+        navigationPanel.addComponent(lastButton);
 
-        // Ajouter un bouton pour fermer la vue
-        contentPanel.addComponent(new Button("Close", () -> window.close()));
+        bottomPanel.addComponent(navigationPanel);
 
-        // Attacher le panneau de contenu à la fenêtre
-        window.setComponent(contentPanel);
+        // Panneau principal
+        Panel mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
 
-        // Afficher la fenêtre
-        gui.addWindowAndWait(window);
+        // Ajouter le panneau supérieur (topPanel) en premier
+        mainPanel.addComponent(topPanel);  // Boutons "File" et "Parameters"
+
+        // Ajouter les autres panneaux
+        mainPanel.addComponent(centerPanel);  // Panneau central
+        mainPanel.addComponent(bottomPanel);  // Panneau de navigation
+
+        setComponent(mainPanel);
     }
 }
