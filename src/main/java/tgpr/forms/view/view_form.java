@@ -3,6 +3,7 @@ package tgpr.forms.view;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.BorderLayout;
 import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.Component;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
@@ -11,12 +12,14 @@ import com.googlecode.lanterna.gui2.AbstractWindow;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.TestController;
 import tgpr.forms.controller.formController;
-import tgpr.forms.model.Question;
-import tgpr.forms.model.User;
+import tgpr.forms.model.*;
 import tgpr.framework.Controller;
+import tgpr.framework.ViewManager;
 
 import java.awt.*;
 import java.util.List;
+
+import static tgpr.framework.Tools.ifNull;
 
 //import static jdk.internal.net.http.common.Utils.close;
 
@@ -47,6 +50,7 @@ import java.util.List;
 public class view_form extends DialogWindow{
 
     private final formController controller;
+    private final Form form;
 
     private final Button nq_button = new Button("New Question");
     private final Button ef_button = new Button("Edit Form");
@@ -55,11 +59,14 @@ public class view_form extends DialogWindow{
     private final Button r_button = new Button("Reorder");
     private final Button a_button = new Button("Analyse");
 
+    private ObjectTable<Question> table;
 
-    public view_form(formController controller) {
+
+    public view_form(formController controller,Form form) {
         super("View Form detail");
 
         this.controller = controller;
+        this.form = form;
 
         setHints(List.of(Hint.CENTERED,Hint.MODAL));
         setCloseWindowWithEscape(true);
@@ -69,7 +76,7 @@ public class view_form extends DialogWindow{
         setComponent(root);
 
         upperDisciption().addTo(root);
-        middleSecion().addTo(root);
+        questionList().addTo(root);
         createButtons().addTo(root);
 
 
@@ -78,28 +85,29 @@ public class view_form extends DialogWindow{
     private Panel title(){
         Panel panel = Panel.gridPanel(2);
         new Label("Title: ").addTo(panel);
-        // new Label().addTo ,extraction des donner
+        new Label(form.getTitle()).addTo(panel);
         return panel;
     }
 
     private Panel description(){
         Panel panel = Panel.gridPanel(2);
         new Label("Description: ").addTo(panel);
-        // new Label().addTo ,extraction des donner
+        new Label(form.getDescription()).addTo(panel);
         return panel;
     }
 
     private Panel createdby(){
         Panel panel = Panel.gridPanel(2);
         new Label("Created by: ").addTo(panel);
-        // new Label().addTo ,extraction des donner
+        User user = form.getOwner();
+        new Label(user.getFullName()).addTo(panel);
         return panel;
     }
 
     private Panel isPublic(){
         Panel panel = Panel.gridPanel(2);
         new Label("IS public: ").addTo(panel);
-        // new Label().addTo ,extraction des donner
+        new Label(form.getIsPublic()+"").addTo(panel);
         return panel;
 
     }
@@ -115,33 +123,31 @@ public class view_form extends DialogWindow{
         return panel;
     }
 
-    private Panel middleSecion(){
-        Panel panel = Panel.gridPanel(20,Margin.of(1));
-        new Label("Index Title").addTo(panel);
-        panel.addEmpty();
-        panel.addEmpty();
-        panel.addEmpty();
-        panel.addEmpty();
-        panel.addEmpty();
-        panel.addEmpty();
-        new Label("Type").addTo(panel);
-        panel.addEmpty();
-        panel.addEmpty();
-        new Label("Required").addTo(panel);
-        new Label("Option").addTo(panel);
-        new Label("List").addTo(panel);
-        return panel;
+
+
+    private Component questionList(){
+        table = new ObjectTable<Question>(
+                new ColumnSpec<>("index title", Question::getIdx),
+                new ColumnSpec<>("Type", Question::getType),
+                new ColumnSpec<>("Required", Question::getRequired),
+                new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
+        );
+        table.sizeTo(ViewManager.getTerminalColumns(),15);
+        table.add(form.getQuestions());
+        return table;
     }
+
+
+
 
     private Panel createButtons(){
         var panel = Panel.horizontalPanel().center();
-
-        nq_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
-        ef_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
-        df_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
-        s_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
-        r_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
-        a_button.setEnabled(false).addTo(panel).addListener(button -> newQuestion());
+        new Button("Nouvelle Question").addTo(panel);
+        new Button("Edit Form").addTo(panel);
+        new Button("Delete Form").addTo(panel);
+        new Button("Share").addTo(panel);
+        new Button("Reorder").addTo(panel);
+        new Button("Analyse").addTo(panel);
         new Button("Cancel", this::close).addTo(panel);
 
         return panel;
@@ -152,3 +158,4 @@ public class view_form extends DialogWindow{
     }
 
 }
+
