@@ -1,36 +1,41 @@
 package tgpr.forms.controller;
 
+// Controller/EditInstanceController.java
+import tgpr.forms.model.Instance;
+import tgpr.forms.model.Question;
+import tgpr.forms.model.User;
+import tgpr.forms.view.EditInstanceView;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EditInstanceController {
-    private FormInstance instance;
+    private Instance instance;
     private EditInstanceView view;
+    private User user; // Utilisation potentielle de la classe User si elle est pertinente
 
-    public EditInstanceController(FormInstance instance, EditInstanceView view) {
+    public EditInstanceController(Instance instance, EditInstanceView view) {
         this.instance = instance;
         this.view = view;
     }
 
     public void start() {
-        view.display(); // Affiche la vue
+        view.display(this);
     }
 
     public void nextQuestion() {
-        // Logique pour passer à la question suivante
         view.showNextQuestion();
     }
 
     public void previousQuestion() {
-        // Logique pour revenir à la question précédente
         view.showPreviousQuestion();
     }
 
     public void submitInstance() {
-        if (instance.isSubmitted()) {
+        if (isInstanceSubmitted()) {
             view.showError("Cette instance est déjà soumise.");
         } else {
             if (validateAnswers()) {
-                instance.setCompleted(LocalDateTime.now());
+                setInstanceCompleted(LocalDateTime.now());
                 view.showMessage("Formulaire soumis avec succès !");
             } else {
                 view.showError("Veuillez remplir toutes les questions obligatoires.");
@@ -39,9 +44,21 @@ public class EditInstanceController {
     }
 
     private boolean validateAnswers() {
-        // Validation des réponses en utilisant les méthodes du modèle
-        return true;
+        List<Question> questions = instance.getForm().getQuestions(); // Récupérer les questions du formulaire
+        for (Question question : questions) {
+            if (question.isRequired() && !question.isAnswered()) { // Vérifie si chaque question requise est répondue
+                return false; // Retourne faux si une question requise n'a pas été répondue
+            }
+        }
+        return true; // Toutes les validations passent
     }
 
 
+    private boolean isInstanceSubmitted() {
+        return instance.getCompleted() != null; // Suppose que l'Instance a un attribut 'completed'
+    }
+
+    private void setInstanceCompleted(LocalDateTime completed) {
+        instance.setCompleted(completed); // Suppose que l'Instance a cette méthode
+    }
 }

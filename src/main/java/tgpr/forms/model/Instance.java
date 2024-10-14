@@ -94,6 +94,11 @@ public class Instance extends Model {
         setCompleted(LocalDateTime.now());
         save();
     }
+    public List<Question> getQuestions() {
+        Form form = getForm(); // Récupérer le formulaire
+        return form.getQuestions(); // Assure-toi que la méthode getQuestions() existe dans la classe Form
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -142,6 +147,7 @@ public class Instance extends Model {
     public static List<Instance> getAll() {
         return queryList(Instance.class, "select * from instances");
     }
+
 
     public Instance save() {
         int c;
