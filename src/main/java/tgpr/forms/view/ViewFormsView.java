@@ -69,8 +69,8 @@ public class ViewFormsView extends BasicWindow {
         bottomPanel.addComponent(navigationPanel);
 
         // Initialisation du formsPanel avec une taille préférée
-        formsPanel = new Panel(new GridLayout(1));
-        formsPanel.setPreferredSize(new TerminalSize(50, 10));  // Définir une taille plus petite pour les formulaires
+        formsPanel = new Panel(new GridLayout(3));
+        formsPanel.setPreferredSize(new TerminalSize(100, 10));  // Définir une taille plus petite pour les formulaires
 
         // Ajouter les panneaux à mainPanel
         mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
