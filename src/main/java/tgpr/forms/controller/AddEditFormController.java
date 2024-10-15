@@ -1,8 +1,16 @@
 package tgpr.forms.controller;
 
+import com.googlecode.lanterna.gui2.CheckBox;
+import tgpr.forms.model.FormValidator;
 import tgpr.forms.view.AddEditFormView;
 import tgpr.framework.Controller;
 import tgpr.forms.model.Form;
+import tgpr.framework.ErrorList;
+
+import javax.xml.validation.Validator;
+
+import static tgpr.framework.Tools.hash;
+import static tgpr.framework.Tools.toDate;
 
 public class AddEditFormController extends Controller<AddEditFormView> {
 
@@ -27,5 +35,23 @@ public class AddEditFormController extends Controller<AddEditFormView> {
 
     public Form getForm() {
         return form;
+    }
+
+    public void save(String title, String description) {
+        var errors = validate(title, description);
+        if (errors.isEmpty()) {
+            form = new Form();
+            form.save();
+            view.close();
+        }
+    }
+
+    public ErrorList validate(String title, String description) {
+        var errors = new ErrorList();
+
+        if (isNew) {
+            errors.add(FormValidator.isValidAvailableTitle(title), Form.Fields.Title);
+        }
+        return errors;
     }
 }
