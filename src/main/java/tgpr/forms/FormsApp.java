@@ -3,6 +3,7 @@ package tgpr.forms;
 import tgpr.forms.controller.AddEditQuestionController;
 import tgpr.forms.controller.LoginController;
 import tgpr.forms.controller.TestController;
+import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
 import tgpr.framework.Model;
 
@@ -13,7 +14,8 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Controller.navigateTo(new AddEditQuestionController());
+            Question newQuestion = null;
+            Controller.navigateTo(AddEditQuestionController());
         }
     }
 }
