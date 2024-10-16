@@ -55,6 +55,9 @@ public class AddEditQuestionView extends DialogWindow {
         errDescription = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
+        for (Question.Type type : Question.Type.values()) {
+            cbType.addItem(type);
+        }
 
         new Label("Required :").addTo(root);
         lblRequired = new Label("").addTo(root).addStyle(SGR.BOLD);
@@ -62,6 +65,7 @@ public class AddEditQuestionView extends DialogWindow {
         var optionlist = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         new Label("Option :").addTo(optionlist);
         cbOption = new ComboBox<OptionList>().addTo(optionlist);
+
         btnAddEdit = new Button("Add").addTo(optionlist).setEnabled(false);
 
         var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root)
