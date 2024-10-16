@@ -12,6 +12,8 @@ import tgpr.forms.model.Question;
 
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AddEditQuestionView extends DialogWindow {
     private final AddEditQuestionController controller;
@@ -76,8 +78,20 @@ public class AddEditQuestionView extends DialogWindow {
 
         // Cancel button (common to both cases)
         btnCancel = new Button("Cancel", this::handleCancel).addTo(buttonPanel);
+        setComponent(root);
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                validateTitle();
+                validateDescription();
+            }
+        }, 0, 500);
+
+
 
     }
+
     private void handleCreate() {
         if (validateFields()) {
             controller.createQuestion(
@@ -86,6 +100,7 @@ public class AddEditQuestionView extends DialogWindow {
                     cbType.getSelectedItem(),
                     cbOption.getSelectedItem()
             );
+            close();
         }
     }
 
@@ -110,24 +125,26 @@ public class AddEditQuestionView extends DialogWindow {
         // Fermer la fenêtre sans rien faire
         close();
     }
-    private boolean validateFields() {
-        boolean isValid = true;
-
+    private void validateTitle() {
         if (txtTitle.getText().isEmpty()) {
             errTitle.setText("Title is required");
-            isValid = false;
         } else {
             errTitle.setText("");
         }
+    }
 
+    private void validateDescription() {
         if (question != null && txtDescription.getText().length() < 3) {
             errDescription.setText("Description must be at least 3 characters");
-            isValid = false;
         } else {
             errDescription.setText("");
         }
+    }
 
-        return isValid;
+    private boolean validateFields() {
+        validateTitle();
+        validateDescription();
+        return errTitle.getText().isEmpty() && errDescription.getText().isEmpty();
     }
 
 
