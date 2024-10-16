@@ -29,7 +29,7 @@ public class AddEditQuestionView extends DialogWindow {
     private Button btnDelete;
 
     public AddEditQuestionView(AddEditQuestionController controller, Question question) {
-        super((question == null ? "Add" : "Edit") + "Question");
+        super((question == null ? "Add " : "Edit ") + "Question");
         this.controller = controller;
         this.question = question;
         setHints(List.of(Hint.CENTERED,Hint.FIXED_SIZE));
@@ -37,26 +37,35 @@ public class AddEditQuestionView extends DialogWindow {
         setCloseWindowWithEscape(true);
         setFixedSize(new TerminalSize(70, 15));
         Panel root = new Panel();
+        setComponent(root);
         root.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
+
         new Label("Title :").addTo(root);
-        txtTitle = new TextBox(new TerminalSize(10, 10));
+        txtTitle = new TextBox(new TerminalSize(30, 1)).addTo(root);
         new EmptySpace().addTo(root);
         errTitle = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
+
         new Label("Description :").addTo(root);
-        txtDescription = new TextBox(new TerminalSize(15, 12));
+        txtDescription = new TextBox(new TerminalSize(35, 3)).addTo(root);
+
         new EmptySpace().addTo(root);
+
         errDescription = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
+
         new Label("Required :").addTo(root);
         lblRequired = new Label("").addTo(root).addStyle(SGR.BOLD);
+
         var optionlist = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         new Label("Option :").addTo(optionlist);
         cbOption = new ComboBox<OptionList>().addTo(optionlist);
         btnAddEdit = new Button("Add").addTo(optionlist).setEnabled(false);
+
         var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root)
                 .setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2));
-        if (question.getTitle() == null) {
+
+        if (question == null) {
             // Adding a new question, show Create and Cancel buttons
             btnCreateOrUpdate = new Button("Create", this::handleCreate).addTo(buttonPanel);
         } else {
@@ -70,24 +79,28 @@ public class AddEditQuestionView extends DialogWindow {
 
     }
     private void handleCreate() {
-        // Logique pour créer une question
-        controller.createQuestion(
-                txtTitle.getText(),
-                txtDescription.getText(),
-                cbType.getSelectedItem(),
-                cbOption.getSelectedItem()
-        );
+        if (validateFields()) {
+            controller.createQuestion(
+                    txtTitle.getText(),
+                    txtDescription.getText(),
+                    cbType.getSelectedItem(),
+                    cbOption.getSelectedItem()
+            );
+        }
     }
+
     private void handleUpdate() {
-        // Logique pour mettre à jour une question existante
-        controller.updateQuestion(
-                question,
-                txtTitle.getText(),
-                txtDescription.getText(),
-                cbType.getSelectedItem(),
-                cbOption.getSelectedItem()
-        );
+        if (validateFields()) {
+            controller.updateQuestion(
+                    question,
+                    txtTitle.getText(),
+                    txtDescription.getText(),
+                    cbType.getSelectedItem(),
+                    cbOption.getSelectedItem()
+            );
+        }
     }
+
 
     private void handleDelete() {
         controller.deleteQuestion(question);
@@ -96,6 +109,25 @@ public class AddEditQuestionView extends DialogWindow {
     private void handleCancel() {
         // Fermer la fenêtre sans rien faire
         close();
+    }
+    private boolean validateFields() {
+        boolean isValid = true;
+
+        if (txtTitle.getText().isEmpty()) {
+            errTitle.setText("Title is required");
+            isValid = false;
+        } else {
+            errTitle.setText("");
+        }
+
+        if (question != null && txtDescription.getText().length() < 3) {
+            errDescription.setText("Description must be at least 3 characters");
+            isValid = false;
+        } else {
+            errDescription.setText("");
+        }
+
+        return isValid;
     }
 
 
