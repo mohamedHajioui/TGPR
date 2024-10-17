@@ -38,12 +38,17 @@ public class TestView extends DialogWindow {
                 .addTo(panel);
 
         tblUsers.setSelectAction(this::displayUser);
+        tblUsers.addSelectionChangeListener(this::selectionChanged);
 
         return panel;
     }
 
     private void displayUser() {
         controller.displayUser(tblUsers.getSelected());
+    }
+
+    private void selectionChanged(int newIndex, int oldIndex, boolean byUser) {
+        System.out.println("Selection changed: oldIndex=" + oldIndex + ", newIndex=" + newIndex + ", byUser=" + byUser);
     }
 
     private void refresh() {

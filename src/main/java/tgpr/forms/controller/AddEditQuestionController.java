@@ -5,6 +5,8 @@ import tgpr.forms.model.Question;
 import tgpr.forms.view.AddEditQuestionView;
 import tgpr.framework.Controller;
 
+import java.util.List;
+
 public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     private final Question question;
 
@@ -57,5 +59,9 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
             question.delete();
         getView().close();
     }
+    public List<OptionList> getOptionLists() {
+        return OptionList.getAll();
+    }
+
 }
 

@@ -43,30 +43,31 @@ public class AddEditQuestionView extends DialogWindow {
         root.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
 
         new Label("Title :").addTo(root);
-        txtTitle = new TextBox(new TerminalSize(30, 1)).addTo(root);
+        txtTitle = new TextBox(new TerminalSize(28, 1)).addTo(root);
         new EmptySpace().addTo(root);
         errTitle = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Description :").addTo(root);
-        txtDescription = new TextBox(new TerminalSize(35, 3)).addTo(root);
+        txtDescription = new TextBox(new TerminalSize(50, 3)).addTo(root);
 
         new EmptySpace().addTo(root);
 
         errDescription = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
-        for (Question.Type type : Question.Type.values()) {
-            cbType.addItem(type);
-        }
-
+        questionTypes();
+        new EmptySpace(new TerminalSize(0,1)).addTo(root);
+        new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new Label("Required :").addTo(root);
         lblRequired = new Label("").addTo(root).addStyle(SGR.BOLD);
+        new EmptySpace(new TerminalSize(0,1)).addTo(root);
+        new EmptySpace(new TerminalSize(0,1)).addTo(root);
+        new Label("Option List :").addTo(root);
+        Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
+        cbOption = new ComboBox<OptionList>().addTo(optionPanel);
+        btnAddEdit = new Button("Add").addTo(optionPanel);
 
-        var optionlist = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        new Label("Option :").addTo(optionlist);
-        cbOption = new ComboBox<OptionList>().addTo(optionlist);
-
-        btnAddEdit = new Button("Add").addTo(optionlist).setEnabled(false);
+        new EmptySpace(new TerminalSize(0,1)).addTo(root);
 
         var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root)
                 .setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2));
@@ -82,7 +83,9 @@ public class AddEditQuestionView extends DialogWindow {
 
         // Cancel button (common to both cases)
         btnCancel = new Button("Cancel", this::handleCancel).addTo(buttonPanel);
+        root.addComponent(buttonPanel);
         setComponent(root);
+
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -91,9 +94,19 @@ public class AddEditQuestionView extends DialogWindow {
                 validateDescription();
             }
         }, 0, 500);
+        List<OptionList> optionLists = controller.getOptionLists();
+        for (OptionList optionList : optionLists) {
+            cbOption.addItem(optionList);
+        }
 
 
 
+
+    }
+    private void questionTypes() {
+        for (Question.Type type : Question.Type.values()) {
+            cbType.addItem(type);
+        }
     }
 
     private void handleCreate() {
