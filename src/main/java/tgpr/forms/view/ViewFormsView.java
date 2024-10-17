@@ -18,7 +18,7 @@ public class ViewFormsView extends BasicWindow {
     private final Button nextButton = new Button("Next");
     private final Button lastButton = new Button("Last");
     private final ViewFormsController controller;
-
+    private final TextBox filterTextBox = new TextBox();
     //variables pour la pagination
     private final int formsPerPage = 9;
     private int currentPage = 0;
@@ -46,11 +46,15 @@ public class ViewFormsView extends BasicWindow {
         topPanel.addComponent(fileButton);
         topPanel.addComponent(parametersButton);
 
-        // Panneau central avec les boutons Open et Manage
         Panel centerPanel = new Panel(new GridLayout(2));
-        centerPanel.addComponent(openButton);
-        centerPanel.addComponent(manageButton);
-        centerPanel.setPreferredSize(new TerminalSize(110, 15));  // Limiter la hauteur du panneau central
+        centerPanel.setPreferredSize(new TerminalSize(110, 19));  // Limiter la hauteur du panneau central
+
+        //zone de texte pour le filtre
+        Panel filterPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        filterPanel.addComponent(new Label("Filter:"));
+        filterTextBox.setPreferredSize(new TerminalSize(30, 1));
+        filterTextBox.setTextChangeListener(((newText, changedByUser) -> controller.filterForms(newText)));
+        filterPanel.addComponent(filterTextBox);
 
         // Panneau de navigation en bas
         Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
@@ -80,6 +84,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Ajouter les panneaux à mainPanel
         mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
+        mainPanel.addComponent(filterPanel);    // Zone de filtre
         mainPanel.addComponent(centerPanel);    // Panneau central (Open/Manage)
         mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
         mainPanel.addComponent(bottomPanel);    // Panneau de navigation avec "Create a new form"
@@ -92,6 +97,10 @@ public class ViewFormsView extends BasicWindow {
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
+        GridLayout gridLayout = new GridLayout(3);
+        gridLayout.setVerticalSpacing(2);
+        formsPanel.setLayoutManager(gridLayout);
+
         // Calculer les formulaires à afficher en fonction de la page actuelle
         int start = currentPage * formsPerPage;
         int end = Math.min(start + formsPerPage, forms.size());
@@ -102,8 +111,20 @@ public class ViewFormsView extends BasicWindow {
             if (form != null && form.getTitle() != null && form.getDescription() != null) {
                 // Créer un panneau pour chaque formulaire avec son titre et sa description
                 Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                formPanel.addComponent(new Label("Title: " + form.getTitle()));
-                formPanel.addComponent(new Label("Description: " + form.getDescription()));
+                formPanel.setPreferredSize(new TerminalSize(60, 10));
+                formPanel.addComponent(new Label(form.getTitle()));
+                formPanel.addComponent(new Label(form.getDescription()));
+                // infos supplementaires
+                /*
+                formPanel.addComponent(new Label("Created by: "));
+                formPanel.addComponent(new Label("Started on: " ));
+                formPanel.addComponent(new Label("Submitted on: "));
+
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("Open"));
+                buttonPanel.addComponent(new Button("Manage"));
+
+                 */
 
                 // Ajouter le panneau du formulaire dans le formsPanel
                 formsPanel.addComponent(formPanel);
@@ -118,10 +139,18 @@ public class ViewFormsView extends BasicWindow {
         this.setComponent(mainPanel);
     }
 
+    public void displayFilteredForms(List<Form> forms) {
+        formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
+        for (Form form : forms) {
+            Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+            formPanel.addComponent(new Label("Title: " + form.getTitle()));
+            formPanel.addComponent(new Label("Description: " + form.getDescription()));
+            formsPanel.addComponent(formPanel);
+        }
 
-
-
+        this.setComponent(mainPanel);
+    }
 
     private void openFileMenu() {
         Window fileMenuWindow = new BasicWindow("File Menu");

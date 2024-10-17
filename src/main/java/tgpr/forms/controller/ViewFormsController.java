@@ -7,6 +7,7 @@ import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ViewFormsController extends Controller<ViewFormsView> {
     private final User currentUser;
@@ -14,11 +15,13 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     private int currentPage = 0;
     private final int formsPerPage = 9;
     private List<Form> forms;
+    private List<Form> filteredForms;
 
     public ViewFormsController(User user) {
         this.currentUser = user;
         this.view = new ViewFormsView(this);
         this.forms = getUserForms();
+        this.filteredForms = forms;
         showUserForms();
     }
 
@@ -95,6 +98,24 @@ public class ViewFormsController extends Controller<ViewFormsView> {
             showUserForms();
         }
     }
+
+    public void filterForms(String filter) {
+        if (filter == null || filter.isEmpty()) {
+            filteredForms = forms;  // Si le filtre est vide, afficher tous les formulaires
+        } else {
+            filteredForms = forms.stream()
+                    .filter(form -> form.getTitle().toLowerCase().contains(filter.toLowerCase()) ||
+                            form.getDescription().toLowerCase().contains(filter.toLowerCase()) ||
+                            form.getOwner().getFullName().toLowerCase().contains(filter.toLowerCase()) ||
+                            form.getQuestions().stream().anyMatch(q -> q.getTitle().toLowerCase().contains(filter.toLowerCase()) ||
+                                    q.getDescription().toLowerCase().contains(filter.toLowerCase())))
+                    .collect(Collectors.toList());  // Filtrer la liste en fonction de la clé de recherche
+        }
+        // Utiliser la méthode displayForms pour afficher les formulaires filtrés
+        view.displayForms(filteredForms, 0, 9);  // Réinitialiser à la page 0 et afficher 9 formulaires par page
+    }
+
+
 
 
 
