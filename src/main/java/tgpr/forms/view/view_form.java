@@ -141,10 +141,10 @@ public class view_form extends DialogWindow{
 
 
     private Panel createButtons(){
-        var panel = Panel.horizontalPanel().center();
+        var panel = Panel.horizontalPanel().right().right().center();
         new Button("Nouvelle Question").addTo(panel);
         new Button("Edit Form").addTo(panel);
-        new Button("Delete Form").addTo(panel);
+        new Button("Delete Form", this::delete).addTo(panel);
         new Button("Share").addTo(panel);
         new Button("Reorder").addTo(panel);
         new Button("Analyse").addTo(panel);
@@ -153,8 +153,8 @@ public class view_form extends DialogWindow{
         return panel;
     }
 
-    private void newQuestion() {
-
+    private void delete() {
+        controller.delete();
     }
 
 }
