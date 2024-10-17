@@ -11,10 +11,14 @@ import java.util.List;
 public class ViewFormsController extends Controller<ViewFormsView> {
     private final User currentUser;
     private final ViewFormsView view;
+    private int currentPage = 0;
+    private final int formsPerPage = 9;
+    private List<Form> forms;
 
     public ViewFormsController(User user) {
         this.currentUser = user;
         this.view = new ViewFormsView(this);
+        this.forms = getUserForms();
         showUserForms();
     }
 
@@ -32,8 +36,9 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void showUserForms(){
-        List<Form> forms = getUserForms();
-        view.displayForms(forms);
+        if (forms != null){
+            view.displayForms(forms, currentPage, formsPerPage);
+        }
     }
 
     public void showProfile() {
@@ -57,6 +62,38 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     public void exitApplication() {
         // Logique pour fermer l'application proprement
         System.exit(0);
+    }
+
+
+    //Pagination
+    public void goToFirstPage(){
+        if (currentPage != 0){
+            currentPage = 0;
+            showUserForms();
+        }
+    }
+
+    public void goToPreviousPage(){
+        if (currentPage > 0){
+            currentPage--;
+            showUserForms();
+        }
+    }
+
+    public void goToNextPage(){
+        int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
+        if (currentPage < totalPages - 1){
+            currentPage++;
+            showUserForms();
+        }
+    }
+
+    public void goToLastPage(){
+        int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
+        if (currentPage != totalPages - 1){
+            currentPage = totalPages - 1;
+            showUserForms();
+        }
     }
 
 

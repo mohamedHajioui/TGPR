@@ -2,13 +2,10 @@ package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
-import tgpr.forms.model.User;
 
 import java.util.List;
 
@@ -21,6 +18,11 @@ public class ViewFormsView extends BasicWindow {
     private final Button nextButton = new Button("Next");
     private final Button lastButton = new Button("Last");
     private final ViewFormsController controller;
+
+    //variables pour la pagination
+    private final int formsPerPage = 9;
+    private int currentPage = 0;
+    private Label pageLabel;
 
     // Déclaration du mainPanel et du formsPanel
     private Panel mainPanel;
@@ -57,14 +59,18 @@ public class ViewFormsView extends BasicWindow {
 
         Panel navigationPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         navigationPanel.addComponent(firstButton);
+        firstButton.addListener(button -> controller.goToFirstPage());
         navigationPanel.addComponent(previousButton);
+        previousButton.addListener(button -> controller.goToPreviousPage());
 
         // Texte de pagination entre Previous et Next
-        Label pageLabel = new Label("Page 1 of 2");
+        pageLabel = new Label("Page 1 of 1");
         navigationPanel.addComponent(pageLabel);
 
         navigationPanel.addComponent(nextButton);
+        nextButton.addListener(button -> controller.goToNextPage());
         navigationPanel.addComponent(lastButton);
+        lastButton.addListener(button -> controller.goToLastPage());
 
         bottomPanel.addComponent(navigationPanel);
 
@@ -82,19 +88,40 @@ public class ViewFormsView extends BasicWindow {
     }
 
     // Méthode pour afficher les formulaires
-    public void displayForms(List<Form> forms) {
-        formsPanel.removeAllComponents();  // Supprimer les anciens composants s'il y en a
 
-        // Ajouter chaque formulaire sous forme de label dans formsPanel
-        for (Form form : forms) {
-            formsPanel.addComponent(new Label(form.getTitle()));  // Affiche le titre de chaque formulaire
-            formsPanel.addComponent(new Label(form.getDescription()));
-            //formsPanel.addComponent(new Label(form.getDist);
+    public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
+        formsPanel.removeAllComponents();  // Supprimer les anciens composants
+
+        // Calculer les formulaires à afficher en fonction de la page actuelle
+        int start = currentPage * formsPerPage;
+        int end = Math.min(start + formsPerPage, forms.size());
+
+        for (int i = start; i < end; i++) {
+            Form form = forms.get(i);
+
+            if (form != null && form.getTitle() != null && form.getDescription() != null) {
+                // Créer un panneau pour chaque formulaire avec son titre et sa description
+                Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                formPanel.addComponent(new Label("Title: " + form.getTitle()));
+                formPanel.addComponent(new Label("Description: " + form.getDescription()));
+
+                // Ajouter le panneau du formulaire dans le formsPanel
+                formsPanel.addComponent(formPanel);
+            }
         }
+
+        // Mettre à jour l'affichage du numéro de page
+        int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
+        pageLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
 
         // Mettre à jour le composant principal
         this.setComponent(mainPanel);
     }
+
+
+
+
+
 
     private void openFileMenu() {
         Window fileMenuWindow = new BasicWindow("File Menu");
