@@ -33,28 +33,25 @@ public class AddEditQuestionView extends DialogWindow {
         super((question == null ? "Add " : "Edit ") + "Question");
         this.controller = controller;
         this.question = question;
-        setHints(List.of(Hint.CENTERED,Hint.FIXED_SIZE));
+        setHints(List.of(Hint.CENTERED));
         //permet de fermer avec Echap
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(70, 16));
         Panel root = new Panel();
         setComponent(root);
-        root.setLayoutManager(new GridLayout(2).setTopMarginSize(1).setBottomMarginSize(0).setLeftMarginSize(0).setRightMarginSize(0).setHorizontalSpacing(1));
-
+        root.setLayoutManager(new GridLayout(2).setTopMarginSize(1).setBottomMarginSize(0).setLeftMarginSize(1).setRightMarginSize(1).setHorizontalSpacing(0));
 
         new Label("Title:").addTo(root);
-        txtTitle = new TextBox(new TerminalSize(28, 1)).addTo(root);
+        txtTitle = new TextBox(new TerminalSize(35, 1)).addTo(root);
         new EmptySpace(new TerminalSize(0, 1)).addTo(root);
         errTitle = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Description:").addTo(root);
-        txtDescription = new TextBox(new TerminalSize(45, 3)).addTo(root);
+        txtDescription = new TextBox(new TerminalSize(47 , 3)).addTo(root);
         new EmptySpace(new TerminalSize(0, 1)).addTo(root);
         errDescription = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
         questionTypes();
-        cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
 
@@ -71,7 +68,7 @@ public class AddEditQuestionView extends DialogWindow {
         new EmptySpace(new TerminalSize(1,0)).addTo(root);
         errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
-        root.addComponent(new EmptySpace(new TerminalSize(1, 2)).setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2)));
+
 
         var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         if (question == null) {
@@ -154,7 +151,7 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void validateDescription() {
-        if (question != null && txtDescription.getText().length() < 3) {
+        if (!txtDescription.getText().isEmpty()  && txtDescription.getText().length() < 3) {
             errDescription.setText("3 char");
         } else {
             errDescription.setText("");
