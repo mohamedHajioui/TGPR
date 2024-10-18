@@ -27,6 +27,7 @@ public class AddEditQuestionView extends DialogWindow {
     private final Button btnCreateOrUpdate;
     private final Button btnCancel;
     private Button btnDelete;
+    private final Label errOptionList;
 
     public AddEditQuestionView(AddEditQuestionController controller, Question question) {
         super((question == null ? "Add " : "Edit ") + "Question");
@@ -35,7 +36,7 @@ public class AddEditQuestionView extends DialogWindow {
         setHints(List.of(Hint.CENTERED,Hint.FIXED_SIZE));
         //permet de fermer avec Echap
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(70, 15));
+        setFixedSize(new TerminalSize(65, 15));
         Panel root = new Panel();
         setComponent(root);
         root.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
@@ -64,25 +65,23 @@ public class AddEditQuestionView extends DialogWindow {
         Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         cbOption = new ComboBox<OptionList>().addTo(optionPanel);
         btnAddEdit = new Button("Add").addTo(optionPanel);
+        errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
-        new EmptySpace(new TerminalSize(0,1)).addTo(root);
+        root.addComponent(new EmptySpace(new TerminalSize(0, 2)).setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2)));
 
-        var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root)
-                .setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2));
-
+        var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         if (question == null) {
-            // Adding a new question, show Create and Cancel buttons
+            // Add a new question, show Create and Cancel buttons
             btnCreateOrUpdate = new Button("Create", this::handleCreate).addTo(buttonPanel);
         } else {
-            // Editing an existing question, show Update, Delete, and Cancel buttons
+            // Edit a question, Update, Delete, and Cancel buttons
             btnCreateOrUpdate = new Button("Update", this::handleUpdate).addTo(buttonPanel);
             btnDelete = new Button("Delete", this::handleDelete).addTo(buttonPanel);
         }
-
         // Cancel button (common to both cases)
         btnCancel = new Button("Cancel", this::handleCancel).addTo(buttonPanel);
         root.addComponent(buttonPanel);
-        setComponent(root);
+        buttonPanel.setLayoutData(GridLayout.createHorizontallyEndAlignedLayoutData(2));
 
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -90,6 +89,7 @@ public class AddEditQuestionView extends DialogWindow {
             public void run() {
                 validateTitle();
                 validateDescription();
+                validateOptionList();
             }
         }, 0, 500);
         List<OptionList> optionLists = controller.getOptionLists();
@@ -149,16 +149,24 @@ public class AddEditQuestionView extends DialogWindow {
 
     private void validateDescription() {
         if (question != null && txtDescription.getText().length() < 3) {
-            errDescription.setText("Description must be at least 3 characters");
+            errDescription.setText("3 char");
         } else {
             errDescription.setText("");
+        }
+    }
+    private void validateOptionList() {
+        if (cbType.getSelectedItem() != null && cbType.getSelectedItem().requiresOptionList() && cbOption.getSelectedItem() == null) {
+            errOptionList.setText("Required for this type");
+        } else {
+            errOptionList.setText("");
         }
     }
 
     private boolean validateFields() {
         validateTitle();
         validateDescription();
-        return errTitle.getText().isEmpty() && errDescription.getText().isEmpty();
+        validateOptionList();
+        return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();
     }
 
 
