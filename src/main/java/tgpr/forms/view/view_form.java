@@ -17,6 +17,8 @@ import tgpr.framework.Controller;
 import tgpr.framework.ViewManager;
 
 import java.awt.*;
+import java.awt.desktop.QuitResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 import static tgpr.framework.Tools.ifNull;
@@ -51,6 +53,7 @@ public class view_form extends DialogWindow{
 
     private final formController controller;
     private final Form form;
+    private boolean normal;
 
     private final Button nq_button = new Button("New Question");
     private final Button ef_button = new Button("Edit Form");
@@ -62,24 +65,29 @@ public class view_form extends DialogWindow{
     private ObjectTable<Question> table;
 
 
-    public view_form(formController controller,Form form) {
+    public view_form(formController controller,Form form,boolean normal) {
         super("View Form detail");
 
         this.controller = controller;
         this.form = form;
+        this.normal = normal;
 
+
+
+        affichage(normal);
+    }
+
+    public void affichage(boolean normal) {
         setHints(List.of(Hint.CENTERED,Hint.MODAL));
         setCloseWindowWithEscape(true);
-
-
         Panel root = Panel.verticalPanel();
         setComponent(root);
 
         upperDisciption().addTo(root);
         questionList().addTo(root);
-        createButtons().addTo(root);
-
-
+        if (normal){
+            createButtonsNormal().addTo(root);
+        }else createButtonsReorder().addTo(root);
     }
 
     private Panel title(){
@@ -140,21 +148,52 @@ public class view_form extends DialogWindow{
 
 
 
-    private Panel createButtons(){
+    private Panel createButtonsNormal(){
         var panel = Panel.horizontalPanel().right().right().center();
         new Button("Nouvelle Question").addTo(panel);
         new Button("Edit Form").addTo(panel);
         new Button("Delete Form", this::delete).addTo(panel);
         new Button("Share").addTo(panel);
-        new Button("Reorder").addTo(panel);
+        new Button("Reorder",this::reorder).addTo(panel);
         new Button("Analyse").addTo(panel);
         new Button("Cancel", this::close).addTo(panel);
 
         return panel;
     }
 
+    private Panel createButtonsReorder(){
+        var panel = Panel.horizontalPanel().right().right().center();
+        new Button("Save Order").addTo(panel);
+        new Button("Cancel", this::close).addTo(panel);
+        return panel;
+    }
+
     private void delete() {
         controller.delete();
+    }
+
+    private void reorder() {
+        controller.reorder();
+        Panel panel = new Panel();
+        List<Integer> choix = new ArrayList<>();
+
+        table.setSelectAction(() -> {
+            int selected = table.getSelectedRow();
+            choix.add(selected);
+
+            if( choix.size() == 2){
+                Question tmp = table.getItem(choix.get(0));
+                table.setItem(choix.get(0), table.getItem(choix.get(1)));
+                table.setItem(choix.get(1), tmp);
+            }
+
+            panel.invalidate();
+        });
+
+        controller.reorder();
+
+
+
     }
 
 }
