@@ -154,7 +154,7 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void validateDescription() {
-        if ( txtDescription.getText().length() < 3) {
+        if (question != null && txtDescription.getText().length() < 3) {
             errDescription.setText("3 char");
         } else {
             errDescription.setText("");
