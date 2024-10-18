@@ -55,6 +55,7 @@ public class AddEditQuestionView extends DialogWindow {
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
         questionTypes();
+        cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new Label("Required :").addTo(root);
@@ -96,7 +97,9 @@ public class AddEditQuestionView extends DialogWindow {
         for (OptionList optionList : optionLists) {
             cbOption.addItem(optionList);
         }
+        updateOptionListState();
     }
+
 
     private void questionTypes() {
         List<Question.Type> types = new ArrayList<>(Arrays.asList(Question.Type.values()));
@@ -154,11 +157,21 @@ public class AddEditQuestionView extends DialogWindow {
             errDescription.setText("");
         }
     }
+
     private void validateOptionList() {
         if (cbType.getSelectedItem() != null && cbType.getSelectedItem().requiresOptionList() && cbOption.getSelectedItem() == null) {
             errOptionList.setText("Required for this type");
         } else {
             errOptionList.setText("");
+        }
+    }
+    private void updateOptionListState() {
+        if (cbType.getSelectedItem() != null && cbType.getSelectedItem().requiresOptionList()) {
+            cbOption.setEnabled(true);
+            cbOption.setSelectedItem(null);
+        } else {
+            cbOption.setEnabled(false);
+            cbOption.setSelectedItem(null);
         }
     }
 
