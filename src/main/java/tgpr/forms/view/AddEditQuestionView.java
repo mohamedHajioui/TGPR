@@ -36,21 +36,20 @@ public class AddEditQuestionView extends DialogWindow {
         setHints(List.of(Hint.CENTERED,Hint.FIXED_SIZE));
         //permet de fermer avec Echap
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(65, 15));
+        setFixedSize(new TerminalSize(70, 16));
         Panel root = new Panel();
         setComponent(root);
-        root.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
+        root.setLayoutManager(new GridLayout(2).setTopMarginSize(1).setBottomMarginSize(0).setLeftMarginSize(0).setRightMarginSize(0).setHorizontalSpacing(1));
 
-        new Label("Title :").addTo(root);
+
+        new Label("Title:").addTo(root);
         txtTitle = new TextBox(new TerminalSize(28, 1)).addTo(root);
-        new EmptySpace().addTo(root);
+        new EmptySpace(new TerminalSize(0, 1)).addTo(root);
         errTitle = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
-        new Label("Description :").addTo(root);
-        txtDescription = new TextBox(new TerminalSize(50, 3)).addTo(root);
-
-        new EmptySpace().addTo(root);
-
+        new Label("Description:").addTo(root);
+        txtDescription = new TextBox(new TerminalSize(45, 3)).addTo(root);
+        new EmptySpace(new TerminalSize(0, 1)).addTo(root);
         errDescription = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
         new Label("Type :").addTo(root);
         cbType = new ComboBox<Question.Type>().addTo(root);
@@ -58,17 +57,21 @@ public class AddEditQuestionView extends DialogWindow {
         cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
+
         new Label("Required :").addTo(root);
         lblRequired = new Label("").addTo(root).addStyle(SGR.BOLD);
+
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
+
         new Label("Option List :").addTo(root);
         Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         cbOption = new ComboBox<OptionList>().addTo(optionPanel);
         btnAddEdit = new Button("Add").addTo(optionPanel);
+        new EmptySpace(new TerminalSize(1,0)).addTo(root);
         errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
-        root.addComponent(new EmptySpace(new TerminalSize(0, 2)).setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2)));
+        root.addComponent(new EmptySpace(new TerminalSize(1, 2)).setLayoutData(GridLayout.createHorizontallyFilledLayoutData(2)));
 
         var buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         if (question == null) {
@@ -181,14 +184,4 @@ public class AddEditQuestionView extends DialogWindow {
         validateOptionList();
         return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();
     }
-
-
-
-
-
-
-
-
-
-
 }
