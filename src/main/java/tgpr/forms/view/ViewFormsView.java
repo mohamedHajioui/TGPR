@@ -1,11 +1,13 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
+import tgpr.forms.model.User;
 
 import java.util.List;
 
@@ -28,8 +30,11 @@ public class ViewFormsView extends BasicWindow {
     private Panel mainPanel;
     private Panel formsPanel;
 
-    public ViewFormsView(ViewFormsController controller) {
+    private final User currentUser;
+
+    public ViewFormsView(ViewFormsController controller, User currentUser) {
         this.controller = controller;
+        this.currentUser = currentUser;
         String email = Security.getLoggedUser().getEmail();
 
         // Initialisation de mainPanel
@@ -47,7 +52,7 @@ public class ViewFormsView extends BasicWindow {
         topPanel.addComponent(parametersButton);
 
         Panel centerPanel = new Panel(new GridLayout(2));
-        centerPanel.setPreferredSize(new TerminalSize(110, 19));  // Limiter la hauteur du panneau central
+        centerPanel.setPreferredSize(new TerminalSize(110, 2));  // Limiter la hauteur du panneau central
 
         //zone de texte pour le filtre
         Panel filterPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
@@ -80,7 +85,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Initialisation du formsPanel avec une taille préférée
         formsPanel = new Panel(new GridLayout(3));
-        formsPanel.setPreferredSize(new TerminalSize(100, 10));  // Définir une taille plus petite pour les formulaires
+        formsPanel.setPreferredSize(new TerminalSize(100, 28));  // Définir une taille plus petite pour les formulaires
 
         // Ajouter les panneaux à mainPanel
         mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
@@ -98,7 +103,7 @@ public class ViewFormsView extends BasicWindow {
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
         GridLayout gridLayout = new GridLayout(3);
-        gridLayout.setVerticalSpacing(2);
+        gridLayout.setVerticalSpacing(1);
         formsPanel.setLayoutManager(gridLayout);
 
         // Calculer les formulaires à afficher en fonction de la page actuelle
@@ -108,29 +113,34 @@ public class ViewFormsView extends BasicWindow {
         for (int i = start; i < end; i++) {
             Form form = forms.get(i);
 
-            if (form != null && form.getTitle() != null && form.getDescription() != null) {
+            if (form != null) {
+
                 // Créer un panneau pour chaque formulaire avec son titre et sa description
                 Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
                 formPanel.setPreferredSize(new TerminalSize(60, 10));
-                formPanel.addComponent(new Label(form.getTitle()));
-                formPanel.addComponent(new Label(form.getDescription()));
-                // infos supplementaires
-                /*
-                formPanel.addComponent(new Label("Created by: "));
-                formPanel.addComponent(new Label("Started on: " ));
-                formPanel.addComponent(new Label("Submitted on: "));
+                Label labelTitle = new Label(form.getTitle());
+                labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
+                labelTitle.center();
+                formPanel.addComponent(labelTitle);
+                Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
+                description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+                description.center();
+                formPanel.addComponent(description);
+                Label created = new Label("Created by " + currentUser.getName());
+                created.center();
+                formPanel.addComponent(created);
 
+
+                // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
                 Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
                 buttonPanel.addComponent(new Button("Open"));
                 buttonPanel.addComponent(new Button("Manage"));
-
-                 */
-
-                // Ajouter le panneau du formulaire dans le formsPanel
+                buttonPanel.center();
+                formPanel.addComponent(buttonPanel);
                 formsPanel.addComponent(formPanel);
+
             }
         }
-
         // Mettre à jour l'affichage du numéro de page
         int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
         pageLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
@@ -139,6 +149,13 @@ public class ViewFormsView extends BasicWindow {
         this.setComponent(mainPanel);
     }
 
+    private Border createCell() {
+        return new Panel()
+                .addComponent(new Label(""))
+                .withBorder(Borders.singleLine());
+    }
+
+/*
     public void displayFilteredForms(List<Form> forms) {
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
@@ -151,7 +168,7 @@ public class ViewFormsView extends BasicWindow {
 
         this.setComponent(mainPanel);
     }
-
+*/
     private void openFileMenu() {
         Window fileMenuWindow = new BasicWindow("File Menu");
         Panel fileMenuPanel = new Panel();

@@ -19,7 +19,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
 
     public ViewFormsController(User user) {
         this.currentUser = user;
-        this.view = new ViewFormsView(this);
+        this.view = new ViewFormsView(this, currentUser);
         this.forms = getUserForms();
         this.filteredForms = forms;
         showUserForms();
@@ -38,9 +38,12 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         return currentUser.getForms();
     }
 
-    public void showUserForms(){
-        if (forms != null){
+    public void showUserForms() {
+        if (forms != null && !forms.isEmpty()) {
+            System.out.println("Nombre de formulaires récupérés : " + forms.size());
             view.displayForms(forms, currentPage, formsPerPage);
+        } else {
+            System.out.println("Aucun formulaire trouvé.");
         }
     }
 
