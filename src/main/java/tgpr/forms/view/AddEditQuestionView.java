@@ -87,15 +87,11 @@ public class AddEditQuestionView extends DialogWindow {
         root.addComponent(buttonPanel);
         buttonPanel.setLayoutData(GridLayout.createHorizontallyEndAlignedLayoutData(2));
 
-        Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                validateTitle();
-                validateDescription();
-                validateOptionList();
-            }
-        }, 0, 500);
+        txtTitle.setTextChangeListener((text, changedByUserInteraction) -> validateTitle());
+        txtDescription.setTextChangeListener((text, changedByUserInteraction) -> validateDescription());
+        cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
+        cbOption.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> validateOptionList());
+
         List<OptionList> optionLists = controller.getOptionLists();
         for (OptionList optionList : optionLists) {
             cbOption.addItem(optionList);
@@ -148,13 +144,17 @@ public class AddEditQuestionView extends DialogWindow {
     private void validateTitle() {
         if (txtTitle.getText().isEmpty()) {
             errTitle.setText("Title is required");
-        } else {
+
+        } else if (txtTitle.getText().length() < 3) {
+            errTitle.setText("min 3 caracters");
+        }
+        else {
             errTitle.setText("");
         }
     }
 
     private void validateDescription() {
-        if (question != null && txtDescription.getText().length() < 3) {
+        if ( txtDescription.getText().length() < 3) {
             errDescription.setText("3 char");
         } else {
             errDescription.setText("");
