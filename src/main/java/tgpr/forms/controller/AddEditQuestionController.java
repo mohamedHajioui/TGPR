@@ -20,11 +20,12 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
 
     public void createQuestion(String title, String description, Question.Type type, OptionList optionList) {
+
         Question newQuestion = new Question();
         newQuestion.setTitle(title);
         newQuestion.setDescription(description);
         newQuestion.setType(type);
-        newQuestion.setRequired(false); // Set default value or update according to your requirements
+        newQuestion.setRequired(false);
 
         // Handle optionList if required by the question type
         if (type.requiresOptionList()) {

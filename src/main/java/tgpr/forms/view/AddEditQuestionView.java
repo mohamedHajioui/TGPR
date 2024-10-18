@@ -11,9 +11,7 @@ import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
 
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class AddEditQuestionView extends DialogWindow {
     private final AddEditQuestionController controller;
@@ -98,13 +96,12 @@ public class AddEditQuestionView extends DialogWindow {
         for (OptionList optionList : optionLists) {
             cbOption.addItem(optionList);
         }
-
-
-
-
     }
+
     private void questionTypes() {
-        for (Question.Type type : Question.Type.values()) {
+        List<Question.Type> types = new ArrayList<>(Arrays.asList(Question.Type.values()));
+        types.sort(Comparator.comparing(Enum::name));
+        for (Question.Type type : types) {
             cbType.addItem(type);
         }
     }
