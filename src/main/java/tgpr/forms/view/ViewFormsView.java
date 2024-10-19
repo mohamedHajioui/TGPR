@@ -113,7 +113,7 @@ public class ViewFormsView extends BasicWindow {
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
         GridLayout gridLayout = new GridLayout(3);
-        gridLayout.setVerticalSpacing(1);
+        gridLayout.setVerticalSpacing(0);
         formsPanel.setLayoutManager(gridLayout);
 
         // Calculer les formulaires à afficher en fonction de la page actuelle
@@ -125,7 +125,7 @@ public class ViewFormsView extends BasicWindow {
             if (form != null) {
                 // Créer un panneau pour chaque formulaire avec son titre et sa description
                 Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                formPanel.setPreferredSize(new TerminalSize(60, 10));
+                formPanel.setPreferredSize(new TerminalSize(70, 10));
 
                 Label labelTitle = new Label(form.getTitle());
                 labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
@@ -158,10 +158,11 @@ public class ViewFormsView extends BasicWindow {
                 submissionLabel.center();
                 formPanel.addComponent(submissionLabel);
 
-                formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+                //formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
 
                 // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
                 Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.setSize(new TerminalSize(40, 1));
 
                 if (!form.getQuestions().isEmpty()) {
                     Button openButton = new Button("Open");
@@ -175,6 +176,8 @@ public class ViewFormsView extends BasicWindow {
                 buttonPanel.center();
                 formPanel.addComponent(buttonPanel);
                 formsPanel.addComponent(formPanel);
+
+                formsPanel.addComponent(formPanel.withBorder(Borders.singleLine()));
             }
 
         }
@@ -185,6 +188,7 @@ public class ViewFormsView extends BasicWindow {
         // Mettre à jour le composant principal
         this.setComponent(mainPanel);
     }
+
 
     public boolean hasEditorAccess(Form form, User user) {
         // Vérifier les accès de l'utilisateur individuel
