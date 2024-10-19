@@ -7,8 +7,6 @@ import tgpr.framework.Controller;
 import tgpr.forms.model.Form;
 import tgpr.framework.ErrorList;
 
-import javax.xml.validation.Validator;
-
 import static tgpr.framework.Tools.hash;
 import static tgpr.framework.Tools.toDate;
 
@@ -51,7 +49,14 @@ public class AddEditFormController extends Controller<AddEditFormView> {
 
         if (isNew) {
             errors.add(FormValidator.isValidAvailableTitle(title), Form.Fields.Title);
+            errors.add(FormValidator.isValidDescription(description), Form.Fields.Description);
         }
         return errors;
+    }
+
+    public Form update() {
+        var controller = new AddEditFormController(form);
+        navigateTo(controller);
+        return controller.form;
     }
 }

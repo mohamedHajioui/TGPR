@@ -20,6 +20,7 @@ public class AddEditFormView extends DialogWindow {
     private final TextBox txtDescription;
     private final CheckBox chkIsPublic;
     private final Label errTitle;
+    private final Label errDescription;
     private final Panel root;
     private final Panel formPanel;
     private final Panel buttonsPanel;
@@ -51,10 +52,10 @@ public class AddEditFormView extends DialogWindow {
 
         new Label("Description:").addTo(formPanel);
         txtDescription = new TextBox(new TerminalSize(55, 4)).addTo(formPanel)
-                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d]{0,200}"));
-
+                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d]{0,200}"))
+                .setTextChangeListener((txt, byUser) -> validate());
         new EmptySpace().addTo(formPanel);
-        new EmptySpace().addTo(formPanel);
+        errDescription = new Label("").addTo(formPanel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Public:").addTo(formPanel);
         chkIsPublic = new CheckBox().addTo(formPanel);
@@ -94,6 +95,7 @@ public class AddEditFormView extends DialogWindow {
         );
 
         errTitle.setText(errors.getFirstErrorMessage(Form.Fields.Title));
+        errDescription.setText(errors.getFirstErrorMessage(Form.Fields.Description));
 
         btnAddUpdate.setEnabled(errors.isEmpty());
     }

@@ -12,4 +12,11 @@ public class FormValidator {
         return null;
     }
 
+    public static String isValidDescription(String description) {
+        if (description != null && !description.isBlank() && description.length() < 3) {
+            return "min 3 characters required";
+        }
+        return null;
+    }
+
 }
