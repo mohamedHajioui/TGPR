@@ -5,10 +5,9 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import tgpr.forms.controller.ViewFormsController;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.Security;
-import tgpr.forms.model.User;
+import tgpr.forms.model.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class ViewFormsView extends BasicWindow {
@@ -55,17 +54,41 @@ public class ViewFormsView extends BasicWindow {
         centerPanel.setPreferredSize(new TerminalSize(110, 2));  // Limiter la hauteur du panneau central
 
         //zone de texte pour le filtre
+        Panel filterPanel = filterBox(controller);
+
+
+        Panel buttonCreateNewForm = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        buttonCreateNewForm.addComponent(createNewFormButton);
+        buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(40, 1)));
+
+        // Panneau de navigation en bas
+        Panel navigationPanel = buttonsNavigation(controller);
+        buttonCreateNewForm.addComponent(navigationPanel);
+
+        // Initialisation du formsPanel avec une taille préférée
+        formsPanel = new Panel(new GridLayout(3));
+        formsPanel.setPreferredSize(new TerminalSize(100, 28));  // Définir une taille plus petite pour les formulaires
+
+        // Ajouter les panneaux à mainPanel
+        mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
+        mainPanel.addComponent(filterPanel);    // Zone de filtre
+        mainPanel.addComponent(centerPanel);    // Panneau central (Open/Manage)
+        mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
+        mainPanel.addComponent(buttonCreateNewForm);    // Panneau de navigation avec "Create a new form"
+
+        setComponent(mainPanel);
+    }
+
+    private Panel filterBox(ViewFormsController controller) {
         Panel filterPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         filterPanel.addComponent(new Label("Filter:"));
         filterTextBox.setPreferredSize(new TerminalSize(30, 1));
         filterTextBox.setTextChangeListener(((newText, changedByUser) -> controller.filterForms(newText)));
         filterPanel.addComponent(filterTextBox);
+        return filterPanel;
+    }
 
-        // Panneau de navigation en bas
-        Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        bottomPanel.addComponent(createNewFormButton);
-        bottomPanel.addComponent(new EmptySpace(new TerminalSize(40, 1)));
-
+    private Panel buttonsNavigation(ViewFormsController controller) {
         Panel navigationPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         navigationPanel.addComponent(firstButton);
         firstButton.addListener(button -> controller.goToFirstPage());
@@ -80,26 +103,13 @@ public class ViewFormsView extends BasicWindow {
         nextButton.addListener(button -> controller.goToNextPage());
         navigationPanel.addComponent(lastButton);
         lastButton.addListener(button -> controller.goToLastPage());
-
-        bottomPanel.addComponent(navigationPanel);
-
-        // Initialisation du formsPanel avec une taille préférée
-        formsPanel = new Panel(new GridLayout(3));
-        formsPanel.setPreferredSize(new TerminalSize(100, 28));  // Définir une taille plus petite pour les formulaires
-
-        // Ajouter les panneaux à mainPanel
-        mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
-        mainPanel.addComponent(filterPanel);    // Zone de filtre
-        mainPanel.addComponent(centerPanel);    // Panneau central (Open/Manage)
-        mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
-        mainPanel.addComponent(bottomPanel);    // Panneau de navigation avec "Create a new form"
-
-        setComponent(mainPanel);
+        return navigationPanel;
     }
 
     // Méthode pour afficher les formulaires
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
+        forms.sort(Comparator.comparing(Form::getTitle, String.CASE_INSENSITIVE_ORDER));
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
         GridLayout gridLayout = new GridLayout(3);
@@ -112,34 +122,61 @@ public class ViewFormsView extends BasicWindow {
 
         for (int i = start; i < end; i++) {
             Form form = forms.get(i);
-
             if (form != null) {
-
                 // Créer un panneau pour chaque formulaire avec son titre et sa description
                 Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
                 formPanel.setPreferredSize(new TerminalSize(60, 10));
+
                 Label labelTitle = new Label(form.getTitle());
                 labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
                 labelTitle.center();
                 formPanel.addComponent(labelTitle);
+
                 Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
                 description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
                 description.center();
                 formPanel.addComponent(description);
+
+                formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+
                 Label created = new Label("Created by " + currentUser.getName());
                 created.center();
                 formPanel.addComponent(created);
 
+                var instance = form.getMostRecentInstance(currentUser);
+                String startDate = (instance != null) ? instance.getStarted().toString() : "Not started";
+                Label startLabel = new Label(startDate);
+                startLabel.center();
+                formPanel.addComponent(startLabel);
+
+                String submissionDate = (instance != null && instance.getCompleted() != null) ?
+                        instance.getCompleted().toString() : "In Progress";
+                Label submissionLabel = new Label(submissionDate);
+                if (startDate == null){
+                    submissionLabel = new Label("");
+                }
+                submissionLabel.center();
+                formPanel.addComponent(submissionLabel);
+
+                formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
 
                 // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
                 Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                buttonPanel.addComponent(new Button("Open"));
-                buttonPanel.addComponent(new Button("Manage"));
+
+                if (!form.getQuestions().isEmpty()) {
+                    Button openButton = new Button("Open");
+                    buttonPanel.addComponent(openButton);
+                }
+
+                if (hasEditorAccess(form, currentUser)){
+                    Button manageButton = new Button("Manage");
+                    buttonPanel.addComponent(manageButton);
+                }
                 buttonPanel.center();
                 formPanel.addComponent(buttonPanel);
                 formsPanel.addComponent(formPanel);
-
             }
+
         }
         // Mettre à jour l'affichage du numéro de page
         int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
@@ -149,26 +186,24 @@ public class ViewFormsView extends BasicWindow {
         this.setComponent(mainPanel);
     }
 
-    private Border createCell() {
-        return new Panel()
-                .addComponent(new Label(""))
-                .withBorder(Borders.singleLine());
+    public boolean hasEditorAccess(Form form, User user) {
+        // Vérifier les accès de l'utilisateur individuel
+        UserFormAccess userAccess = UserFormAccess.getByKey(form.getId(), user.getId());
+        if (userAccess != null && userAccess.getAccessType() == AccessType.Editor) {
+            return true;
+        }
+        // Vérifier les accès via les listes de distribution
+        List<DistListFormAccess> distListAccesses = form.getDistListFormAccesses();
+        for (DistListFormAccess access : distListAccesses) {
+            if (access.getAccessType() == AccessType.Editor) {
+                return true;
+            }
+        }
+
+        // Si l'utilisateur est admin ou propriétaire, il a toujours accès en tant qu'éditeur
+        return user.isAdmin() || form.getOwnerId() == user.getId();
     }
 
-    /*
-        public void displayFilteredForms(List<Form> forms) {
-            formsPanel.removeAllComponents();  // Supprimer les anciens composants
-
-            for (Form form : forms) {
-                Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                formPanel.addComponent(new Label("Title: " + form.getTitle()));
-                formPanel.addComponent(new Label("Description: " + form.getDescription()));
-                formsPanel.addComponent(formPanel);
-            }
-
-            this.setComponent(mainPanel);
-        }
-    */
     private void openFileMenu() {
         Window fileMenuWindow = new BasicWindow("File Menu");
         Panel fileMenuPanel = new Panel();
