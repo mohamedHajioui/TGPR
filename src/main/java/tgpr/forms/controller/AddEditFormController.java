@@ -37,7 +37,7 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         return form;
     }
 
-    public void save(String title, String description) {
+    public void save(String title, String description, boolean isPublic) {
         var errors = validate(title, description);
         if (errors.isEmpty()) {
             form = new Form();

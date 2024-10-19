@@ -18,8 +18,8 @@ public class AddEditFormView extends DialogWindow {
     private final Form form;
     private final TextBox txtTitle;
     private final TextBox txtDescription;
+    private final CheckBox chkIsPublic;
     private final Label errTitle;
-    private final CheckBox isPublic;
     private final Panel root;
     private final Panel formPanel;
     private final Panel buttonsPanel;
@@ -57,13 +57,13 @@ public class AddEditFormView extends DialogWindow {
         new EmptySpace().addTo(formPanel);
 
         new Label("Public:").addTo(formPanel);
-        isPublic = new CheckBox().addTo(formPanel);
+        chkIsPublic = new CheckBox().addTo(formPanel);
 
         buttonsPanel = new Panel().addTo(root).setLayoutData(BorderLayout.Location.BOTTOM)
                 .setLayoutManager(new GridLayout(3));
         new EmptySpace().addTo(buttonsPanel)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING, true, false));
-        btnAddUpdate = new Button(form == null ? "Create" : "Update", this::add).addTo(buttonsPanel).setEnabled(false)
+        btnAddUpdate = new Button(form == null ? "Create" : "Update", this::addForm).addTo(buttonsPanel).setEnabled(false)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.END, GridLayout.Alignment.BEGINNING));
         txtTitle.setTextChangeListener((txtTitle, byUser) -> validate());
 
@@ -75,13 +75,15 @@ public class AddEditFormView extends DialogWindow {
         if (form != null) {
             txtTitle.setText(form.getTitle());
             txtDescription.setText(form.getDescription());
+            chkIsPublic.setChecked(form.getIsPublic());
         }
     }
 
-    private void add() {
+    private void addForm() {
         controller.save(
                 txtTitle.getText(),
-                txtDescription.getText()
+                txtDescription.getText(),
+                chkIsPublic.isChecked()
         );
     }
 
