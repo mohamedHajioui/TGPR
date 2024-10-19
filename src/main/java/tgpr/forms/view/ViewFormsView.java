@@ -12,6 +12,8 @@ import tgpr.forms.model.User;
 import java.util.List;
 
 public class ViewFormsView extends BasicWindow {
+    private final Button openButton = new Button("Open");
+    private final Button manageButton = new Button("Manage");
     private final Button createNewFormButton = new Button("Create a new form");
     private final Button firstButton = new Button("First");
     private final Button previousButton = new Button("Previous");
@@ -19,91 +21,87 @@ public class ViewFormsView extends BasicWindow {
     private final Button lastButton = new Button("Last");
     private final ViewFormsController controller;
     private final TextBox filterTextBox = new TextBox();
+    //variables pour la pagination
+    private final int formsPerPage = 9;
+    private int currentPage = 0;
     private Label pageLabel;
+
+    // Déclaration du mainPanel et du formsPanel
     private Panel mainPanel;
     private Panel formsPanel;
+
     private final User currentUser;
 
     public ViewFormsView(ViewFormsController controller, User currentUser) {
         this.controller = controller;
         this.currentUser = currentUser;
         String email = Security.getLoggedUser().getEmail();
+
         // Initialisation de mainPanel
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         setTitle("MyForms (" + email + ")");
         setHints(List.of(Hint.CENTERED, Hint.MODAL));
         setCloseWindowWithEscape(true);
-        Panel topPanel = buttonsFileAndParameters();
-        Panel centerPanel = new Panel(new GridLayout(2));
-        centerPanel.setPreferredSize(new TerminalSize(110, 2));
-        //zone de texte pour le filtre
-        Panel filterPanel = zoneFilter(controller);
-        //bouton CreateNewForm
-        Panel bottomPanel = createNewForm();
-        //pagination
-        Panel navigationPanel = pagination(controller);
-        bottomPanel.addComponent(navigationPanel);
-        // Initialisation du formsPanel avec une taille préférée
-        formsPanel = new Panel(new GridLayout(3));
-        formsPanel.setPreferredSize(new TerminalSize(100, 28));
-        // Ajouter les panneaux à mainPanel
-        addComponents(topPanel, filterPanel, bottomPanel);
 
-        setComponent(mainPanel);
-    }
-
-    private void addComponents(Panel topPanel, Panel filterPanel, Panel bottomPanel) {
-        mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
-        mainPanel.addComponent(filterPanel);    // Zone de filtre
-        mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
-        mainPanel.addComponent(bottomPanel);    // Panneau de navigation avec "Create a new form"
-    }
-
-    private Panel createNewForm() {
-        Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        bottomPanel.addComponent(createNewFormButton);
-        bottomPanel.addComponent(new EmptySpace(new TerminalSize(40, 1)));
-        return bottomPanel;
-    }
-
-    private Panel zoneFilter(ViewFormsController controller) {
-        Panel filterPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        filterPanel.addComponent(new Label("Filter:"));
-        filterTextBox.setPreferredSize(new TerminalSize(30, 1));
-        filterTextBox.setTextChangeListener(((newText, changedByUser) -> controller.filterForms(newText)));
-        filterPanel.addComponent(filterTextBox);
-        return filterPanel;
-    }
-
-    private Panel pagination(ViewFormsController controller) {
-        Panel navigationPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        navigationPanel.addComponent(firstButton);
-        firstButton.addListener(button -> controller.goToFirstPage());
-        navigationPanel.addComponent(previousButton);
-        previousButton.addListener(button -> controller.goToPreviousPage());
-        pageLabel = new Label("Page 1 of 1");
-        navigationPanel.addComponent(pageLabel);
-        navigationPanel.addComponent(nextButton);
-        nextButton.addListener(button -> controller.goToNextPage());
-        navigationPanel.addComponent(lastButton);
-        lastButton.addListener(button -> controller.goToLastPage());
-        return navigationPanel;
-    }
-
-    private Panel buttonsFileAndParameters() {
+        // Ajouter les boutons "File" et "Parameters" en haut à gauche
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Button fileButton = new Button("File");
         fileButton.addListener(button -> openFileMenu());
         Button parametersButton = new Button("Parameters");
         topPanel.addComponent(fileButton);
         topPanel.addComponent(parametersButton);
-        return topPanel;
+
+        Panel centerPanel = new Panel(new GridLayout(2));
+        centerPanel.setPreferredSize(new TerminalSize(110, 2));  // Limiter la hauteur du panneau central
+
+        //zone de texte pour le filtre
+        Panel filterPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        filterPanel.addComponent(new Label("Filter:"));
+        filterTextBox.setPreferredSize(new TerminalSize(30, 1));
+        filterTextBox.setTextChangeListener(((newText, changedByUser) -> controller.filterForms(newText)));
+        filterPanel.addComponent(filterTextBox);
+
+        // Panneau de navigation en bas
+        Panel bottomPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        bottomPanel.addComponent(createNewFormButton);
+        bottomPanel.addComponent(new EmptySpace(new TerminalSize(40, 1)));
+
+        Panel navigationPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        navigationPanel.addComponent(firstButton);
+        firstButton.addListener(button -> controller.goToFirstPage());
+        navigationPanel.addComponent(previousButton);
+        previousButton.addListener(button -> controller.goToPreviousPage());
+
+        // Texte de pagination entre Previous et Next
+        pageLabel = new Label("Page 1 of 1");
+        navigationPanel.addComponent(pageLabel);
+
+        navigationPanel.addComponent(nextButton);
+        nextButton.addListener(button -> controller.goToNextPage());
+        navigationPanel.addComponent(lastButton);
+        lastButton.addListener(button -> controller.goToLastPage());
+
+        bottomPanel.addComponent(navigationPanel);
+
+        // Initialisation du formsPanel avec une taille préférée
+        formsPanel = new Panel(new GridLayout(3));
+        formsPanel.setPreferredSize(new TerminalSize(100, 28));  // Définir une taille plus petite pour les formulaires
+
+        // Ajouter les panneaux à mainPanel
+        mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
+        mainPanel.addComponent(filterPanel);    // Zone de filtre
+        mainPanel.addComponent(centerPanel);    // Panneau central (Open/Manage)
+        mainPanel.addComponent(formsPanel);     // Les formulaires seront affichés ici
+        mainPanel.addComponent(bottomPanel);    // Panneau de navigation avec "Create a new form"
+
+        setComponent(mainPanel);
     }
 
     // Méthode pour afficher les formulaires
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
+
         GridLayout gridLayout = new GridLayout(3);
         gridLayout.setVerticalSpacing(1);
         formsPanel.setLayoutManager(gridLayout);
@@ -114,64 +112,81 @@ public class ViewFormsView extends BasicWindow {
 
         for (int i = start; i < end; i++) {
             Form form = forms.get(i);
+
             if (form != null) {
-                Panel formPanel = setTitle(form);
-                setDescription(form, formPanel);
+
+                // Créer un panneau pour chaque formulaire avec son titre et sa description
+                Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                formPanel.setPreferredSize(new TerminalSize(60, 10));
+                Label labelTitle = new Label(form.getTitle());
+                labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
+                labelTitle.center();
+                formPanel.addComponent(labelTitle);
+                Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
+                description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+                description.center();
+                formPanel.addComponent(description);
                 Label created = new Label("Created by " + currentUser.getName());
                 created.center();
                 formPanel.addComponent(created);
-                buttonsOpenAndManage(formPanel);
+
+
+                // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("Open"));
+                buttonPanel.addComponent(new Button("Manage"));
+                buttonPanel.center();
+                formPanel.addComponent(buttonPanel);
                 formsPanel.addComponent(formPanel);
+
             }
         }
         // Mettre à jour l'affichage du numéro de page
         int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
         pageLabel.setText("Page " + (currentPage + 1) + " of " + totalPages);
 
+        // Mettre à jour le composant principal
         this.setComponent(mainPanel);
     }
 
-    private static void buttonsOpenAndManage(Panel formPanel) {
-        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("Open"));
-        buttonPanel.addComponent(new Button("Manage"));
-        buttonPanel.center();
-        formPanel.addComponent(buttonPanel);
+    private Border createCell() {
+        return new Panel()
+                .addComponent(new Label(""))
+                .withBorder(Borders.singleLine());
     }
 
-    private static void setDescription(Form form, Panel formPanel) {
-        Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
-        description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
-        description.center();
-        formPanel.addComponent(description);
-    }
+    /*
+        public void displayFilteredForms(List<Form> forms) {
+            formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
-    private static Panel setTitle(Form form) {
-        Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        formPanel.setPreferredSize(new TerminalSize(60, 10));
-        Label labelTitle = new Label(form.getTitle());
-        labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
-        labelTitle.center();
-        formPanel.addComponent(labelTitle);
-        return formPanel;
-    }
+            for (Form form : forms) {
+                Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                formPanel.addComponent(new Label("Title: " + form.getTitle()));
+                formPanel.addComponent(new Label("Description: " + form.getDescription()));
+                formsPanel.addComponent(formPanel);
+            }
 
-
+            this.setComponent(mainPanel);
+        }
+    */
     private void openFileMenu() {
         Window fileMenuWindow = new BasicWindow("File Menu");
         Panel fileMenuPanel = new Panel();
 
         Button viewProfileButton = new Button("View Profile", () -> {
+            // Appeler le contrôleur pour afficher le profil
             controller.showProfile();
-            fileMenuWindow.close();
+            fileMenuWindow.close();  // Fermer la fenêtre après l'action
         });
 
         Button logoutButton = new Button("Logout", () -> {
+            // Appeler le contrôleur pour gérer la déconnexion
             controller.logout();
-            fileMenuWindow.close();
+            fileMenuWindow.close();  // Fermer la fenêtre après l'action
         });
 
         Button exitButton = new Button("Exit", () -> {
+            // Appeler le contrôleur pour fermer l'application
             controller.exitApplication();
         });
 
