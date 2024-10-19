@@ -11,8 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ViewFormsView extends BasicWindow {
-    private final Button openButton = new Button("Open");
-    private final Button manageButton = new Button("Manage");
     private final Button createNewFormButton = new Button("Create a new form");
     private final Button firstButton = new Button("First");
     private final Button previousButton = new Button("Previous");
@@ -20,15 +18,9 @@ public class ViewFormsView extends BasicWindow {
     private final Button lastButton = new Button("Last");
     private final ViewFormsController controller;
     private final TextBox filterTextBox = new TextBox();
-    //variables pour la pagination
-    private final int formsPerPage = 9;
-    private int currentPage = 0;
     private Label pageLabel;
-
-    // Déclaration du mainPanel et du formsPanel
     private Panel mainPanel;
     private Panel formsPanel;
-
     private final User currentUser;
 
     public ViewFormsView(ViewFormsController controller, User currentUser) {
@@ -43,20 +35,13 @@ public class ViewFormsView extends BasicWindow {
         setCloseWindowWithEscape(true);
 
         // Ajouter les boutons "File" et "Parameters" en haut à gauche
-        Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Button fileButton = new Button("File");
-        fileButton.addListener(button -> openFileMenu());
-        Button parametersButton = new Button("Parameters");
-        topPanel.addComponent(fileButton);
-        topPanel.addComponent(parametersButton);
+        Panel topPanel = buttonsFileAndParameters();
 
         Panel centerPanel = new Panel(new GridLayout(2));
         centerPanel.setPreferredSize(new TerminalSize(110, 2));  // Limiter la hauteur du panneau central
 
         //zone de texte pour le filtre
         Panel filterPanel = filterBox(controller);
-
-
         Panel buttonCreateNewForm = new Panel(new LinearLayout(Direction.HORIZONTAL));
         buttonCreateNewForm.addComponent(createNewFormButton);
         buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(40, 1)));
@@ -77,6 +62,16 @@ public class ViewFormsView extends BasicWindow {
         mainPanel.addComponent(buttonCreateNewForm);    // Panneau de navigation avec "Create a new form"
 
         setComponent(mainPanel);
+    }
+
+    private Panel buttonsFileAndParameters() {
+        Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Button fileButton = new Button("File");
+        fileButton.addListener(button -> openFileMenu());
+        Button parametersButton = new Button("Parameters");
+        topPanel.addComponent(fileButton);
+        topPanel.addComponent(parametersButton);
+        return topPanel;
     }
 
     private Panel filterBox(ViewFormsController controller) {
@@ -114,72 +109,48 @@ public class ViewFormsView extends BasicWindow {
 
         GridLayout gridLayout = new GridLayout(3);
         gridLayout.setVerticalSpacing(0);
+
         formsPanel.setLayoutManager(gridLayout);
+        if (forms.isEmpty()) {
+            Label noFormLabel = new Label("No form found");
+            noFormLabel.setForegroundColor(TextColor.ANSI.RED);
+            formsPanel.addComponent(noFormLabel);
+        } else {
+            // Calculer les formulaires à afficher en fonction de la page actuelle
+            int start = currentPage * formsPerPage;
+            int end = Math.min(start + formsPerPage, forms.size());
 
-        // Calculer les formulaires à afficher en fonction de la page actuelle
-        int start = currentPage * formsPerPage;
-        int end = Math.min(start + formsPerPage, forms.size());
+            for (int i = start; i < end; i++) {
+                Form form = forms.get(i);
+                if (form != null) {
+                    // Créer un panneau pour chaque formulaire avec son titre et sa description
+                    Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                    formPanel.setPreferredSize(new TerminalSize(70, 10));
+                    setTitle(form, formPanel);
+                    setDescription(form, formPanel);
+                    formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+                    nameOfCreator(formPanel);
 
-        for (int i = start; i < end; i++) {
-            Form form = forms.get(i);
-            if (form != null) {
-                // Créer un panneau pour chaque formulaire avec son titre et sa description
-                Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                formPanel.setPreferredSize(new TerminalSize(70, 10));
+                    var instance = form.getMostRecentInstance(currentUser);
+                    String startDate = (instance != null) ? instance.getStarted().toString() : "Not started";
+                    Label startLabel = new Label(startDate);
+                    startLabel.center();
+                    formPanel.addComponent(startLabel);
 
-                Label labelTitle = new Label(form.getTitle());
-                labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
-                labelTitle.center();
-                formPanel.addComponent(labelTitle);
+                    String submissionDate = (instance != null && instance.getCompleted() != null) ?
+                            instance.getCompleted().toString() : "In Progress";
+                    Label submissionLabel = new Label(submissionDate);
+                    if (startDate == null){
+                        submissionLabel = new Label("");
+                    }
+                    submissionLabel.center();
+                    formPanel.addComponent(submissionLabel);
 
-                Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
-                description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
-                description.center();
-                formPanel.addComponent(description);
-
-                formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-
-                Label created = new Label("Created by " + currentUser.getName());
-                created.center();
-                formPanel.addComponent(created);
-
-                var instance = form.getMostRecentInstance(currentUser);
-                String startDate = (instance != null) ? instance.getStarted().toString() : "Not started";
-                Label startLabel = new Label(startDate);
-                startLabel.center();
-                formPanel.addComponent(startLabel);
-
-                String submissionDate = (instance != null && instance.getCompleted() != null) ?
-                        instance.getCompleted().toString() : "In Progress";
-                Label submissionLabel = new Label(submissionDate);
-                if (startDate == null){
-                    submissionLabel = new Label("");
+                    // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
+                    buttonsOpenAndManage(form, formPanel);
+                    formsPanel.addComponent(formPanel.withBorder(Borders.singleLine()));
                 }
-                submissionLabel.center();
-                formPanel.addComponent(submissionLabel);
-
-                //formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-
-                // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
-                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                buttonPanel.setSize(new TerminalSize(40, 1));
-
-                if (!form.getQuestions().isEmpty()) {
-                    Button openButton = new Button("Open");
-                    buttonPanel.addComponent(openButton);
-                }
-
-                if (hasEditorAccess(form, currentUser)){
-                    Button manageButton = new Button("Manage");
-                    buttonPanel.addComponent(manageButton);
-                }
-                buttonPanel.center();
-                formPanel.addComponent(buttonPanel);
-                formsPanel.addComponent(formPanel);
-
-                formsPanel.addComponent(formPanel.withBorder(Borders.singleLine()));
             }
-
         }
         // Mettre à jour l'affichage du numéro de page
         int totalPages = (int) Math.ceil((double) forms.size() / formsPerPage);
@@ -187,6 +158,43 @@ public class ViewFormsView extends BasicWindow {
 
         // Mettre à jour le composant principal
         this.setComponent(mainPanel);
+    }
+
+    private void buttonsOpenAndManage(Form form, Panel formPanel) {
+        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        buttonPanel.setSize(new TerminalSize(40, 1));
+
+        if (!form.getQuestions().isEmpty()) {
+            Button openButton = new Button("Open");
+            buttonPanel.addComponent(openButton);
+        }
+        if (hasEditorAccess(form, currentUser)){
+            Button manageButton = new Button("Manage");
+            buttonPanel.addComponent(manageButton);
+        }
+        buttonPanel.center();
+        formPanel.addComponent(buttonPanel);
+        formsPanel.addComponent(formPanel);
+    }
+
+    private void nameOfCreator(Panel formPanel) {
+        Label created = new Label("Created by " + currentUser.getName());
+        created.center();
+        formPanel.addComponent(created);
+    }
+
+    private static void setDescription(Form form, Panel formPanel) {
+        Label description = new Label(form.getDescription() != null ? form.getDescription() : "No description");
+        description.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        description.center();
+        formPanel.addComponent(description);
+    }
+
+    private static void setTitle(Form form, Panel formPanel) {
+        Label labelTitle = new Label(form.getTitle());
+        labelTitle.setForegroundColor(TextColor.ANSI.BLUE_BRIGHT);
+        labelTitle.center();
+        formPanel.addComponent(labelTitle);
     }
 
 
