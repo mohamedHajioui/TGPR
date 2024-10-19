@@ -65,7 +65,7 @@ public class AddEditQuestionView extends DialogWindow {
         Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         cbOption = new ComboBox<OptionList>().addTo(optionPanel);
         btnAddEdit = new Button("Add").addTo(optionPanel);
-        new EmptySpace(new TerminalSize(1,0)).addTo(root);
+        new EmptySpace(new TerminalSize(1,2)).addTo(root);
         errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
 
@@ -97,13 +97,7 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
 
-    private void questionTypes() {
-        List<Question.Type> types = new ArrayList<>(Arrays.asList(Question.Type.values()));
-        types.sort(Comparator.comparing(Enum::name));
-        for (Question.Type type : types) {
-            cbType.addItem(type);
-        }
-    }
+
 
     private void handleCreate() {
         if (validateFields()) {
@@ -138,6 +132,13 @@ public class AddEditQuestionView extends DialogWindow {
         // Fermer la fenêtre sans rien faire
         close();
     }
+    private void questionTypes() {
+        List<Question.Type> types = new ArrayList<>(Arrays.asList(Question.Type.values()));
+        types.sort(Comparator.comparing(Enum::name));
+        for (Question.Type type : types) {
+            cbType.addItem(type);
+        }
+    }
     private void validateTitle() {
         if (txtTitle.getText().isEmpty()) {
             errTitle.setText("Title is required");
@@ -165,6 +166,13 @@ public class AddEditQuestionView extends DialogWindow {
             errOptionList.setText("");
         }
     }
+
+    private boolean validateFields() {
+        validateTitle();
+        validateDescription();
+        validateOptionList();
+        return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();
+    }
     private void updateOptionListState() {
         if (cbType.getSelectedItem() != null && cbType.getSelectedItem().requiresOptionList()) {
             cbOption.setEnabled(true);
@@ -175,10 +183,5 @@ public class AddEditQuestionView extends DialogWindow {
         }
     }
 
-    private boolean validateFields() {
-        validateTitle();
-        validateDescription();
-        validateOptionList();
-        return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();
-    }
+
 }
