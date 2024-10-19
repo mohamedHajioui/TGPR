@@ -19,13 +19,13 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         return new AddEditQuestionView(this, question);
     }
 
-    public void createQuestion(String title, String description, Question.Type type, OptionList optionList) {
+    public void createQuestion(String title, String description, Question.Type type, OptionList optionList, boolean required) {
 
         Question newQuestion = new Question();
         newQuestion.setTitle(title);
         newQuestion.setDescription(description);
         newQuestion.setType(type);
-        newQuestion.setRequired(false);
+        newQuestion.setRequired(required);
 
         // Handle optionList if required by the question type
         if (type.requiresOptionList()) {
@@ -37,7 +37,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         getView().close();
     }
 
-    public void updateQuestion(Question question, String title, String description, Question.Type type, OptionList optionList) {
+    public void updateQuestion(Question question, String title, String description, Question.Type type, OptionList optionList, boolean required) {
         // Update the existing question
         question.setTitle(title);
         question.setDescription(description);
@@ -49,6 +49,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         } else {
             question.setOptionListId(null); // Clear option list if not required
         }
+        question.setRequired(required);
 
         // Save the updated question in the database
         question.save();

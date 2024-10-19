@@ -20,7 +20,7 @@ public class AddEditQuestionView extends DialogWindow {
     private final Label errTitle;
     private final Label errDescription;
     private final ComboBox<Question.Type> cbType;
-    private final Label lblRequired;
+    private final CheckBox cklRequired;
     private final ComboBox<OptionList> cbOption;
     private final Question question;
     private final Button btnAddEdit;
@@ -56,7 +56,8 @@ public class AddEditQuestionView extends DialogWindow {
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
 
         new Label("Required :").addTo(root);
-        lblRequired = new Label("").addTo(root).addStyle(SGR.BOLD);
+        cklRequired = new CheckBox("");
+        root.addComponent(cklRequired);
 
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
         new EmptySpace(new TerminalSize(0,1)).addTo(root);
@@ -105,7 +106,9 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem()
+                    cbOption.getSelectedItem(),
+                    cklRequired.isChecked()
+
             );
             close();
         }
@@ -118,7 +121,8 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem()
+                    cbOption.getSelectedItem(),
+                    cklRequired.isChecked()
             );
         }
     }
