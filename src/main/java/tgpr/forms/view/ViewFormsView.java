@@ -30,7 +30,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Initialisation de mainPanel
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        setTitle("MyForms (" + email + ")");
+        setTitle("MyForms (" + email + " - " + currentUser.getRole() + ")");
         setHints(List.of(Hint.CENTERED, Hint.MODAL));
         setCloseWindowWithEscape(true);
 
@@ -52,7 +52,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Initialisation du formsPanel avec une taille préférée
         formsPanel = new Panel(new GridLayout(3));
-        formsPanel.setPreferredSize(new TerminalSize(100, 28));  // Définir une taille plus petite pour les formulaires
+        formsPanel.setPreferredSize(new TerminalSize(110, 28));  // Définir une taille plus petite pour les formulaires
 
         // Ajouter les panneaux à mainPanel
         mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
@@ -99,6 +99,7 @@ public class ViewFormsView extends BasicWindow {
         navigationPanel.addComponent(lastButton);
         lastButton.addListener(button -> controller.goToLastPage());
         return navigationPanel;
+
     }
 
     // Méthode pour afficher les formulaires
@@ -132,19 +133,18 @@ public class ViewFormsView extends BasicWindow {
                     nameOfCreator(formPanel);
 
                     var instance = form.getMostRecentInstance(currentUser);
-                    String startDate = (instance != null) ? instance.getStarted().toString() : "Not started";
+                    String startDate = (instance != null) ? "Started on " + instance.getStarted().toString() : "Not started";
                     Label startLabel = new Label(startDate);
                     startLabel.center();
                     formPanel.addComponent(startLabel);
 
-                    String submissionDate = (instance != null && instance.getCompleted() != null) ?
-                            instance.getCompleted().toString() : "In Progress";
-                    Label submissionLabel = new Label(submissionDate);
-                    if (startDate == null){
-                        submissionLabel = new Label("");
+                    if (startDate != "Not started") {
+                        String submissionDate = (instance != null && instance.getCompleted() != null) ?
+                                "Submitted on " + instance.getCompleted().toString() : "In Progress";
+                        Label submissionLabel = new Label(submissionDate);
+                        submissionLabel.center();
+                        formPanel.addComponent(submissionLabel);
                     }
-                    submissionLabel.center();
-                    formPanel.addComponent(submissionLabel);
 
                     // Ajouter un panneau pour les boutons "Open" et "Manage" côte à côte
                     buttonsOpenAndManage(form, formPanel);
