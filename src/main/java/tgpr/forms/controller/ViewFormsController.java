@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 import tgpr.forms.model.*;
+import tgpr.forms.view.LoginView;
 import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     public void logout() {
         Security.logout();
         System.out.println("Utilisateur déconnecté.");
+        navigateTo(new LoginController());
         // Ajoute la logique de redirection après la déconnexion, si nécessaire
     }
 
