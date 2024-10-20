@@ -102,10 +102,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         } else {
             filteredForms = forms.stream()
                     .filter(form -> (form.getTitle() != null && form.getTitle().toLowerCase().startsWith(filter.toLowerCase())) ||
-                            (form.getDescription() != null && form.getDescription().toLowerCase().startsWith(filter.toLowerCase())) ||
-                            (form.getOwner().getFullName() != null && form.getOwner().getFullName().toLowerCase().startsWith(filter.toLowerCase())) ||
-                            form.getQuestions().stream().anyMatch(q -> (q.getTitle() != null && q.getTitle().toLowerCase().startsWith(filter.toLowerCase())) ||
-                                    (q.getDescription() != null && q.getDescription().toLowerCase().startsWith(filter.toLowerCase()))))
+                            (form.getDescription() != null && form.getDescription().toLowerCase().startsWith(filter.toLowerCase())))
                     .collect(Collectors.toList());  // Filtrer la liste en fonction de la clé de recherche
         }
         // Utiliser la méthode displayForms pour afficher les formulaires filtrés

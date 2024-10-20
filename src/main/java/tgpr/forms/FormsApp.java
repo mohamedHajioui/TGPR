@@ -12,7 +12,7 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE)) {
             Controller.abort("Database is not available!");
         } else {
-            User user = User.getByFullName("Administrator");
+            User user = User.getByFullName("Benoît Penelle");
             Security.login(user);
             Controller.navigateTo(new ViewFormsController(user));
         }
