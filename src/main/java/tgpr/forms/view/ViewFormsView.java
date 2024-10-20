@@ -31,6 +31,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Initialisation de mainPanel
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        mainPanel.setPreferredSize(new TerminalSize(111, 32));
         setTitle("MyForms (" + email + " - " + currentUser.getRole() + ")");
         setHints(List.of(Hint.CENTERED, Hint.MODAL));
         setCloseWindowWithEscape(true);
@@ -67,8 +68,7 @@ public class ViewFormsView extends BasicWindow {
 
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        MenuItem fileButton = new MenuItem("File");
-        fileButton.addListener(button -> openFileMenu());
+        MenuItem fileButton = new MenuItem("File", () -> openFileMenu());
         MenuItem parametersButton = new MenuItem("Parameters");
         topPanel.addComponent(fileButton);
         topPanel.addComponent(parametersButton);
@@ -222,26 +222,26 @@ public class ViewFormsView extends BasicWindow {
         Window fileMenuWindow = new BasicWindow("File Menu");
         Panel fileMenuPanel = new Panel();
 
-        Button viewProfileButton = new Button("View Profile", () -> {
+        MenuItem viewProfileMenu = new MenuItem("View Profile", () -> {
             // Appeler le contrôleur pour afficher le profil
             controller.showProfile();
             fileMenuWindow.close();  // Fermer la fenêtre après l'action
         });
 
-        Button logoutButton = new Button("Logout", () -> {
+        MenuItem logoutMenu = new MenuItem("Logout", () -> {
             // Appeler le contrôleur pour gérer la déconnexion
             controller.logout();
             fileMenuWindow.close();  // Fermer la fenêtre après l'action
         });
 
-        Button exitButton = new Button("Exit", () -> {
+        MenuItem exitMenu = new MenuItem("Exit", () -> {
             // Appeler le contrôleur pour fermer l'application
             controller.exitApplication();
         });
 
-        fileMenuPanel.addComponent(viewProfileButton);
-        fileMenuPanel.addComponent(logoutButton);
-        fileMenuPanel.addComponent(exitButton);
+        fileMenuPanel.addComponent(viewProfileMenu);
+        fileMenuPanel.addComponent(logoutMenu);
+        fileMenuPanel.addComponent(exitMenu);
 
         fileMenuWindow.setComponent(fileMenuPanel);
         this.getTextGUI().addWindowAndWait(fileMenuWindow);  // Afficher la fenêtre contextuelle
