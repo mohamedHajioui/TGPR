@@ -127,7 +127,7 @@ public class ViewFormsView extends BasicWindow {
                 if (form != null) {
                     // Créer un panneau pour chaque formulaire avec son titre et sa description
                     Panel formPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                    formPanel.setPreferredSize(new TerminalSize(70, 10));
+                    formPanel.setPreferredSize(new TerminalSize(33, 7));
                     setTitle(form, formPanel);
                     setDescription(form, formPanel);
                     formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
