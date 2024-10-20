@@ -1,11 +1,8 @@
 package tgpr.forms.controller;
-
-import tgpr.forms.model.Form;
-import tgpr.forms.model.Security;
-import tgpr.forms.model.User;
+import tgpr.forms.model.*;
 import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,12 +27,9 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         return view;
     }
 
-    public List<Form> getForms() {
-        return currentUser.getForms();
-    }
-
     public List<Form> getUserForms() {
-        return currentUser.getForms();
+        // Récupérer tous les formulaires auxquels l'utilisateur a accès
+        return Form.getForUser(currentUser, "", 0, Integer.MAX_VALUE);
     }
 
     public void showUserForms() {

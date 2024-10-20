@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.menu.MenuItem;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
 
@@ -52,7 +53,7 @@ public class ViewFormsView extends BasicWindow {
 
         // Initialisation du formsPanel avec une taille préférée
         formsPanel = new Panel(new GridLayout(3));
-        formsPanel.setPreferredSize(new TerminalSize(110, 28));  // Définir une taille plus petite pour les formulaires
+        formsPanel.setPreferredSize(new TerminalSize(110, 27));  // Définir une taille plus petite pour les formulaires
 
         // Ajouter les panneaux à mainPanel
         mainPanel.addComponent(topPanel);       // Boutons "File" et "Parameters"
@@ -66,9 +67,9 @@ public class ViewFormsView extends BasicWindow {
 
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Button fileButton = new Button("File");
+        MenuItem fileButton = new MenuItem("File");
         fileButton.addListener(button -> openFileMenu());
-        Button parametersButton = new Button("Parameters");
+        MenuItem parametersButton = new MenuItem("Parameters");
         topPanel.addComponent(fileButton);
         topPanel.addComponent(parametersButton);
         return topPanel;
@@ -130,7 +131,7 @@ public class ViewFormsView extends BasicWindow {
                     setTitle(form, formPanel);
                     setDescription(form, formPanel);
                     formPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-                    nameOfCreator(formPanel);
+                    nameOfCreator(formPanel, form);
 
                     var instance = form.getMostRecentInstance(currentUser);
                     String startDate = (instance != null) ? "Started on " + instance.getStarted().toString() : "Not started";
@@ -177,8 +178,9 @@ public class ViewFormsView extends BasicWindow {
         formsPanel.addComponent(formPanel);
     }
 
-    private void nameOfCreator(Panel formPanel) {
-        Label created = new Label("Created by " + currentUser.getName());
+    private void nameOfCreator(Panel formPanel, Form form) {
+        String creatorName = form.getOwner().getFullName();  // Récupérer le nom complet du créateur du formulaire
+        Label created = new Label("Created by " + creatorName);  // Afficher le nom du créateur
         created.center();
         formPanel.addComponent(created);
     }

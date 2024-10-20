@@ -1,10 +1,4 @@
 package tgpr.forms;
-
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import tgpr.forms.controller.TestController;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
@@ -18,7 +12,7 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE)) {
             Controller.abort("Database is not available!");
         } else {
-            User user = User.getByFullName("Benoît Penelle");
+            User user = User.getByFullName("Administrator");
             Security.login(user);
             Controller.navigateTo(new ViewFormsController(user));
         }
