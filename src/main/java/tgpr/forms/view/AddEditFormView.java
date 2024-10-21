@@ -9,15 +9,16 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.CheckBox;
 import tgpr.forms.controller.AddEditFormController;
 import tgpr.forms.model.Form;
+import tgpr.forms.model.User;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class AddEditFormView extends DialogWindow {
     private final AddEditFormController controller;
-    private final Form form;
-    private final TextBox txtTitle;
+    private TextBox txtTitle;
     private final TextBox txtDescription;
+    private final Form form;
     private final CheckBox chkIsPublic;
     private final Label errTitle;
     private final Label errDescription;
@@ -27,7 +28,7 @@ public class AddEditFormView extends DialogWindow {
     private final Button btnAddUpdate;
     private final Button btnCancel;
 
-    public AddEditFormView(AddEditFormController controller, Form form) {
+    public AddEditFormView(AddEditFormController controller, User owner, Form form) {
         super((form == null ? "Add" : "Edit ") + " a form");
 
         this.form = form;

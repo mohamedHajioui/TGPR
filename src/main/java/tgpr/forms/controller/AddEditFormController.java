@@ -1,29 +1,23 @@
 package tgpr.forms.controller;
 
-import com.googlecode.lanterna.gui2.CheckBox;
 import tgpr.forms.model.FormValidator;
+import tgpr.forms.model.User;
 import tgpr.forms.view.AddEditFormView;
 import tgpr.framework.Controller;
 import tgpr.forms.model.Form;
 import tgpr.framework.ErrorList;
 
-import static tgpr.framework.Tools.hash;
-import static tgpr.framework.Tools.toDate;
 
 public class AddEditFormController extends Controller<AddEditFormView> {
 
-    private final AddEditFormView view;
+    private AddEditFormView view;
     private Form form;
-    private final boolean isNew;
+    private User owner;
 
-    public AddEditFormController() {
-        this(null);
-    }
 
-    public AddEditFormController(Form form) {
-        this.form = form;
-        isNew = form == null;
-        view = new AddEditFormView(this, form);
+    public AddEditFormController(User owner, Form form) {
+        this.owner = owner;
+        view = new AddEditFormView(this, owner, form);
     }
 
     @Override
@@ -38,7 +32,7 @@ public class AddEditFormController extends Controller<AddEditFormView> {
     public void save(String title, String description, boolean isPublic) {
         var errors = validate(title, description);
         if (errors.isEmpty()) {
-            form = new Form();
+            form = new Form(title, description, owner, isPublic);
             form.save();
             view.close();
         }
@@ -47,7 +41,7 @@ public class AddEditFormController extends Controller<AddEditFormView> {
     public ErrorList validate(String title, String description) {
         var errors = new ErrorList();
 
-        if (isNew) {
+        if (form == null) {
             errors.add(FormValidator.isValidAvailableTitle(title), Form.Fields.Title);
             errors.add(FormValidator.isValidDescription(description), Form.Fields.Description);
         }
@@ -55,7 +49,7 @@ public class AddEditFormController extends Controller<AddEditFormView> {
     }
 
     public Form update() {
-        var controller = new AddEditFormController(form);
+        var controller = new AddEditFormController(owner, form);
         navigateTo(controller);
         return controller.form;
     }

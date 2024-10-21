@@ -1,6 +1,8 @@
 package tgpr.forms;
 
 import tgpr.forms.controller.AddEditFormController;
+import tgpr.forms.model.Form;
+import tgpr.forms.model.User;
 import tgpr.framework.Controller;
 import tgpr.framework.Model;
 
@@ -11,7 +13,9 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Controller.navigateTo(new AddEditFormController());
+            Form form = Form.getByKey(17);
+            User owner = User.getByKey(1);
+            Controller.navigateTo(new AddEditFormController(owner, form));
         }
     }
 }
