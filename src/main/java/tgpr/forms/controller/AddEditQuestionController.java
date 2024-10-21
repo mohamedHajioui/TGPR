@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
 import tgpr.forms.view.AddEditQuestionView;
@@ -9,9 +10,13 @@ import java.util.List;
 
 public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     private final Question question;
+    private final Form form;
+    private int formId;
 
-    public AddEditQuestionController(Question question) {
-        this.question = question;  // Question à modifier ou null pour une nouvelle question
+    public AddEditQuestionController(Question question,Form form) {
+        this.question = question; // Question à modifier ou null pour une nouvelle question
+        this.form = form;
+        this.formId = form.getId();
     }
 
     @Override
@@ -19,6 +24,10 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         return new AddEditQuestionView(this, question);
     }
 
+    public int getNextIdxForForm() {
+        int lastIdx = form.getQuestions().size();
+        return lastIdx + 1;
+    }
     public void createQuestion(String title, String description, Question.Type type, OptionList optionList, boolean required) {
 
         Question newQuestion = new Question();
@@ -26,6 +35,8 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         newQuestion.setDescription(description);
         newQuestion.setType(type);
         newQuestion.setRequired(required);
+        newQuestion.setFormId(formId);
+        newQuestion.setIdx(getNextIdxForForm());
 
         // Handle optionList if required by the question type
         if (type.requiresOptionList()) {
