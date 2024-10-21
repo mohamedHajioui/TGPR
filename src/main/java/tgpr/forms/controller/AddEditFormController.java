@@ -10,13 +10,14 @@ import tgpr.framework.ErrorList;
 
 public class AddEditFormController extends Controller<AddEditFormView> {
 
-    private AddEditFormView view;
+    private final AddEditFormView view;
     private Form form;
-    private User owner;
+    private final User owner;
 
 
     public AddEditFormController(User owner, Form form) {
         this.owner = owner;
+        this.form = form;
         view = new AddEditFormView(this, owner, form);
     }
 
@@ -29,15 +30,6 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         return form;
     }
 
-    public void save(String title, String description, boolean isPublic) {
-        var errors = validate(title, description);
-        if (errors.isEmpty()) {
-            form = new Form(title, description, owner, isPublic);
-            form.save();
-            view.close();
-        }
-    }
-
     public ErrorList validate(String title, String description) {
         var errors = new ErrorList();
 
@@ -48,9 +40,25 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         return errors;
     }
 
-    public Form update() {
-        var controller = new AddEditFormController(owner, form);
-        navigateTo(controller);
-        return controller.form;
+    public void addForm(String title, String description, boolean isPublic) {
+        var errors = validate(title, description);
+        if (errors.isEmpty()) {
+            form = new Form(title, description, owner, isPublic);
+            form.save();
+            view.close();
+        }
+    }
+
+    public void updateForm(String title, String description, boolean isPublic) {
+        if (form != null) {
+            var errors = validate(title, description);
+            if (errors.isEmpty()) {
+                form.setTitle(title);
+                form.setDescription(description);
+                form.setIsPublic(isPublic);
+                form.save();
+                view.close();
+            }
+        }
     }
 }

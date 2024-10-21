@@ -29,7 +29,7 @@ public class AddEditFormView extends DialogWindow {
     private final Button btnCancel;
 
     public AddEditFormView(AddEditFormController controller, User owner, Form form) {
-        super((form == null ? "Add" : "Edit ") + " a form");
+        super((form == null ? "Add" : "Edit") + " a form");
 
         this.form = form;
         this.controller = controller;
@@ -45,15 +45,14 @@ public class AddEditFormView extends DialogWindow {
 
         new Label("Title:").addTo(formPanel);
         txtTitle = new TextBox(new TerminalSize(20, 1)).addTo(formPanel)
-                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d]{0,25}"))
-                .setTextChangeListener((txt, byUser) -> validate())
-                .setReadOnly(form != null);
+                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
+                .setTextChangeListener((txt, byUser) -> validate());
         new EmptySpace().addTo(formPanel);
         errTitle = new Label("title required").addTo(formPanel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Description:").addTo(formPanel);
         txtDescription = new TextBox(new TerminalSize(55, 4)).addTo(formPanel)
-                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d]{0,200}"))
+                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,200}"))
                 .setTextChangeListener((txt, byUser) -> validate());
         new EmptySpace().addTo(formPanel);
         errDescription = new Label("").addTo(formPanel).setForegroundColor(TextColor.ANSI.RED);
@@ -65,7 +64,7 @@ public class AddEditFormView extends DialogWindow {
                 .setLayoutManager(new GridLayout(3));
         new EmptySpace().addTo(buttonsPanel)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING, true, false));
-        btnAddUpdate = new Button(form == null ? "Create" : "Update", this::addForm).addTo(buttonsPanel).setEnabled(false)
+        btnAddUpdate = new Button(form == null ? "Create" : "Update", this::createOrUpdate).addTo(buttonsPanel).setEnabled(false)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.END, GridLayout.Alignment.BEGINNING));
         txtTitle.setTextChangeListener((txtTitle, byUser) -> validate());
 
@@ -81,8 +80,24 @@ public class AddEditFormView extends DialogWindow {
         }
     }
 
+    private void createOrUpdate() {
+        if (form == null ) {
+            addForm();
+        } else {
+            updateForm();
+        }
+    }
+
     private void addForm() {
-        controller.save(
+        controller.addForm(
+                txtTitle.getText(),
+                txtDescription.getText(),
+                chkIsPublic.isChecked()
+        );
+    }
+
+    private void updateForm() {
+        controller.updateForm(
                 txtTitle.getText(),
                 txtDescription.getText(),
                 chkIsPublic.isChecked()
