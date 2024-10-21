@@ -1,110 +1,77 @@
 package tgpr.forms.view;
 
-// View/EditInstanceView.java
+
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import tgpr.forms.model.Question;
 
-import com.googlecode.lanterna.gui2.Button;
+
+import com.sun.net.httpserver.Request;
 import tgpr.forms.controller.EditInstanceController;
 
-import com.googlecode.lanterna.terminal.Terminal;
-
-import java.io.IOException;
 import java.util.List;
 
-
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 
 public class EditInstanceView extends DialogWindow {
     private EditInstanceController controller;
     private Panel mainPanel;
 
-    public EditInstanceView(EditInstanceController controller){
-
+    public EditInstanceView(EditInstanceController controller) {
         super("Open a form");
         this.controller = controller;
 
-        mainPanel = new Panel();
+        RequestConfirmation();
     }
+
+    private void RequestConfirmation() {
+
+        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        mainPanel.setPreferredSize(new TerminalSize(50, 5)); // Définir une taille préférée pour le panel
+
+        Label textLabel = new Label("You Have already answered this form.\n You can view your submission or submit again.\n What would you like to do?");
+        mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
+
+        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+
+        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
+        buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
+        buttonPanel.addComponent(new Button("cancel", this::close));
+        setHints(List.of(Hint.CENTERED));
+
+        buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+        mainPanel.addComponent(buttonPanel);
+
+        Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+        container.addComponent(mainPanel);
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+        // Définir le panneau de conteneur comme composant principal de la fenêtre
+        setComponent(container);
+
+    }
+
+    private void buttonViewSubmission() {
+    }
+
+    private void SubmitAgain() {
+    }
+
+    private void buttonCancel() {
+    }
+
+    private void AnswerForm(){
+
+    }
+
 
     public Panel getMainPanel() {
         return mainPanel;
     }
-    //  public void display(EditInstanceController controller) {
-//      // Crée la fenêtre
-//      Window window = new BasicWindow("Open a form");
-//      mainPanel = new Panel();
-//      mainPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-
-//      // Affiche la question actuelle
-//      showCurrentQuestion();
-
-//      // Ajouter les boutons de navigation et de soumission
-//      Button nextButton = new Button("Next", () -> {
-//          controller.nextQuestion(); // Appel à la méthode du contrôleur
-//          showNextQuestion(); // Afficher la prochaine question
-//      });
-//      Button previousButton = new Button("Previous", () -> {
-//          controller.previousQuestion(); // Appel à la méthode du contrôleur
-//          showPreviousQuestion(); // Afficher la question précédente
-//      });
-//      Button submitButton = new Button("Submit", controller::submitInstance);
-
-//      mainPanel.addComponent(previousButton);
-//      mainPanel.addComponent(nextButton);
-//      mainPanel.addComponent(submitButton);
-
-//      window.setComponent(mainPanel);
-//      MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
-//      gui.addWindowAndWait(window);
-//  }
-
-//  private void showCurrentQuestion() {
-//       mainPanel.removeAllComponents(); // Efface les composants existants
-
-//      if (currentQuestionIndex < questions.size()) {
-//          Question currentQuestion = questions.get(currentQuestionIndex);
-//          mainPanel.addComponent(new Label(currentQuestion.getTitle())); // Affiche le titre de la question
-//          // Ajouter la logique pour afficher la réponse ici, selon le type de question.
-//      }
-
-//      // Réinitialise le GUI en recréant la fenêtre
-//      Window window = new BasicWindow("Edit Instance");
-//      window.setComponent(mainPanel);
-//      MultiWindowTextGUI gui = new MultiWindowTextGUI(screen);
-//      gui.addWindowAndWait(window); // Met à jour l'affichage
-//  }
-
-//  public void showNextQuestion() {
-//      if (currentQuestionIndex < questions.size() - 1) {
-//          currentQuestionIndex++; // Avance à la question suivante
-//          showCurrentQuestion(); // Met à jour l'affichage
-//      }
-//  }
-
-//  public void showPreviousQuestion() {
-//      if (currentQuestionIndex > 0) {
-//          currentQuestionIndex--; // Retourne à la question précédente
-//          showCurrentQuestion(); // Met à jour l'affichage
-//      }
-//  }
-
-//  public void showError(String message) {
-//      MessageDialog.showMessageDialog(
-//              new MultiWindowTextGUI(screen),
-//              "Erreur",
-//              message
-//      );
-//  }
-
-//  public void showMessage(String message) {
-//      MessageDialog.showMessageDialog(
-//              new MultiWindowTextGUI(screen),
-//              "Information",
-//              message
-//      );
-  }
-//
+}
