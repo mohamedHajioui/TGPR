@@ -16,7 +16,7 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         else {
             Question newQuestion = null;
-            Form form = Form.getByKey(3);
+            Form form = Form.getByKey(1);
             Controller.navigateTo(new AddEditQuestionController(newQuestion,form));
         }
     }
