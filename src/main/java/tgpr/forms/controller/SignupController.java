@@ -14,6 +14,10 @@ public class SignupController extends Controller<SignupView> {
     public SignupView getView() {
         return view;
     }
+
+    public void close(){
+        System.exit(0);
+    }
 }
 
 

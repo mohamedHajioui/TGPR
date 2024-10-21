@@ -13,7 +13,7 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Controller.navigateTo(new SignupController());
+            Controller.navigateTo(new LoginController());
         }
     }
 }
