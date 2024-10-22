@@ -46,6 +46,7 @@ public class ViewFormsView extends BasicWindow {
         Panel filterPanel = filterBox(controller);
         Panel buttonCreateNewForm = new Panel(new LinearLayout(Direction.HORIZONTAL));
         buttonCreateNewForm.addComponent(createNewFormButton);
+        createNewFormButton.addListener(button -> controller.createForm());
         buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(40, 1)));
 
         // Panneau de navigation en bas
@@ -167,16 +168,19 @@ public class ViewFormsView extends BasicWindow {
 
         if (!form.getQuestions().isEmpty()) {
             Button openButton = new Button("Open");
+            openButton.addListener(button -> controller.openForm());
             buttonPanel.addComponent(openButton);
         }
         if (hasEditorAccess(form, currentUser)){
             Button manageButton = new Button("Manage");
+            manageButton.addListener(button -> controller.manageForm());
             buttonPanel.addComponent(manageButton);
         }
         buttonPanel.center();
         formPanel.addComponent(buttonPanel);
         formsPanel.addComponent(formPanel);
     }
+
 
     private void nameOfCreator(Panel formPanel, Form form) {
         String creatorName = form.getOwner().getFullName();  // Récupérer le nom complet du créateur du formulaire
