@@ -71,6 +71,7 @@ public class SignupView extends DialogWindow {
         Label passwordLabel = new Label(" Password:         ");
         passwordPanel.addComponent(passwordLabel);
         TextBox passwordBox = new TextBox(new TerminalSize(22, 1));
+        passwordBox.setMask('*');
         passwordPanel.addComponent(passwordBox);
         mainPanel.addComponent(passwordPanel);
         passwordBox.setTextChangeListener((newText, changedByUser) -> controller.isValidPassword(newText));
@@ -92,6 +93,7 @@ public class SignupView extends DialogWindow {
         Label confirmPasswordLabel = new Label(" Confirm Password: ");
         confirmPasswordPanel.addComponent(confirmPasswordLabel);
         TextBox confirmPasswordBox = new TextBox(new TerminalSize(22, 1));
+        confirmPasswordBox.setMask('*');
         confirmPasswordPanel.addComponent(confirmPasswordBox);
         mainPanel.addComponent(confirmPasswordPanel);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 10)));
