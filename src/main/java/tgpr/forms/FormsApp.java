@@ -15,7 +15,7 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         else {
             Question newQuestion = null;
-            Controller.navigateTo(new LoginController());
+            Controller.navigateTo(new AddEditQuestionController(newQuestion));
         }
     }
 }
