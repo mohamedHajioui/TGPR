@@ -85,7 +85,7 @@ public class SignupView extends DialogWindow {
 
     private void buttonsSignupAndClose() {
         Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Button signupButton = new Button("Signup");
+        Button signupButton = new Button("Signup", () -> controller.signup());
         buttonsPanel.addComponent(signupButton);
         Button closeButton = new Button("Close", this::close);
         buttonsPanel.addComponent(closeButton);

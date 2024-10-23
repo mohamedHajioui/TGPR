@@ -1,6 +1,7 @@
 package tgpr.forms.controller;
 
 import com.googlecode.lanterna.gui2.TextBox;
+import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 import tgpr.forms.view.SignupView;
 import tgpr.framework.Controller;
@@ -13,6 +14,8 @@ public class SignupController extends Controller<SignupView> {
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^(?=.*[A-Z])(?=.*[0-9])(?=.*\\W).{8,}$");
+
+
 
     public SignupController() {
         this.view = new SignupView(this);
@@ -105,14 +108,13 @@ public class SignupController extends Controller<SignupView> {
 
     public void signup(){
         User newUser = new User();
+        newUser.setRole(User.Role.User);
         newUser.setEmail(view.getEmailText());
         newUser.setFullName(view.getFullNameText());
         newUser.setPassword(view.getPasswordText());
-
         newUser.save();
+        Security.login(newUser);
         navigateTo(new ViewFormsController(newUser));
-
-
     }
 }
 
