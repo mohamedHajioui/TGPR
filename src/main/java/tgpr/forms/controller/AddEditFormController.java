@@ -7,6 +7,8 @@ import tgpr.framework.Controller;
 import tgpr.forms.model.Form;
 import tgpr.framework.ErrorList;
 
+import static tgpr.forms.model.Form.getByTitleAndUser;
+
 
 public class AddEditFormController extends Controller<AddEditFormView> {
 
@@ -30,13 +32,21 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         return form;
     }
 
+    private boolean isTitleUniqueForOwner(String title) {
+        var existingForm = getByTitleAndUser(title, owner);
+        return existingForm == null;
+    }
+
     public ErrorList validate(String title, String description) {
         var errors = new ErrorList();
 
-        if (form == null) {
-            errors.add(FormValidator.isValidAvailableTitle(title), Form.Fields.Title);
-            errors.add(FormValidator.isValidDescription(description), Form.Fields.Description);
+        errors.add(FormValidator.isValidTitle(title), Form.Fields.Title);
+        if (!isTitleUniqueForOwner(title)) {
+            errors.add("Vous avez déjà utilisé ce titre pour un autre fomrulaire.", Form.Fields.Title);
         }
+
+        errors.add(FormValidator.isValidDescription(description), Form.Fields.Description);
+
         return errors;
     }
 

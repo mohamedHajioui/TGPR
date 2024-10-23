@@ -2,7 +2,7 @@ package tgpr.forms.model;
 
 public class FormValidator {
 
-    public static String isValidAvailableTitle(String title) {
+    public static String isValidTitle(String title) {
         if (title == null || title.isBlank()) {
             return "title required";
         }
