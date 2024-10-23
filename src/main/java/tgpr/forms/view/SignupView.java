@@ -18,6 +18,7 @@ public class SignupView extends DialogWindow {
     private TextBox passwordBox;
     private TextBox confirmPasswordBox;
     private Label errorLabelConfirmPassword;
+    private Button signupButton;
 
 
     public SignupView(SignupController controller) {
@@ -32,13 +33,10 @@ public class SignupView extends DialogWindow {
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
 
 
-
-        //creation du formulaire a remplir
         mail(controller);
         fullName();
         password();
         confirmPassword();
-        //ajout des boutons signup et close
         buttonsSignupAndClose();
     }
 
@@ -54,7 +52,6 @@ public class SignupView extends DialogWindow {
         emailBox.setTextChangeListener((newText, changedByUser) -> controller.isValidEmail(newText));
         mainPanel.addComponent(errorLabelMail);
     }
-
 
     private void fullName() {
         errorLabelName = new Label("").setForegroundColor(TextColor.ANSI.RED);
@@ -85,7 +82,8 @@ public class SignupView extends DialogWindow {
 
     private void buttonsSignupAndClose() {
         Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Button signupButton = new Button("Signup", () -> controller.signup());
+        signupButton = new Button("Signup", () -> controller.signup());
+        signupButton.setEnabled(false);
         buttonsPanel.addComponent(signupButton);
         Button closeButton = new Button("Close", this::close);
         buttonsPanel.addComponent(closeButton);
@@ -106,6 +104,11 @@ public class SignupView extends DialogWindow {
         confirmPasswordBox.setTextChangeListener((newText, changedByUser) -> controller.isValidConfirmPassword(newText));
         mainPanel.addComponent(errorLabelConfirmPassword);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 10)));
+    }
+
+
+    public void setSignupButtonEnabled(boolean enabled) {
+        signupButton.setEnabled(enabled);
     }
 
 
@@ -139,6 +142,22 @@ public class SignupView extends DialogWindow {
 
     public String getConfirmPasswordText() {
         return confirmPasswordBox.getText();
+    }
+
+    public String getMailErrorMessage() {
+        return errorLabelMail.getText();
+    }
+
+    public String getNameErrorMessage() {
+        return errorLabelName.getText();
+    }
+
+    public String getPasswordErrorMessage() {
+        return errorLabelPassword.getText();
+    }
+
+    public String getConfirmPasswordErrorMessage() {
+        return errorLabelConfirmPassword.getText();
     }
 
 }

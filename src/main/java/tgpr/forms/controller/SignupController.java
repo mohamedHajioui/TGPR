@@ -8,6 +8,8 @@ import tgpr.framework.Controller;
 
 import java.util.regex.Pattern;
 
+import static tgpr.framework.Tools.hash;
+
 public class SignupController extends Controller<SignupView> {
     private final SignupView view;
     private static final Pattern EMAIL_PATTERN =
@@ -37,7 +39,8 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setMailErrorMessage("");
         }
-        validateOtherFields();
+        updateSignupButtonState();
+
     }
 
     public void isValidName(String name) {
@@ -48,7 +51,8 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setNameErrorMessage("");
         }
-        validateOtherFields();
+        updateSignupButtonState();
+
     }
 
     public void isValidPassword(String password) {
@@ -68,7 +72,7 @@ public class SignupController extends Controller<SignupView> {
             }
         }
         validateConfirmPassword();
-        validateOtherFields();
+        updateSignupButtonState();
     }
 
     public void isValidConfirmPassword(String confirmPassword) {
@@ -77,7 +81,9 @@ public class SignupController extends Controller<SignupView> {
         } else {
             validateConfirmPassword();
         }
+        updateSignupButtonState();
     }
+
 
     private void validateConfirmPassword() {
         String password = view.getPasswordText();
@@ -88,9 +94,10 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setConfirmPasswordErrorMessage("");
         }
+        updateSignupButtonState();
     }
 
-    // Méthode pour valider les autres champs
+
     private void validateOtherFields() {
         if (view.getEmailText().isBlank()) {
             view.setMailErrorMessage("                    Mail is required");
@@ -106,15 +113,33 @@ public class SignupController extends Controller<SignupView> {
         }
     }
 
-    public void signup(){
-        User newUser = new User();
-        newUser.setRole(User.Role.User);
-        newUser.setEmail(view.getEmailText());
-        newUser.setFullName(view.getFullNameText());
-        newUser.setPassword(view.getPasswordText());
-        newUser.save();
-        Security.login(newUser);
-        navigateTo(new ViewFormsController(newUser));
+    private boolean isFormValid() {
+        return !view.getEmailText().isBlank() &&
+                !view.getFullNameText().isBlank() &&
+                !view.getPasswordText().isBlank() &&
+                !view.getConfirmPasswordText().isBlank() &&
+                view.getMailErrorMessage().isEmpty() &&
+                view.getNameErrorMessage().isEmpty() &&
+                view.getPasswordErrorMessage().isEmpty() &&
+                view.getConfirmPasswordErrorMessage().isEmpty();
+    }
+
+    public void updateSignupButtonState() {
+        boolean isValid = isFormValid();
+        view.setSignupButtonEnabled(isValid);
+    }
+
+    public void signup() {
+        if (isFormValid()) {
+            User newUser = new User();
+            newUser.setRole(User.Role.User);
+            newUser.setEmail(view.getEmailText());
+            newUser.setFullName(view.getFullNameText());
+            newUser.setPassword(hash(view.getPasswordText()));
+            newUser.save();
+            Security.login(newUser);
+            navigateTo(new ViewFormsController(newUser));
+        }
     }
 }
 
