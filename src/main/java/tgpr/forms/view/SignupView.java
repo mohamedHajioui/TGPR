@@ -13,7 +13,11 @@ public class SignupView extends DialogWindow {
     private Label errorLabelMail;
     private Label errorLabelName;
     private Label errorLabelPassword;
-    private Label hashedPasswordLabel;
+    private TextBox emailBox;
+    private TextBox fullNameBox;
+    private TextBox passwordBox;
+    private TextBox confirmPasswordBox;
+    private Label errorLabelConfirmPassword;
 
 
     public SignupView(SignupController controller) {
@@ -44,12 +48,13 @@ public class SignupView extends DialogWindow {
         Panel mailPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label mailLabel = new Label(" Mail:             ");
         mailPanel.addComponent(mailLabel);
-        TextBox mailBox = new TextBox(new TerminalSize(22, 1));
-        mailPanel.addComponent(mailBox);
+        emailBox = new TextBox(new TerminalSize(22, 1));
+        mailPanel.addComponent(emailBox);
         mainPanel.addComponent(mailPanel);
-        mailBox.setTextChangeListener((newText, changedByUser) -> controller.isValidEmail(newText));
+        emailBox.setTextChangeListener((newText, changedByUser) -> controller.isValidEmail(newText));
         mainPanel.addComponent(errorLabelMail);
     }
+
 
     private void fullName() {
         errorLabelName = new Label("").setForegroundColor(TextColor.ANSI.RED);
@@ -57,7 +62,7 @@ public class SignupView extends DialogWindow {
         Panel fullNamePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label fullNameLabel = new Label(" Full Name:        ");
         fullNamePanel.addComponent(fullNameLabel);
-        TextBox fullNameBox = new TextBox(new TerminalSize(40, 1));
+        fullNameBox = new TextBox(new TerminalSize(40, 1));
         fullNamePanel.addComponent(fullNameBox);
         mainPanel.addComponent(fullNamePanel);
         fullNameBox.setTextChangeListener((newText, changedByUser) -> controller.isValidName(newText));
@@ -70,7 +75,7 @@ public class SignupView extends DialogWindow {
         Panel passwordPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label passwordLabel = new Label(" Password:         ");
         passwordPanel.addComponent(passwordLabel);
-        TextBox passwordBox = new TextBox(new TerminalSize(22, 1));
+        passwordBox = new TextBox(new TerminalSize(22, 1));
         passwordBox.setMask('*');
         passwordPanel.addComponent(passwordBox);
         mainPanel.addComponent(passwordPanel);
@@ -89,17 +94,19 @@ public class SignupView extends DialogWindow {
     }
 
     private void confirmPassword() {
+        errorLabelConfirmPassword = new Label("").setForegroundColor(TextColor.ANSI.RED);
+        errorLabelConfirmPassword.setPreferredSize(new TerminalSize(40, 1));
         Panel confirmPasswordPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label confirmPasswordLabel = new Label(" Confirm Password: ");
         confirmPasswordPanel.addComponent(confirmPasswordLabel);
-        TextBox confirmPasswordBox = new TextBox(new TerminalSize(22, 1));
+        confirmPasswordBox = new TextBox(new TerminalSize(22, 1));
         confirmPasswordBox.setMask('*');
         confirmPasswordPanel.addComponent(confirmPasswordBox);
         mainPanel.addComponent(confirmPasswordPanel);
+        confirmPasswordBox.setTextChangeListener((newText, changedByUser) -> controller.isValidConfirmPassword(newText));
+        mainPanel.addComponent(errorLabelConfirmPassword);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 10)));
     }
-
-
 
 
     public void setMailErrorMessage(String message) {
@@ -114,8 +121,24 @@ public class SignupView extends DialogWindow {
         errorLabelPassword.setText(password != null ? password : "");
     }
 
-
-    public void displayHashedPassword(String hashedPassword) {
-        hashedPasswordLabel.setText("Hashed Password: " + hashedPassword);
+    public void setConfirmPasswordErrorMessage(String password){
+        errorLabelConfirmPassword.setText(password != null ? password : "");
     }
+
+    public String getEmailText() {
+        return emailBox.getText();
+    }
+
+    public String getFullNameText() {
+        return fullNameBox.getText();
+    }
+
+    public String getPasswordText() {
+        return passwordBox.getText();
+    }
+
+    public String getConfirmPasswordText() {
+        return confirmPasswordBox.getText();
+    }
+
 }

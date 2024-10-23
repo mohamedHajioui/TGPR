@@ -1,5 +1,7 @@
 package tgpr.forms.controller;
 
+import com.googlecode.lanterna.gui2.TextBox;
+import tgpr.forms.model.User;
 import tgpr.forms.view.SignupView;
 import tgpr.framework.Controller;
 
@@ -12,7 +14,6 @@ public class SignupController extends Controller<SignupView> {
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^(?=.*[A-Z])(?=.*[0-9])(?=.*\\W).{8,}$");
 
-
     public SignupController() {
         this.view = new SignupView(this);
     }
@@ -21,34 +22,35 @@ public class SignupController extends Controller<SignupView> {
         return view;
     }
 
-    public void close(){
+    public void close() {
         System.exit(0);
     }
 
     public void isValidEmail(String email) {
-        if (email.isBlank()){
-            view.setMailErrorMessage("");
+        if (email.isBlank()) {
+            view.setMailErrorMessage("                    Mail is required");
         } else if (!EMAIL_PATTERN.matcher(email).matches()) {
             view.setMailErrorMessage("                    Invalid mail");
         } else {
             view.setMailErrorMessage("");
         }
+        validateOtherFields();
     }
 
-
     public void isValidName(String name) {
-        if (name.isBlank()){
-            view.setNameErrorMessage("");
+        if (name.isBlank()) {
+            view.setNameErrorMessage("                    Name is required");
         } else if (name.length() < 3) {
             view.setNameErrorMessage("                    Minimum 3 chars");
         } else {
             view.setNameErrorMessage("");
         }
+        validateOtherFields();
     }
 
     public void isValidPassword(String password) {
-        if (password.isEmpty()){
-            view.setPasswordErrorMessage("");
+        if (password.isBlank()) {
+            view.setPasswordErrorMessage("                    Password is required");
         } else {
             if (password.length() < 8) {
                 view.setPasswordErrorMessage("                    Minimum 8 chars");
@@ -62,11 +64,62 @@ public class SignupController extends Controller<SignupView> {
                 view.setPasswordErrorMessage("");  // Mot de passe valide
             }
         }
+        validateConfirmPassword();
+        validateOtherFields();
     }
 
+    public void isValidConfirmPassword(String confirmPassword) {
+        if (confirmPassword.isBlank()) {
+            view.setConfirmPasswordErrorMessage("                    Confirm password is required");
+        } else {
+            validateConfirmPassword();
+        }
+    }
+
+    private void validateConfirmPassword() {
+        String password = view.getPasswordText();
+        String confirmPassword = view.getConfirmPasswordText();
+
+        if (!confirmPassword.equals(password)) {
+            view.setConfirmPasswordErrorMessage("                    Passwords do not match");
+        } else {
+            view.setConfirmPasswordErrorMessage("");
+        }
+    }
+
+    // Méthode pour valider les autres champs
+    private void validateOtherFields() {
+        if (view.getEmailText().isBlank()) {
+            view.setMailErrorMessage("                    Mail is required");
+        }
+        if (view.getFullNameText().isBlank()) {
+            view.setNameErrorMessage("                    Name is required");
+        }
+        if (view.getPasswordText().isBlank()) {
+            view.setPasswordErrorMessage("                    Password is required");
+        }
+        if (view.getConfirmPasswordText().isBlank()) {
+            view.setConfirmPasswordErrorMessage("                    Confirm is required");
+        }
+    }
+
+    public void signup(){
+        User newUser = new User();
+        newUser.setEmail(view.getEmailText());
+        newUser.setFullName(view.getFullNameText());
+        newUser.setPassword(view.getPasswordText());
+
+        newUser.save();
+        navigateTo(new ViewFormsController(newUser));
 
 
-
+    }
 }
+
+
+
+
+
+
 
 

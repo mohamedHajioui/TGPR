@@ -41,7 +41,6 @@ public class LoginController extends Controller<LoginView> {
     }
 
 
-
     public void seedData() {
         Model.seedData(FormsApp.DATABASE_SCRIPT_FILE);
     }
