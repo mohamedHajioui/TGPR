@@ -37,9 +37,8 @@ public class LoginController extends Controller<LoginView> {
         return errors;
     }
     public void navigateToSignup() {
-        navigateTo(new TestController());
+        navigateTo(new SignupController());
     }
-
 
 
     public void seedData() {
