@@ -39,6 +39,7 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setMailErrorMessage("");
         }
+        validateOtherFields();
         updateSignupButtonState();
 
     }
@@ -51,6 +52,7 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setNameErrorMessage("");
         }
+        validateOtherFields();
         updateSignupButtonState();
 
     }
@@ -71,7 +73,7 @@ public class SignupController extends Controller<SignupView> {
                 view.setPasswordErrorMessage("");  // Mot de passe valide
             }
         }
-        validateConfirmPassword();
+        validateOtherFields();
         updateSignupButtonState();
     }
 
@@ -81,6 +83,7 @@ public class SignupController extends Controller<SignupView> {
         } else {
             validateConfirmPassword();
         }
+        validateOtherFields();
         updateSignupButtonState();
     }
 
@@ -94,6 +97,7 @@ public class SignupController extends Controller<SignupView> {
         } else {
             view.setConfirmPasswordErrorMessage("");
         }
+        validateOtherFields();
         updateSignupButtonState();
     }
 

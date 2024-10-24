@@ -106,11 +106,9 @@ public class SignupView extends DialogWindow {
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 10)));
     }
 
-
     public void setSignupButtonEnabled(boolean enabled) {
         signupButton.setEnabled(enabled);
     }
-
 
     public void setMailErrorMessage(String message) {
         errorLabelMail.setText(message != null ? message : "");
