@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class AddEditFormView extends DialogWindow {
     private final AddEditFormController controller;
+    private final User owner;
     private TextBox txtTitle;
     private final TextBox txtDescription;
     private final Form form;
@@ -32,6 +33,7 @@ public class AddEditFormView extends DialogWindow {
         super((form == null ? "Add" : "Edit") + " a form");
 
         this.form = form;
+        this.owner = owner;
         this.controller = controller;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
@@ -81,7 +83,7 @@ public class AddEditFormView extends DialogWindow {
     }
 
     private void createOrUpdate() {
-        if (form == null ) {
+        if (form == null) {
             addForm();
         } else {
             updateForm();

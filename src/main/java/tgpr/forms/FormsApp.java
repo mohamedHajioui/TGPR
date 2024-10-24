@@ -13,9 +13,9 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Form form = Form.getByKey(17);
+            Form form = Form.getByKey(10);
             User owner = User.getByKey(1);
-            Controller.navigateTo(new AddEditFormController(owner, form));
+            Controller.navigateTo(new AddEditFormController(owner, null));
         }
     }
 }
