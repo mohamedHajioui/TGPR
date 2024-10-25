@@ -39,12 +39,19 @@ import static tgpr.framework.Tools.ifNull;
                                 -Analyse
                                 -Close
 
+
+3 modes:
+    1 - la vue normal avec une instance sauvegarder
+    2 - la vue normal avec sans instance suvegarder
+    3 - la vue reorder
  */
 public class view_form extends DialogWindow{
 
     private final formController controller;
     private final Form form;
+    private boolean moving;
     private boolean normal;
+    private ObjectTable<Question> table;
 
     private final Button nq_button = new Button("New Question");
     private final Button ef_button = new Button("Edit Form");
@@ -53,7 +60,7 @@ public class view_form extends DialogWindow{
     private final Button r_button = new Button("Reorder");
     private final Button a_button = new Button("Analyse");
 
-    private ObjectTable<Question> table;
+
 
 
     public view_form(formController controller,Form form,boolean normal) {
@@ -126,6 +133,7 @@ public class view_form extends DialogWindow{
 
     private Component questionList(){
         System.out.println("questionList");
+        form.reload();
         table = new ObjectTable<Question>(
                 new ColumnSpec<>("index title", Question::getIdx),
                 new ColumnSpec<>("Type", Question::getType),
@@ -135,6 +143,9 @@ public class view_form extends DialogWindow{
         table.sizeTo(ViewManager.getTerminalColumns(),15);
         table.add(form.getQuestions());
 
+        //on peut que associer qu'une fois le handler
+        table.setSelectAction(this::choice);
+        table.addSelectionChangeListener(this::selectionChanged);
         if (!normal){
             reOrder();
         }
@@ -143,11 +154,8 @@ public class view_form extends DialogWindow{
 
 
 
-
-
-
-
     private Panel createButtonsNormal(){
+        form.reorderQuestions(table.getItems());
         var panel = Panel.horizontalPanel().right().right().center();
         new Button("Nouvelle Question").addTo(panel);
         new Button("Edit Form").addTo(panel);
@@ -162,9 +170,15 @@ public class view_form extends DialogWindow{
 
     private Panel createButtonsReorder(){
         var panel = Panel.horizontalPanel().right().right().center();
-        new Button("Save Order").addTo(panel);
+        new Button("Save Order", this::save).addTo(panel);
         new Button("Cancel", this::returnNormal).addTo(panel);
         return panel;
+    }
+
+    private void save(){
+        System.out.println("save");
+        form.reorderQuestions(table.getItems());
+        affichage(true);
     }
 
     private void returnNormal(){
@@ -183,28 +197,24 @@ public class view_form extends DialogWindow{
 
     private void reOrder() {
         System.out.println("reOrder");
-        if (normal){
-            normal = false;
-            affichage(false);
-        }
-        table.setSelectAction(this::choice);
+        affichage(false);
+
     }
 
 
     // 2eme etape: attend que l'utilisateur apuisse sur enter pour commencer le swap
     private void choice(){
+        //on change juste l'etat de moving pour dire si on bouge ou paS
+        moving = !moving;
         System.out.println("choice");
-        table.addSelectionChangeListener(this::selectionChanged);
-        System.out.println("test");
     }
 
     // 3eme etape: faire le swap jusqu'au prochain appui du enter qui renvoie vers tmpsave
     private void selectionChanged(int prec, int current, boolean byUser) {
+        if (!moving) return;
         System.out.println("sectionChanged");
         swap(prec, current);
         System.out.println("return");
-        table.setSelectAction(this::questionList);
-        choice();
 
 
     }
@@ -217,8 +227,6 @@ public class view_form extends DialogWindow{
         table.refresh();
     }
 
-    private void endChoice(){
-        affichage(false);
-    }
+
 }
 
