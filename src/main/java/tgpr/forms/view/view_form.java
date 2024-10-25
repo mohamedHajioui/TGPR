@@ -135,13 +135,10 @@ public class view_form extends DialogWindow{
         description().addTo(panel);
         createdby().addTo(panel);
         isPublic().addTo(panel);
-        panel.addEmpty();
         if(form.isUsed()){
-            panel.addEmpty();
             Label label  = new Label("This form is read only beacause it has already been answered ("+form.getInstances().size()+"instance(s)).");
             label.setForegroundColor(TextColor.ANSI.BLUE);
             label.addTo(panel);
-            panel.addEmpty();
         }
         return panel;
     }
@@ -157,7 +154,7 @@ public class view_form extends DialogWindow{
                 new ColumnSpec<>("Required", Question::getRequired),
                 new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
         );
-        table.sizeTo(ViewManager.getTerminalColumns(),20);
+        table.sizeTo(ViewManager.getTerminalColumns(),10);
         table.add(form.getQuestions());
 
         //on peut que associer qu'une fois le handler
