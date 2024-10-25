@@ -1,3 +1,4 @@
+
 package tgpr.forms.view;
 
 
@@ -21,35 +22,49 @@ public class EditInstanceView extends DialogWindow {
     public EditInstanceView(EditInstanceController controller) {
         super("Answer a form");
         this.controller = controller;
+
         RequestConfirmation();
+        //AnswerForm();
     }
 
+    private void setViewTitle(String title) {
+        setTitle(title); // Méthode pour changer le titre dynamiquement
+    }
+
+
     private void RequestConfirmation() {
+
+        setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
+
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(55, 5));
+        mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
 
         Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
-        mainPanel.addComponent(textLabel);
+        mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
 
         mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
 
         Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
         buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
         buttonPanel.addComponent(new Button("cancel", this::close));
-
         setHints(List.of(Hint.CENTERED));
 
         buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
         mainPanel.addComponent(buttonPanel);
 
         Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
         container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1)));
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
         container.addComponent(mainPanel);
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1)));
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
 
+        // Définir le panneau de conteneur comme composant principal de la fenêtre
         setComponent(container);
+
     }
 
     private void buttonViewSubmission() {
@@ -61,53 +76,80 @@ public class EditInstanceView extends DialogWindow {
 
     private void buttonCancel() {
     }
-    private int currentQuestionIndex = 0;
-    private Panel questionPanel;
+
+    private int currentQuestionIndex = 0; // Pour suivre l'indice de la question actuelle
+    private Panel questionPanel; // Panel pour afficher la question actuelle
     private Button nextButton;
     private Button previousButton;
-    private Panel buttonPanel;
+    private Panel buttonPanel; // Panel pour les boutons
 
     private void AnswerForm() {
+
+        setViewTitle("Answer the form"); // Titre spécifique pour RequestConfirmation
+
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 30));
 
-        Label titleLabel = new Label("Title: Abc" + Form.getTitle());
-        Label descriptionLabel = new Label("Description: Test form" + Form.getDescription());
-        Label dateLabel = new Label("Started on: " + LocalDateTime.now());
+        Form form = new Form();
+
+        form.setId(1);
+
+        List<Question> questions = form.getQuestions();
+
+        List<Instance> value = form.getInstances();
+
+        Form formData = Form.getByKey(1);
+
+        // Créer et ajouter les labels principaux (Title, Description, and Date)
+        Label titleLabel = new Label("Title: " + formData.getTitle());
+        Label descriptionLabel = new Label("Description: " + formData.getDescription());
+        Label dateLabel = new Label("Started on: " + value.getFirst().getStarted());
 
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(dateLabel);
 
+        // Créer un panneau pour afficher la question actuelle
         questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        questionPanel.setPreferredSize(new TerminalSize(55, 25));
+        questionPanel.setPreferredSize(new TerminalSize(55, 25)); // Taille du panneau
 
         Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        container.addComponent(new EmptySpace(new TerminalSize(20, 1)));
+        container.addComponent(new EmptySpace(new TerminalSize(20, 1))); // Espace vide avant
         container.addComponent(questionPanel);
-        container.addComponent(new EmptySpace(new TerminalSize(3, 1)));
+        container.addComponent(new EmptySpace(new TerminalSize(3, 1))); // Espace vide aprè
 
-        Form form = new Form();
-        form.setId(1);
-        List<Question> questions = form.getQuestions();
 
-        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+        // Créer un panel pour organiser les boutons horizontalement
+        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)); // Initialisation du buttonPanel
+
+        // Ajouter les boutons "Previous", "Next", "Close", et "Cancel"
         createButtons(questions);
+
 
         mainPanel.addComponent(questionPanel);
         mainPanel.addComponent(buttonPanel);
 
+
         displayQuestion(questions);
+
+
         setComponent(mainPanel);
     }
+
+
     private void displayQuestion(List<Question> questions) {
+
         questionPanel.removeAllComponents();
 
         Label emptyLabel = new Label("");
         Label emptyLabel1 = new Label("");
 
+
+
         Label requiredLabelText = new Label("Input Required (*)")
                 .setForegroundColor(TextColor.ANSI.RED);
+
 
         Question question = questions.get(currentQuestionIndex);
 
@@ -124,80 +166,106 @@ public class EditInstanceView extends DialogWindow {
 
         if (question.getRequired()) {
             Label requiredLabel = new Label(" (*)")
-                    .setForegroundColor(TextColor.ANSI.RED);
+                    .setForegroundColor(TextColor.ANSI.RED); // Astérisque en rouge
 
+            // Ajouter l'astérisque rouge au panel horizontal
             titlePanel.addComponent(requiredLabel);
         }
 
+        // Ajouter le panel horizontal avec le titre et l'astérisque au questionPanel
         questionPanel.addComponent(questionNumberLabel);
         questionPanel.addComponent(emptyLabel1);
-        questionPanel.addComponent(titlePanel);
+        questionPanel.addComponent(titlePanel); // Ajouter le panel du titre
+
         questionPanel.addComponent(new Label(""));
 
-        if (question != null) {
-            String type = String.valueOf(question.getType());
+        if (question != null) {  // Check if question is not null
+            String type = String.valueOf(question.getType());  // This should work if getType() returns a String
 
             OptionList options = new OptionList();
             switch (type.toLowerCase()) {
                 case "short":
-                    TextBox shortInput = new TextBox(new TerminalSize(45, 1));
+                    TextBox shortInput = new TextBox(new TerminalSize(45, 1)); // Input pour réponse courte
                     questionPanel.addComponent(shortInput);
                     break;
                 case "email":
-                    TextBox email = new TextBox(new TerminalSize(45, 1));
+                    TextBox email = new TextBox(new TerminalSize(45, 1)); // Input pour réponse courte
                     questionPanel.addComponent(email);
                     break;
                 case "date":
-                    TextBox date = new TextBox(new TerminalSize(45, 1));
+                    TextBox date = new TextBox(new TerminalSize(45, 1)); // Input pour réponse courte
                     questionPanel.addComponent(date);
                     break;
                 case "long":
-                    TextBox longInput = new TextBox(new TerminalSize(55, 1));
+                    TextBox longInput = new TextBox(new TerminalSize(55, 1)); // Input pour réponse courte
                     questionPanel.addComponent(longInput);
                     break;
                 case "combo":
+
+                    // Fetch the list of OptionValues using the getOptionValues method
+
                     options.setId(question.getOptionListId());
                     List<OptionValue> valueOptions = options.getOptionValues();
 
+                    // Create the ComboBox and populate it with option values from the database
                     ComboBox<String> comboInput = new ComboBox<>();
                     for (OptionValue optionValue : valueOptions) {
-                        comboInput.addItem(optionValue.getLabel());
+                        comboInput.addItem(optionValue.getLabel());  // Assuming OptionValue has a getValue() method
                     }
 
+                    // Add the ComboBox to the panel
                     questionPanel.addComponent(comboInput);
                     break;
+
                 case "check":
+                    // Fetch the list of OptionValues using the getOptionValues method
                     options.setId(question.getOptionListId());
                     List<OptionValue> checkboxOptions = options.getOptionValues();
 
+                    // Create the CheckBoxList and populate it with option values from the database
                     CheckBoxList<String> checkboxList = new CheckBoxList<>(new TerminalSize(55, 10));
                     for (OptionValue optionValue : checkboxOptions) {
-                        checkboxList.addItem(optionValue.getLabel());
+                        checkboxList.addItem(optionValue.getLabel());  // Assuming OptionValue has a getLabel() method
                     }
 
+                    // Add the CheckBoxList to the panel
                     questionPanel.addComponent(checkboxList);
                     break;
+
                 case "radio":
+                    // Fetch the list of OptionValues using the getOptionValues method
                     options.setId(question.getOptionListId());
                     List<OptionValue> radioOptions = options.getOptionValues();
 
+                    // Create the RadioBoxList and populate it with option values from the database
                     RadioBoxList<String> radioList = new RadioBoxList<>(new TerminalSize(55, 10));
                     for (OptionValue optionValue : radioOptions) {
-                        radioList.addItem(optionValue.getLabel());
+                        radioList.addItem(optionValue.getLabel());  // Assuming OptionValue has a getLabel() method
                     }
 
+                    // Add the RadioBoxList to the panel
                     questionPanel.addComponent(radioList);
                     break;
+
             }
+        } else {
+            System.out.println("Question object is null.");
         }
 
-        if (question.getRequired()) {
+
+
+        if(question.getRequired()) {
             questionPanel.addComponent(requiredLabelText);
         }
 
-        questionPanel.invalidate();
+        // Mettre à jour l'affichage du panneau des questions
+        questionPanel.invalidate(); // Actualiser l'affichage des questions
+
+        // Mettre à jour la visibilité des boutons
         updateButtonPanel(questions.size());
     }
+
+    // Méthode pour créer les boutons et les ajouter au panel buttonPanel
     private void createButtons(List<Question> questions) {
         Button cancelButton = new Button("Cancel", () -> {
             System.out.println("Cancel clicked");
@@ -205,15 +273,15 @@ public class EditInstanceView extends DialogWindow {
 
         previousButton = new Button("Previous", () -> {
             if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                displayQuestion(questions);
+                currentQuestionIndex--; // Aller à la question précédente
+                displayQuestion(questions); // Actualiser l'affichage
             }
         });
 
         nextButton = new Button("Next", () -> {
             if (currentQuestionIndex < questions.size() - 1) {
-                currentQuestionIndex++;
-                displayQuestion(questions);
+                currentQuestionIndex++; // Aller à la question suivante
+                displayQuestion(questions); // Actualiser l'affichage
             }
         });
 
@@ -221,13 +289,17 @@ public class EditInstanceView extends DialogWindow {
             System.out.println("Close clicked");
         });
 
+        // Ajouter les boutons au panel buttonPanel
         buttonPanel.addComponent(closeButton);
         buttonPanel.addComponent(cancelButton);
     }
 
+    // Méthode pour mettre à jour la visibilité des boutons "Next" et "Previous"
     private void updateButtonPanel(int totalQuestions) {
+        // Supprimer tous les boutons actuels du buttonPanel sauf "Close" et "Cancel"
         buttonPanel.removeAllComponents();
 
+        // Ajouter conditionnellement les boutons "Previous" et "Next"
         Button closeButton = new Button("Close", () -> {
             System.out.println("Close clicked");
         });
@@ -235,18 +307,24 @@ public class EditInstanceView extends DialogWindow {
             System.out.println("Cancel clicked");
         });
 
-        buttonPanel.addComponent(closeButton);
-        buttonPanel.addComponent(cancelButton);
+        buttonPanel.addComponent(closeButton); // Ajouter bouton "Close"
+        buttonPanel.addComponent(cancelButton); // Ajouter bouton "Cancel"
 
         if (currentQuestionIndex > 0) {
+            // Ajouter "Previous" si ce n'est pas la première question
             buttonPanel.addComponent(previousButton);
         }
 
         if (currentQuestionIndex < totalQuestions - 1) {
+            // Ajouter "Next" si ce n'est pas la dernière question
             buttonPanel.addComponent(nextButton);
         }
 
-        buttonPanel.invalidate();
+        // Actualiser l'affichage du panneau des boutons
+        buttonPanel.invalidate(); // Rafraîchir l'affichage des boutons
     }
 
+    public Panel getMainPanel() {
+        return mainPanel;
+    }
 }
