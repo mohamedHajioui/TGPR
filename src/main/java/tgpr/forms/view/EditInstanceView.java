@@ -61,4 +61,44 @@ public class EditInstanceView extends DialogWindow {
 
     private void buttonCancel() {
     }
+    private int currentQuestionIndex = 0;
+    private Panel questionPanel;
+    private Button nextButton;
+    private Button previousButton;
+    private Panel buttonPanel;
+
+    private void AnswerForm() {
+        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        mainPanel.setPreferredSize(new TerminalSize(55, 30));
+
+        Label titleLabel = new Label("Title: Abc" + Form.getTitle());
+        Label descriptionLabel = new Label("Description: Test form" + Form.getDescription());
+        Label dateLabel = new Label("Started on: " + LocalDateTime.now());
+
+        mainPanel.addComponent(titleLabel);
+        mainPanel.addComponent(descriptionLabel);
+        mainPanel.addComponent(dateLabel);
+
+        questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        questionPanel.setPreferredSize(new TerminalSize(55, 25));
+
+        Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        container.addComponent(new EmptySpace(new TerminalSize(20, 1)));
+        container.addComponent(questionPanel);
+        container.addComponent(new EmptySpace(new TerminalSize(3, 1)));
+
+        Form form = new Form();
+        form.setId(1);
+        List<Question> questions = form.getQuestions();
+
+        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        createButtons(questions);
+
+        mainPanel.addComponent(questionPanel);
+        mainPanel.addComponent(buttonPanel);
+
+        displayQuestion(questions);
+        setComponent(mainPanel);
+    }
+
 }
