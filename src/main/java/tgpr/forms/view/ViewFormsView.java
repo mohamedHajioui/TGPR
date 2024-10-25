@@ -70,7 +70,7 @@ public class ViewFormsView extends BasicWindow {
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         MenuItem fileButton = new MenuItem("File", () -> openFileMenu());
-        MenuItem parametersButton = new MenuItem("Parameters");
+        MenuItem parametersButton = new MenuItem("Parameters", () -> openParameterMenu());
         topPanel.addComponent(fileButton);
         topPanel.addComponent(parametersButton);
         return topPanel;
@@ -220,6 +220,20 @@ public class ViewFormsView extends BasicWindow {
 
         // Si l'utilisateur est admin ou propriétaire, il a toujours accès en tant qu'éditeur
         return user.isAdmin() || form.getOwnerId() == user.getId();
+    }
+
+    public void openParameterMenu(){
+        Window parameterMenu = new BasicWindow("");
+        Panel parameterMenuPanel = new Panel();
+
+        MenuItem optionList = new MenuItem("Manage your Option Lists", () ->
+                controller.manageOptionListMenu());
+        MenuItem distributionList = new MenuItem("Manage your Distribution Lists");
+
+        parameterMenuPanel.addComponent(optionList);
+        parameterMenuPanel.addComponent(distributionList);
+        parameterMenu.setComponent(parameterMenuPanel);
+        this.getTextGUI().addWindowAndWait(parameterMenu);
     }
 
     private void openFileMenu() {
