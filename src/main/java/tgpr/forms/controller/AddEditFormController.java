@@ -1,11 +1,12 @@
 package tgpr.forms.controller;
 
-import tgpr.forms.model.FormValidator;
-import tgpr.forms.model.User;
+import tgpr.forms.model.*;
 import tgpr.forms.view.AddEditFormView;
 import tgpr.framework.Controller;
-import tgpr.forms.model.Form;
 import tgpr.framework.ErrorList;
+import tgpr.framework.Params;
+
+import java.util.List;
 
 
 public class AddEditFormController extends Controller<AddEditFormView> {
@@ -52,11 +53,15 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         if (form != null) {
             var errors = validate(title, description);
             if (errors.isEmpty()) {
-                form.setTitle(title);
-                form.setDescription(description);
-                form.setIsPublic(isPublic);
-                form.save();
-                view.close();
+                if (askConfirmation("Are you sure you want to make this form public? " +
+                        "This will delete all existing shares.", "Confirmation")) {
+                    form.getUserFormAccesses();
+                    form.setTitle(title);
+                    form.setDescription(description);
+                    form.setIsPublic(isPublic);
+                    form.save();
+                    view.close();
+                }
             }
         }
     }
