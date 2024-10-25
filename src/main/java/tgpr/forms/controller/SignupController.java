@@ -37,7 +37,13 @@ public class SignupController extends Controller<SignupView> {
         } else if (!EMAIL_PATTERN.matcher(email).matches()) {
             view.setMailErrorMessage("                    Invalid mail");
         } else {
-            view.setMailErrorMessage("");
+            User existingUser = User.getByEmail(email);
+            if (existingUser != null) {
+                view.setMailErrorMessage("                    Already in use");
+            } else {
+                view.setMailErrorMessage("");
+            }
+
         }
         validateOtherFields();
         updateSignupButtonState();
