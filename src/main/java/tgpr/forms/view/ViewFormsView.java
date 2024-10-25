@@ -173,7 +173,7 @@ public class ViewFormsView extends BasicWindow {
         }
         if (hasEditorAccess(form, currentUser)){
             Button manageButton = new Button("Manage");
-            manageButton.addListener(button -> controller.manageForm());
+            manageButton.addListener(button -> controller.manageForm(form));
             buttonPanel.addComponent(manageButton);
         }
         buttonPanel.center();

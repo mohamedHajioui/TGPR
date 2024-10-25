@@ -115,8 +115,8 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         navigateTo(new TestController());
     }
 
-    public void manageForm(){
-        navigateTo(new TestController());
+    public void manageForm(Form form) {
+        navigateTo(new formController(form));
     }
 
     public void createForm(){
