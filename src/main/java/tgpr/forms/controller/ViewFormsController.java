@@ -54,6 +54,10 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         }
     }
 
+    public void manageOptionListMenu(){
+        navigateTo(new TestController());
+    }
+
     public void logout() {
         Security.logout();
         System.out.println("Utilisateur déconnecté.");
