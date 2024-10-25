@@ -100,5 +100,103 @@ public class EditInstanceView extends DialogWindow {
         displayQuestion(questions);
         setComponent(mainPanel);
     }
+    private void displayQuestion(List<Question> questions) {
+        questionPanel.removeAllComponents();
+
+        Label emptyLabel = new Label("");
+        Label emptyLabel1 = new Label("");
+
+        Label requiredLabelText = new Label("Input Required (*)")
+                .setForegroundColor(TextColor.ANSI.RED);
+
+        Question question = questions.get(currentQuestionIndex);
+
+        questionPanel.addComponent(emptyLabel);
+
+        Label questionNumberLabel = new Label("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
+
+        Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+        Label questionTitle = new Label(question.getTitle())
+                .setForegroundColor(TextColor.ANSI.BLACK);
+
+        titlePanel.addComponent(questionTitle);
+
+        if (question.getRequired()) {
+            Label requiredLabel = new Label(" (*)")
+                    .setForegroundColor(TextColor.ANSI.RED);
+
+            titlePanel.addComponent(requiredLabel);
+        }
+
+        questionPanel.addComponent(questionNumberLabel);
+        questionPanel.addComponent(emptyLabel1);
+        questionPanel.addComponent(titlePanel);
+        questionPanel.addComponent(new Label(""));
+
+        if (question != null) {
+            String type = String.valueOf(question.getType());
+
+            OptionList options = new OptionList();
+            switch (type.toLowerCase()) {
+                case "short":
+                    TextBox shortInput = new TextBox(new TerminalSize(45, 1));
+                    questionPanel.addComponent(shortInput);
+                    break;
+                case "email":
+                    TextBox email = new TextBox(new TerminalSize(45, 1));
+                    questionPanel.addComponent(email);
+                    break;
+                case "date":
+                    TextBox date = new TextBox(new TerminalSize(45, 1));
+                    questionPanel.addComponent(date);
+                    break;
+                case "long":
+                    TextBox longInput = new TextBox(new TerminalSize(55, 1));
+                    questionPanel.addComponent(longInput);
+                    break;
+                case "combo":
+                    options.setId(question.getOptionListId());
+                    List<OptionValue> valueOptions = options.getOptionValues();
+
+                    ComboBox<String> comboInput = new ComboBox<>();
+                    for (OptionValue optionValue : valueOptions) {
+                        comboInput.addItem(optionValue.getLabel());
+                    }
+
+                    questionPanel.addComponent(comboInput);
+                    break;
+                case "check":
+                    options.setId(question.getOptionListId());
+                    List<OptionValue> checkboxOptions = options.getOptionValues();
+
+                    CheckBoxList<String> checkboxList = new CheckBoxList<>(new TerminalSize(55, 10));
+                    for (OptionValue optionValue : checkboxOptions) {
+                        checkboxList.addItem(optionValue.getLabel());
+                    }
+
+                    questionPanel.addComponent(checkboxList);
+                    break;
+                case "radio":
+                    options.setId(question.getOptionListId());
+                    List<OptionValue> radioOptions = options.getOptionValues();
+
+                    RadioBoxList<String> radioList = new RadioBoxList<>(new TerminalSize(55, 10));
+                    for (OptionValue optionValue : radioOptions) {
+                        radioList.addItem(optionValue.getLabel());
+                    }
+
+                    questionPanel.addComponent(radioList);
+                    break;
+            }
+        }
+
+        if (question.getRequired()) {
+            questionPanel.addComponent(requiredLabelText);
+        }
+
+        questionPanel.invalidate();
+        updateButtonPanel(questions.size());
+    }
 
 }
