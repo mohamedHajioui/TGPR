@@ -55,7 +55,20 @@ public class AddEditFormController extends Controller<AddEditFormView> {
             if (errors.isEmpty()) {
                 if (askConfirmation("Are you sure you want to make this form public? " +
                         "This will delete all existing shares.", "Confirmation")) {
-                    form.getUserFormAccesses();
+                    if(!form.getIsPublic()) {
+                        List<UserFormAccess> userAccesses = form.getUserFormAccesses();
+                        List<DistListFormAccess> distListAccesses = form.getDistListFormAccesses();
+
+                        userAccesses.removeIf(access -> access.getAccessType() == AccessType.User);
+                        distListAccesses.removeIf(access -> access.getAccessType() == AccessType.User);
+
+                        for (UserFormAccess access : userAccesses) {
+                            access.delete();
+                        }
+                        for (DistListFormAccess access : distListAccesses) {
+                            access.delete();
+                        }
+                    }
                     form.setTitle(title);
                     form.setDescription(description);
                     form.setIsPublic(isPublic);
