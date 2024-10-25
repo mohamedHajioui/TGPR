@@ -1,24 +1,15 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.BorderLayout;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Component;
-import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
-import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.AbstractWindow;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.input.KeyStroke;
-import tgpr.forms.controller.TestController;
 import tgpr.forms.controller.formController;
 import tgpr.forms.model.*;
-import tgpr.framework.Controller;
 import tgpr.framework.ViewManager;
-import java.awt.*;
-import java.awt.desktop.QuitResponse;
-import java.util.ArrayList;
+
 import java.util.List;
 
 import static tgpr.framework.Tools.ifNull;
@@ -134,6 +125,7 @@ public class view_form extends DialogWindow{
 
 
     private Component questionList(){
+        System.out.println("questionList");
         table = new ObjectTable<Question>(
                 new ColumnSpec<>("index title", Question::getIdx),
                 new ColumnSpec<>("Type", Question::getType),
@@ -143,24 +135,14 @@ public class view_form extends DialogWindow{
         table.sizeTo(ViewManager.getTerminalColumns(),15);
         table.add(form.getQuestions());
 
-        table.setSelectAction(this::reorder);
-        System.out.println("bonjour");
-        //le mouvement de l'utilisateur dans la liste fleche haut et bas
-        table.addSelectionChangeListener(this::selectionChanged);
+        if (!normal){
+            reOrder();
+        }
         return table;
     }
 
-    private void selectionChanged(int prec, int current, boolean byUser) {
-        System.out.println(normal);
-        if(!normal){
-            swap(prec, current);
-            table.setSelectAction(this::save);
-        }
 
-    }
-    public void save(){
-        form.reorderQuestions(table.getItems());
-    }
+
 
 
 
@@ -171,7 +153,7 @@ public class view_form extends DialogWindow{
         new Button("Edit Form").addTo(panel);
         new Button("Delete Form", this::delete).addTo(panel);
         new Button("Share").addTo(panel);
-        new Button("Reorder",this::reorder).addTo(panel);
+        new Button("Reorder",this::reOrder).addTo(panel);
         new Button("Analyse").addTo(panel);
         new Button("Cancel", this::close).addTo(panel);
 
@@ -187,24 +169,56 @@ public class view_form extends DialogWindow{
 
     private void returnNormal(){
         normal = true;
-        affichage(normal);
+        affichage(true);
     }
 
     private void delete() {
         controller.delete();
     }
+
+
+
+
+    //1er etape: Rend l'affichage en mode reOrder avec les boutton save et cancel
+
+    private void reOrder() {
+        System.out.println("reOrder");
+        if (normal){
+            normal = false;
+            affichage(false);
+        }
+        table.setSelectAction(this::choice);
+    }
+
+
+    // 2eme etape: attend que l'utilisateur apuisse sur enter pour commencer le swap
+    private void choice(){
+        System.out.println("choice");
+        table.addSelectionChangeListener(this::selectionChanged);
+        System.out.println("test");
+    }
+
+    // 3eme etape: faire le swap jusqu'au prochain appui du enter qui renvoie vers tmpsave
+    private void selectionChanged(int prec, int current, boolean byUser) {
+        System.out.println("sectionChanged");
+        swap(prec, current);
+        System.out.println("return");
+        table.setSelectAction(this::questionList);
+        choice();
+
+
+    }
+
     private void swap(int prec, int current){
+        System.out.println("swap");
         Question tmp = table.getItem(current);
         table.setItem(current, table.getItem(prec));
         table.setItem(prec, tmp);
         table.refresh();
     }
 
-    private void reorder() {
-        normal = !normal;
-        affichage(normal);
-
+    private void endChoice(){
+        affichage(false);
     }
-
 }
 
