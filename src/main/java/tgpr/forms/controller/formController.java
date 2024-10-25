@@ -29,6 +29,26 @@ public class formController extends Controller<view_form> {
         }
     }
 
+    public void versAnalyse(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versShare(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versEditForm(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versNouvelleQuestion(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versEditQuestion(){
+        Controller.navigateTo(new TestController());
+    }
+
     public view_form getView() {return view;}
 
     public void delete(){

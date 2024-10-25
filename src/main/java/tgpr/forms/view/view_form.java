@@ -171,15 +171,31 @@ public class view_form extends DialogWindow{
     private Panel createButtonsNormal(){
         form.reorderQuestions(table.getItems());
         var panel = Panel.horizontalPanel().right().right().center();
-        new Button("Nouvelle Question").addTo(panel);
-        new Button("Edit Form").addTo(panel);
+        new Button("Nouvelle Question",this::nouvelleQuestion).addTo(panel);
+        new Button("Edit Form",this::EditForm).addTo(panel);
         new Button("Delete Form", this::delete).addTo(panel);
-        new Button("Share").addTo(panel);
+        new Button("Share",this::shares).addTo(panel);
         new Button("Reorder",this::reOrder).addTo(panel);
-        new Button("Analyse").addTo(panel);
+        new Button("Analyse",this::Analyse).addTo(panel);
         new Button("Cancel", this::close).addTo(panel);
 
         return panel;
+    }
+    private void Analyse(){
+        controller.versAnalyse();
+    }
+
+    private void EditForm(){
+        controller.versEditForm();
+    }
+
+    private void shares(){
+        controller.versShare();
+    }
+
+    private void nouvelleQuestion(){
+        controller.versNouvelleQuestion();
+        affichage(true);
     }
 
     private Panel createButtonsReorder(){
@@ -223,6 +239,7 @@ public class view_form extends DialogWindow{
     private void save(){
         System.out.println("save");
         form.reorderQuestions(table.getItems());
+        normal = true;
         affichage(true);
     }
 
@@ -243,14 +260,17 @@ public class view_form extends DialogWindow{
     private void reOrder() {
         System.out.println("reOrder");
         affichage(false);
+        normal = false;
 
     }
 
 
     // 2eme etape: attend que l'utilisateur apuisse sur enter pour commencer le swap
     private void choice(){
-        //on change juste l'etat de moving pour dire si on bouge ou paS
-        moving = !moving;
+        if (!normal){
+            //on change juste l'etat de moving pour dire si on bouge ou paS
+            moving = !moving;
+        }else controller.versEditQuestion();
         System.out.println("choice");
     }
 
