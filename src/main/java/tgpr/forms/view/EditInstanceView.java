@@ -198,5 +198,55 @@ public class EditInstanceView extends DialogWindow {
         questionPanel.invalidate();
         updateButtonPanel(questions.size());
     }
+    private void createButtons(List<Question> questions) {
+        Button cancelButton = new Button("Cancel", () -> {
+            System.out.println("Cancel clicked");
+        });
+
+        previousButton = new Button("Previous", () -> {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion(questions);
+            }
+        });
+
+        nextButton = new Button("Next", () -> {
+            if (currentQuestionIndex < questions.size() - 1) {
+                currentQuestionIndex++;
+                displayQuestion(questions);
+            }
+        });
+
+        Button closeButton = new Button("Close", () -> {
+            System.out.println("Close clicked");
+        });
+
+        buttonPanel.addComponent(closeButton);
+        buttonPanel.addComponent(cancelButton);
+    }
+
+    private void updateButtonPanel(int totalQuestions) {
+        buttonPanel.removeAllComponents();
+
+        Button closeButton = new Button("Close", () -> {
+            System.out.println("Close clicked");
+        });
+        Button cancelButton = new Button("Cancel", () -> {
+            System.out.println("Cancel clicked");
+        });
+
+        buttonPanel.addComponent(closeButton);
+        buttonPanel.addComponent(cancelButton);
+
+        if (currentQuestionIndex > 0) {
+            buttonPanel.addComponent(previousButton);
+        }
+
+        if (currentQuestionIndex < totalQuestions - 1) {
+            buttonPanel.addComponent(nextButton);
+        }
+
+        buttonPanel.invalidate();
+    }
 
 }
