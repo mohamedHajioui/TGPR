@@ -94,10 +94,7 @@ public class Instance extends Model {
         setCompleted(LocalDateTime.now());
         save();
     }
-    public List<Question> getQuestions() {
-        Form form = getForm(); // Récupérer le formulaire
-        return form.getQuestions(); // Assure-toi que la méthode getQuestions() existe dans la classe Form
-    }
+
 
 
     @Override
