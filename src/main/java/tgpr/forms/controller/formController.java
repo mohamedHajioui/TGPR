@@ -22,6 +22,13 @@ public class formController extends Controller<view_form> {
         view = new view_form(this,form,normal);
     }
 
+    public void makePublic(){
+        if (askConfirmation("Are you sure you want to delete all instances?"+"\n Note: This will delete instances currently being edited (not submited).", "Delete All Instances")){
+            form.deleteAllInstances();
+            form.save();
+        }
+    }
+
     public view_form getView() {return view;}
 
     public void delete(){
@@ -32,11 +39,5 @@ public class formController extends Controller<view_form> {
         }
     }
 
-    public void reorder() {
-        view.affichage(!normal);
 
-
-
-
-    }
 }

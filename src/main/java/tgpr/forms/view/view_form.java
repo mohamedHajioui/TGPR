@@ -1,5 +1,6 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Component;
@@ -76,6 +77,7 @@ public class view_form extends DialogWindow{
     }
 
     public void affichage(boolean normal) {
+
         setHints(List.of(Hint.CENTERED,Hint.MODAL));
         setCloseWindowWithEscape(true);
         Panel root = Panel.verticalPanel();
@@ -83,8 +85,14 @@ public class view_form extends DialogWindow{
 
         upperDisciption().addTo(root);
         questionList().addTo(root);
+
         if (normal){
-            createButtonsNormal().addTo(root);
+            if(form.isUsed()){
+                createButtonsInstance().addTo(root);
+            }
+            else{
+                createButtonsNormal().addTo(root);
+            }
         }else createButtonsReorder().addTo(root);
     }
 
@@ -122,10 +130,19 @@ public class view_form extends DialogWindow{
     //La methode qui regroupe les placement des description de la partie superieure du panel
     private Panel upperDisciption(){
         Panel panel = Panel.gridPanel(1);
+        panel.addEmpty();
         title().addTo(panel);
         description().addTo(panel);
         createdby().addTo(panel);
         isPublic().addTo(panel);
+        panel.addEmpty();
+        if(form.isUsed()){
+            panel.addEmpty();
+            Label label  = new Label("This form is read only beacause it has already been answered ("+form.getInstances().size()+"instance(s)).");
+            label.setForegroundColor(TextColor.ANSI.BLUE);
+            label.addTo(panel);
+            panel.addEmpty();
+        }
         return panel;
     }
 
@@ -140,7 +157,7 @@ public class view_form extends DialogWindow{
                 new ColumnSpec<>("Required", Question::getRequired),
                 new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
         );
-        table.sizeTo(ViewManager.getTerminalColumns(),15);
+        table.sizeTo(ViewManager.getTerminalColumns(),20);
         table.add(form.getQuestions());
 
         //on peut que associer qu'une fois le handler
@@ -173,6 +190,37 @@ public class view_form extends DialogWindow{
         new Button("Save Order", this::save).addTo(panel);
         new Button("Cancel", this::returnNormal).addTo(panel);
         return panel;
+    }
+
+    private Panel createButtonsInstance(){
+        var panel = Panel.horizontalPanel().right().right().center();
+        new Button("Delete Form", this::delete).addTo(panel);
+        if(form.getIsPublic()){
+            new Button("Make Private", this::makePrivate).addTo(panel);
+        }else new Button("Make Public", this::makePublic).addTo(panel);
+
+        new Button("Clear Instances", this::clearInstances).addTo(panel);
+        new Button("Analyse").addTo(panel);
+        new Button("Close", this::close).addTo(panel);
+        return panel;
+    }
+
+    private void clearInstances(){
+        form.deleteAllInstances();
+        form.save();
+        affichage(normal);
+    }
+
+    private void makePublic(){
+        controller.makePublic();
+        affichage(normal);
+
+    }
+
+    private void makePrivate(){
+        form.setIsPublic(false);
+        form.save();
+        affichage(normal);
     }
 
     private void save(){
