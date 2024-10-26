@@ -272,6 +272,24 @@ public class EditInstanceView extends DialogWindow {
         options.setId(optionListId);
         ComboBox<String> comboInput = new ComboBox<>();
 
+        private ComboBox<String> addComboBoxInput(OptionList options, int optionListId) {
+            options.setId(optionListId);
+            ComboBox<String> comboInput = new ComboBox<>();
+
+            // Add a placeholder item that is not a valid option
+            comboInput.addItem("Please select one"); // Placeholder item
+            comboInput.setSelectedItem("Please select one"); // Set it as selected initially
+
+            // Add actual option values from the OptionList
+            for (OptionValue optionValue : options.getOptionValues()) {
+                comboInput.addItem(optionValue.getLabel());
+            }
+
+            // Add ComboBox to the question panel
+            questionPanel.addComponent(comboInput);
+            return comboInput; // Return the created ComboBox for further use
+        }
+
 
     }
 
