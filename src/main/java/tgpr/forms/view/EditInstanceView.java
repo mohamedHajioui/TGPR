@@ -391,6 +391,12 @@ public class EditInstanceView extends DialogWindow {
             int maxId = getMaxInstanceId(instances);
 
 
+            Question question = questions.get(currentQuestionIndex);
+            Component currentComponent = questionPanel.getChildren().stream()
+                    .filter(component -> component instanceof TextBox || component instanceof ComboBox ||
+                            component instanceof CheckBoxList || component instanceof RadioBoxList)
+                    .findFirst().orElse(null);
+
 
         }
 
