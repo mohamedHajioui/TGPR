@@ -397,7 +397,54 @@ public class EditInstanceView extends DialogWindow {
                             component instanceof CheckBoxList || component instanceof RadioBoxList)
                     .findFirst().orElse(null);
 
+            if (currentComponent instanceof TextBox) {
+                Object[] entry = new Object[3]; // Size of 3 for question ID, response, and instance ID
+                entry[1] = question.getId(); // Question ID
+                entry[2] = ((TextBox) currentComponent).getText(); // Response
+                entry[0] = maxId+1; // Instance ID (assuming it is always 1)
 
+                // Add the entry to the answer list
+                answerList.add(entry);
+                System.out.println("Input Value: " + ((TextBox) currentComponent).getText());
+
+            } else if (currentComponent instanceof ComboBox) {
+                Object[] entry = new Object[3]; // Size of 3 for question ID, response, and instance ID
+                entry[1] = question.getId(); // Question ID
+                entry[2] = ((ComboBox<?>) currentComponent).getSelectedItem(); // Response
+                entry[0] = maxId+1; // Instance ID (assuming it is always 1)
+
+                // Add the entry to the answer list
+                answerList.add(entry);
+                System.out.println("Selected Option: " + ((ComboBox<?>) currentComponent).getSelectedItem());
+
+            } else if (currentComponent instanceof CheckBoxList) {
+                // Cast the currentComponent to CheckBoxList
+                CheckBoxList<?> checkBoxList = (CheckBoxList<?>) currentComponent;
+
+                // Get the selected items from CheckBoxList
+                List<?> selectedItems = checkBoxList.getCheckedItems();
+
+                // Prepare the entry for answerList
+                Object[] entry = new Object[3]; // Size of 3 for question ID, response, and instance ID
+                entry[1] = question.getId(); // Question ID
+                entry[2] = selectedItems; // Store the List of selected items directly
+                entry[0] = maxId+1;// Instance ID (assuming it is always 1)
+
+                // Add the entry to the answer list
+                answerList.add(entry);
+
+                // Print selected options for debugging
+                System.out.println("Selected Options: " + selectedItems.stream().map(Object::toString).collect(Collectors.joining(", ")));
+            } else if (currentComponent instanceof RadioBoxList) {
+                Object[] entry = new Object[3]; // Size of 3 for question ID, response, and instance ID
+                entry[1] = question.getId(); // Question ID
+                entry[2] = ((RadioBoxList<?>) currentComponent).getCheckedItem(); // Response
+                entry[0] = maxId+1; // Instance ID (assuming it is always 1)
+
+                // Add the entry to the answer list
+                answerList.add(entry);
+                System.out.println("Selected Option: " + ((RadioBoxList<?>) currentComponent).getCheckedItem());
+            }
         }
 
 
