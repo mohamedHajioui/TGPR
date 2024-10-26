@@ -186,6 +186,12 @@ public class EditInstanceView extends DialogWindow {
         questionPanel.invalidate();
         updateButtonPanel(questions.size(), questions);
     }
+    private void addSpacingLabel(Panel panel, int count) {
+        for (int i = 0; i < count; i++) {
+            panel.addComponent(new Label(""));
+        }
+    }
+
 
 
 
