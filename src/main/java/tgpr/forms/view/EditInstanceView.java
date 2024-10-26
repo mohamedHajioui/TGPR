@@ -445,7 +445,14 @@ public class EditInstanceView extends DialogWindow {
                 answerList.add(entry);
                 System.out.println("Selected Option: " + ((RadioBoxList<?>) currentComponent).getCheckedItem());
             }
-        }
+
+            public int getMaxInstanceId(List<Answer> instances) {
+                return instances.stream()
+                        .mapToInt(Answer::getInstanceId) // Assuming getId() returns the ID of an instance
+                        .max()
+                        .orElseThrow(() -> new NoSuchElementException("No instances found"));
+            }
+            }
 
 
 
@@ -454,7 +461,9 @@ public class EditInstanceView extends DialogWindow {
 
 
 
-    }
+
+
+
 
 
 
@@ -474,4 +483,5 @@ public class EditInstanceView extends DialogWindow {
 
     public Panel getMainPanel() {
         return mainPanel;
-    }}
+    }
+}
