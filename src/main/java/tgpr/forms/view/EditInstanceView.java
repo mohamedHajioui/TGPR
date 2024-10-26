@@ -263,6 +263,13 @@ public class EditInstanceView extends DialogWindow {
         // Refresh the question panel display
         questionPanel.invalidate();
     }
+        private TextBox addTextBoxInput(int width) {
+            TextBox textBox = new TextBox(new TerminalSize(width, 1));
+            questionPanel.addComponent(textBox);
+            return textBox; // Return the created TextBox for further use
+        }
+
+    }
 
 
 
