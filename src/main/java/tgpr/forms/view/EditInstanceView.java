@@ -452,22 +452,34 @@ public class EditInstanceView extends DialogWindow {
                         .max()
                         .orElseThrow(() -> new NoSuchElementException("No instances found"));
             }
+            // Méthode pour mettre à jour la visibilité des boutons "Next" et "Previous"
+            private void createButtons(List<Question> questions) {
+                // Initialize the error message label
+                // Add the error message label to the panel
+
+                Button cancelButton = new Button("Cancel", () -> {
+                    System.out.println("Cancel clicked");
+                });
+
+                previousButton = new Button("Previous", () -> {
+
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
 
 
 
