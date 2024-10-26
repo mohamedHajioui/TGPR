@@ -563,6 +563,31 @@ public class EditInstanceView extends DialogWindow {
                 buttonPanel.addComponent(closeButton); // Ajouter bouton "Close"
                 buttonPanel.addComponent(cancelButton); // Ajouter bouton "Cancel"
 
+                if (currentQuestionIndex > 0) {
+                    // Ajouter "Previous" si ce n'est pas la première question
+                    buttonPanel.addComponent(previousButton);
+                }
+
+                if (currentQuestionIndex < totalQuestions - 1) {
+                    // Ajouter "Next" si ce n'est pas la dernière question
+                    buttonPanel.addComponent(nextButton);
+                } else {
+                    // Ajouter "SUBMIT" si c'est la dernière question
+                    Button saveButton = new Button("Submit", () -> {
+                        // Clear any previous error messages
+                        errorMessageLabel.setText("");
+
+                        // Retrieve the current question and component
+
+                        displayCurrentInputValue(questions); // Save current input to answerList
+
+                        // Now handle the submission process
+                        ConfirmationOfSubmission();
+                    });
+
+                    buttonPanel.addComponent(saveButton);
+                }
+
 
 
 
