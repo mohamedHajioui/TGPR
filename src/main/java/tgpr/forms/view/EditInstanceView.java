@@ -268,8 +268,16 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(textBox);
             return textBox; // Return the created TextBox for further use
         }
+    private ComboBox<String> addComboBoxInput(OptionList options, int optionListId) {
+        options.setId(optionListId);
+        ComboBox<String> comboInput = new ComboBox<>();
+
 
     }
+
+
+
+}
 
 
 
