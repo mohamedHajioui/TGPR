@@ -28,13 +28,21 @@ public class ManageOptionListsView extends BasicWindow { ;
 
         table = new ObjectTable<>(
                 new ColumnSpec<>("Name",OptionList::getName),
-                new ColumnSpec<>("Values",OptionList::getOptionValues),
+                new ColumnSpec<>("Values", optionList -> String.valueOf(optionList.getOptionValues().size())),
                 new ColumnSpec<>("Owner",optionList -> optionList.getOwner() != null ? optionList.getOwner().getName() : "System")
         );
 
         content.addComponent(table);
         table.setPreferredSize(new TerminalSize(ViewManager.getTerminalColumns(), 15));
 
+        reloadData();
+
+    }
+    private void reloadData() {
+        List<OptionList> optionLists = controller.getOptionLists();
+        table.clear();
+        table.add(optionLists);
+        table.invalidate();
     }
 
 
