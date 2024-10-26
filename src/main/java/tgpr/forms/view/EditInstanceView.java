@@ -520,6 +520,36 @@ public class EditInstanceView extends DialogWindow {
                         }
                     }
                 });
+                nextButton = new Button("Next", () -> {
+                    errorMessageLabel.setText(""); // Clear previous error message
+
+                    // Pass the current question to isInputValid
+                    Question currentQuestion = questions.get(currentQuestionIndex);
+
+                    if (currentQuestion.getRequired()) {
+                        if (isInputValid(currentQuestion)) {
+                            displayCurrentInputValue(questions); // Display current input value
+                            if (currentQuestionIndex < questions.size() - 1) {
+                                currentQuestionIndex++; // Aller à la question suivante
+                                displayQuestion(questions); // Actualiser l'affichage
+                            }
+                        }
+                    } else {
+                        displayCurrentInputValue(questions); // Display current input value
+                        if (currentQuestionIndex < questions.size() - 1) {
+                            currentQuestionIndex++; // Aller à la question suivante
+                            displayQuestion(questions); // Actualiser l'affichage
+                        }
+                    }
+                });
+
+                Button closeButton = new Button("Close", this::displayAnswerList);
+
+                // Add buttons to the buttonPanel
+                buttonPanel.addComponent(closeButton);
+                buttonPanel.addComponent(cancelButton);
+            }
+
 
 
 
