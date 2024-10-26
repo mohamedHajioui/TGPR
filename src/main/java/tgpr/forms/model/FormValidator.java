@@ -9,14 +9,14 @@ public class FormValidator {
         return existingForm == null;
     }
 
-    public static String isValidTitle(String title, User owner) {
+    public static String isValidAvailableTitle(String title, User owner, Form form) {
         if (title == null || title.isBlank()) {
             return "title required";
         }
         if (title.length() < 3) {
             return "min 3 characters required";
         }
-        if(!isTitleUniqueForOwner(title, owner)) {
+        if(!title.equals(form.getTitle()) && !isTitleUniqueForOwner(title, owner)) {
             return "title must be unique for this owner";
         }
         return null;

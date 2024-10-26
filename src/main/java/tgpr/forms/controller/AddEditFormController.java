@@ -30,18 +30,22 @@ public class AddEditFormController extends Controller<AddEditFormView> {
         return form;
     }
 
-    public ErrorList validate(String title, String description) {
+    public ErrorList validate(String title, String description, boolean isPublic) {
         var errors = new ErrorList();
 
-        if (form == null) {
-            errors.add(FormValidator.isValidTitle(title, owner), Form.Fields.Title);
-            errors.add(FormValidator.isValidDescription(description), Form.Fields.Description);
+        var titleError = FormValidator.isValidAvailableTitle(title, owner, form != null ? form : new Form());
+        if (titleError != null) {
+            errors.add(titleError, Form.Fields.Title);
+        }
+        var descriptionError = FormValidator.isValidDescription(description);
+        if (descriptionError != null) {
+            errors.add(descriptionError, Form.Fields.Description);
         }
         return errors;
     }
 
     public void addForm(String title, String description, boolean isPublic) {
-        var errors = validate(title, description);
+        var errors = validate(title, description, isPublic);
         if (errors.isEmpty()) {
             form = new Form(title, description, owner, isPublic);
             form.save();
@@ -51,11 +55,12 @@ public class AddEditFormController extends Controller<AddEditFormView> {
 
     public void updateForm(String title, String description, boolean isPublic) {
         if (form != null) {
-            var errors = validate(title, description);
+            var errors = validate(title, description, isPublic);
             if (errors.isEmpty()) {
-                if (askConfirmation("Are you sure you want to make this form public? " +
-                        "This will delete all existing shares.", "Confirmation")) {
-                    if(!form.getIsPublic()) {
+                if(!form.getIsPublic() && isPublic) {
+                    if (askConfirmation("Are you sure you want to make this form public?\n" +
+                            "This will delete all existing shares.", "Confirmation")) {
+
                         List<UserFormAccess> userAccesses = form.getUserFormAccesses();
                         List<DistListFormAccess> distListAccesses = form.getDistListFormAccesses();
 
@@ -68,13 +73,17 @@ public class AddEditFormController extends Controller<AddEditFormView> {
                         for (DistListFormAccess access : distListAccesses) {
                             access.delete();
                         }
+
+                        form.setIsPublic(isPublic);
+                    } else {
+                        return;
                     }
-                    form.setTitle(title);
-                    form.setDescription(description);
-                    form.setIsPublic(isPublic);
-                    form.save();
-                    view.close();
                 }
+                form.setTitle(title);
+                form.setDescription(description);
+                form.setIsPublic(isPublic);
+                form.save();
+                view.close();
             }
         }
     }

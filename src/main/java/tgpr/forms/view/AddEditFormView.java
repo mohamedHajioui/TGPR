@@ -109,7 +109,8 @@ public class AddEditFormView extends DialogWindow {
     private void validate() {
         var errors = controller.validate(
                 txtTitle.getText(),
-                txtDescription.getText()
+                txtDescription.getText(),
+                chkIsPublic.isChecked()
         );
 
         errTitle.setText(errors.getFirstErrorMessage(Form.Fields.Title));
