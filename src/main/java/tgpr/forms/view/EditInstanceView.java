@@ -202,6 +202,14 @@ public class EditInstanceView extends DialogWindow {
         questionPanel.addComponent(titlePanel);
 
     }
+    private void renderQuestionInput(Question question) {
+        String type = question.getType().toString().toLowerCase();
+        OptionList options = new OptionList();
+
+    }
+
+
+
 
 
 
