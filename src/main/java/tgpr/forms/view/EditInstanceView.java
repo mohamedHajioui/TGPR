@@ -356,6 +356,11 @@ public class EditInstanceView extends DialogWindow {
             return true; // Default case for unsupported components
         }
 
+        // Méthode pour afficher un message d'erreur
+        private void showError(String message) {
+            errorMessageLabel.setText("Error: " + message); // Update the error message label
+        }
+
 
     }
 
