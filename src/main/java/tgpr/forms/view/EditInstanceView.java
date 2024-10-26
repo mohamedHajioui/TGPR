@@ -195,7 +195,11 @@ public class EditInstanceView extends DialogWindow {
         Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label questionTitle = new Label(question.getTitle()).setForegroundColor(TextColor.ANSI.BLACK);
         titlePanel.addComponent(questionTitle);
-
+        if (question.getRequired()) {
+            Label requiredLabel = new Label(" (*)").setForegroundColor(TextColor.ANSI.RED);
+            titlePanel.addComponent(requiredLabel);
+        }
+        questionPanel.addComponent(titlePanel);
 
     }
 
