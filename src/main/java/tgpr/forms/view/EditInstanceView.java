@@ -191,6 +191,15 @@ public class EditInstanceView extends DialogWindow {
             panel.addComponent(new Label(""));
         }
     }
+    private void addQuestionTitleWithRequiredMarker(Question question) {
+        Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Label questionTitle = new Label(question.getTitle()).setForegroundColor(TextColor.ANSI.BLACK);
+        titlePanel.addComponent(questionTitle);
+
+
+    }
+
+
 
 
 
