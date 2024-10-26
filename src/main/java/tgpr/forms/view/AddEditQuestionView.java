@@ -95,6 +95,13 @@ public class AddEditQuestionView extends DialogWindow {
             cbOption.addItem(optionList);
         }
         updateOptionListState();
+        if(question != null){
+            txtTitle.setText(question.getTitle());
+            txtDescription.setText(question.getDescription());
+            cbType.setSelectedItem(question.getType());
+            cklRequired.setChecked(question.getRequired());
+            cbOption.setSelectedItem(question.getOptionList());
+        }
     }
 
 
