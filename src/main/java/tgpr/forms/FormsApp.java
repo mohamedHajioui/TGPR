@@ -20,8 +20,6 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         else {
             Controller.navigateTo(new LoginController());
-
-
         }
     }
 }
