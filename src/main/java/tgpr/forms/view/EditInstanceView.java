@@ -665,6 +665,86 @@ public class EditInstanceView extends DialogWindow {
                     System.out.println("------------------------------");
                 }
             }
+            private void displayAnswerList() {
+                System.out.println("----- Submitted Answers -----");
+
+
+
+                for (Object[] entry : answerList) {
+                    // Assuming entry[0] is questionId, entry[1] is response, and entry[2] is instanceId
+                    int questionId = (int) entry[1]; // Get the question ID
+                    Object response = entry[2]; // Get the response
+                    int instanceId = (int) entry[0]; // Get the instance ID
+
+                    System.out.println("Question ID: " + questionId);
+
+                    // Check if the response is a List (as returned by CheckBoxList)
+                    if (response instanceof List) {
+                        List<?> responses = (List<?>) response;
+                        String responseString = responses.stream()
+                                .map(Object::toString) // Convert each item to a String
+                                .collect(Collectors.joining(", "));
+                        System.out.println("Responses: " + responseString);
+                        // Save each response for CheckBoxList separately if needed
+                        for (Object res : responses) {
+                            saveAnswer(instanceId, questionId, res.toString());
+                        }
+                    } else {
+                        // Print response directly (for TextBox, ComboBox, or RadioBoxList)
+                        System.out.println("Response: " + response);
+                        saveAnswer(instanceId, questionId, response.toString()); // Save response
+                    }
+
+                    System.out.println("Instance ID: " + instanceId);
+                    System.out.println("------------------------------");
+                }
+            }
+
+            private void displayAnswerList() {
+                System.out.println("----- Submitted Answers -----");
+
+
+
+                for (Object[] entry : answerList) {
+                    // Assuming entry[0] is questionId, entry[1] is response, and entry[2] is instanceId
+                    int questionId = (int) entry[1]; // Get the question ID
+                    Object response = entry[2]; // Get the response
+                    int instanceId = (int) entry[0]; // Get the instance ID
+
+                    System.out.println("Question ID: " + questionId);
+
+                    // Check if the response is a List (as returned by CheckBoxList)
+                    if (response instanceof List) {
+                        List<?> responses = (List<?>) response;
+                        String responseString = responses.stream()
+                                .map(Object::toString) // Convert each item to a String
+                                .collect(Collectors.joining(", "));
+                        System.out.println("Responses: " + responseString);
+                        // Save each response for CheckBoxList separately if needed
+                        for (Object res : responses) {
+                            saveAnswer(instanceId, questionId, res.toString());
+                        }
+                    } else {
+                        // Print response directly (for TextBox, ComboBox, or RadioBoxList)
+                        System.out.println("Response: " + response);
+                        saveAnswer(instanceId, questionId, response.toString()); // Save response
+                    }
+
+                    System.out.println("Instance ID: " + instanceId);
+                    System.out.println("------------------------------");
+                }
+            }
+
+            private void saveAnswer(int instanceId, int questionId, String value) {
+                Answer answer = new Answer(); // Create a new Answer object
+                answer.setInstanceId(instanceId); // Assuming you have a method to set instance ID
+                answer.setQuestionId(questionId); // Assuming you have a method to set question ID
+                answer.setValue(value); // Assuming you have a method to set value
+
+                // Call the save method
+                answer.save();
+            }
+
 
 
 
