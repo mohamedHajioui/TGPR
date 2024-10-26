@@ -289,6 +289,16 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(comboInput);
             return comboInput; // Return the created ComboBox for further use
         }
+        private CheckBoxList<String> addCheckBoxListInput(OptionList options, int optionListId) {
+            options.setId(optionListId);
+            CheckBoxList<String> checkBoxList = new CheckBoxList<>(new TerminalSize(55, 10));
+            for (OptionValue optionValue : options.getOptionValues()) {
+                checkBoxList.addItem(optionValue.getLabel());
+            }
+            questionPanel.addComponent(checkBoxList);
+            return checkBoxList; // Return the created CheckBoxList for further use
+        }
+
 
 
     }
