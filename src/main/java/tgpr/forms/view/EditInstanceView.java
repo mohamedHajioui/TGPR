@@ -549,6 +549,22 @@ public class EditInstanceView extends DialogWindow {
                 buttonPanel.addComponent(closeButton);
                 buttonPanel.addComponent(cancelButton);
             }
+            private void updateButtonPanel(int totalQuestions, List<Question> questions) {
+                // Supprimer tous les boutons actuels du buttonPanel sauf "Close" et "Cancel"
+                buttonPanel.removeAllComponents();
+
+                // Ajouter conditionnellement les boutons "Previous" et "Save"
+                Button closeButton = new Button("Close", this::displayAnswerList);
+
+                Button cancelButton = new Button("Cancel", () -> {
+                    ConfirmationCancel();
+                });
+
+                buttonPanel.addComponent(closeButton); // Ajouter bouton "Close"
+                buttonPanel.addComponent(cancelButton); // Ajouter bouton "Cancel"
+
+
+
 
 
 
