@@ -645,6 +645,24 @@ public class EditInstanceView extends DialogWindow {
                     System.out.println("Question ID: " + questionId);
 
                     // Check if the response is a List (as returned by CheckBoxList)
+                    if (response instanceof List) {
+                        List<?> responses = (List<?>) response;
+                        String responseString = responses.stream()
+                                .map(Object::toString) // Convert each item to a String
+                                .collect(Collectors.joining(", "));
+                        System.out.println("Responses: " + responseString);
+                        // Save each response for CheckBoxList separately if needed
+                        for (Object res : responses) {
+                            saveAnswer(instanceId, questionId, res.toString());
+                        }
+                    } else {
+                        // Print response directly (for TextBox, ComboBox, or RadioBoxList)
+                        System.out.println("Response: " + response);
+                        saveAnswer(instanceId, questionId, response.toString()); // Save response
+                    }
+
+                    System.out.println("Instance ID: " + instanceId);
+                    System.out.println("------------------------------");
                 }
             }
 
