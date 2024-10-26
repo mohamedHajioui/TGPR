@@ -212,6 +212,9 @@ public class EditInstanceView extends DialogWindow {
             currentAnswer = answerList.get(currentQuestionIndex);
         }
 
+        // Clear previous input components to avoid carryover
+        questionPanel.removeAllComponents(); // Clear the previous inputs
+
 
     }
 
