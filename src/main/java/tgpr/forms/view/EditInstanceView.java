@@ -744,6 +744,82 @@ public class EditInstanceView extends DialogWindow {
                 // Call the save method
                 answer.save();
             }
+            private void IndicateFormSubmitted() {
+
+                setViewTitle("Information");
+                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
+
+                Label textLabel = new Label("The form has been successfully submitted");
+                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
+
+                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("OK", this::close));
+
+
+                setHints(List.of(Hint.CENTERED));
+
+                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+                mainPanel.addComponent(buttonPanel);
+
+                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                container.addComponent(mainPanel);
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+                // Définir le panneau de conteneur comme composant principal de la fenêtre
+                setComponent(container);
+
+            }
+            private void ButtonOK() {
+
+            }
+            private void ConfirmationCancel() {
+                setViewTitle("Delete Instance");
+                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                mainPanel.setPreferredSize(new TerminalSize(45, 3)); // Définir une taille préférée pour le panel
+
+                Label textLabel = new Label("Are you sure you want to delete this instance and its answers ?");
+                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
+
+                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("Yes", this::ButtonCancelYes));
+                buttonPanel.addComponent(new Button("No", this::ButtonCancelNo));
+
+                setHints(List.of(Hint.CENTERED));
+
+                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+                mainPanel.addComponent(buttonPanel);
+
+                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                container.addComponent(mainPanel);
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+                // Définir le panneau de conteneur comme composant principal de la fenêtre
+                setComponent(container);
+
+            }
+            private void ButtonCancelYes() {
+                close();
+            }
+            private void ButtonCancelNo() {
+
+            }
+
+
 
 
 
