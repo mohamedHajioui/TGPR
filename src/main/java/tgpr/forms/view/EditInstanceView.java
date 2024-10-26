@@ -462,7 +462,23 @@ public class EditInstanceView extends DialogWindow {
                 });
 
                 previousButton = new Button("Previous", () -> {
+                    if (currentQuestionIndex > 0) {
+                        // Before moving to the previous question, display the answer for the current question index
+                        Object[] currentAnswer = answerList.get(currentQuestionIndex - 1); // Get the answer for the previous question
+                        System.out.println("Previous Question ID: " + currentAnswer[1]); // Display the question ID
+                        if (currentAnswer[2] instanceof List) {
+                            // Check if the response is a List and print the responses
+                            List<?> responses = (List<?>) currentAnswer[2];
+                            String responseString = responses.stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(", "));
+                            System.out.println("Previous Responses: " + responseString);
+                        } else {
+                            System.out.println("Previous Response: " + currentAnswer[2]);
+                        }
 
+
+                    }
                 });
 
 
