@@ -206,7 +206,15 @@ public class EditInstanceView extends DialogWindow {
         String type = question.getType().toString().toLowerCase();
         OptionList options = new OptionList();
 
+        // Fetch the answer for the current question, if it exists
+        Object[] currentAnswer = null;
+        if (currentQuestionIndex < answerList.size()) {
+            currentAnswer = answerList.get(currentQuestionIndex);
+        }
+
+
     }
+
 
 
 
