@@ -384,6 +384,18 @@ public class EditInstanceView extends DialogWindow {
             }
             return false; // All formats failed
         }
+        // Méthode pour afficher la valeur actuelle de l'input
+        private void displayCurrentInputValue(List<Question> questions) {
+
+            List<Answer> instances = Answer.getAll();
+            int maxId = getMaxInstanceId(instances);
+
+
+
+        }
+
+
+
 
 
 
