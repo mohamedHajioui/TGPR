@@ -360,6 +360,13 @@ public class EditInstanceView extends DialogWindow {
         private void showError(String message) {
             errorMessageLabel.setText("Error: " + message); // Update the error message label
         }
+        // Email validation method
+        private boolean isValidEmail(String email) {
+            String emailRegex = "^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,4}$"; // Simple regex for email validation
+            return email.matches(emailRegex);
+        }
+
+
 
 
     }
