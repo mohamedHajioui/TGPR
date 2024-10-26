@@ -8,8 +8,10 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.CheckBox;
 import tgpr.forms.controller.AddEditFormController;
+import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.User;
+import tgpr.framework.Controller;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -85,6 +87,7 @@ public class AddEditFormView extends DialogWindow {
     private void createOrUpdate() {
         if (form == null) {
             addForm();
+            Controller.navigateTo(new ViewFormsController(owner));
         } else {
             updateForm();
         }
