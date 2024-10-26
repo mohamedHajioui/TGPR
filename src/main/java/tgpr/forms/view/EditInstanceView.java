@@ -588,7 +588,9 @@ public class EditInstanceView extends DialogWindow {
                     buttonPanel.addComponent(saveButton);
                 }
 
-
+                // Actualiser l'affichage du panneau des boutons
+                buttonPanel.invalidate(); // Rafraîchir l'affichage des boutons
+            }
 
 
 
