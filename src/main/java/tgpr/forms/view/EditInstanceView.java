@@ -260,7 +260,8 @@ public class EditInstanceView extends DialogWindow {
                 System.out.println("Unknown question type: " + type);
         }
 
-
+        // Refresh the question panel display
+        questionPanel.invalidate();
     }
 
 
