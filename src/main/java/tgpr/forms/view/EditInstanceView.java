@@ -495,6 +495,29 @@ public class EditInstanceView extends DialogWindow {
                             displayQuestion(questions); // Update the display for the previous question
                         }
 
+
+                    }
+                });
+                nextButton = new Button("Next", () -> {
+                    errorMessageLabel.setText(""); // Clear previous error message
+
+                    // Pass the current question to isInputValid
+                    Question currentQuestion = questions.get(currentQuestionIndex);
+
+                    if (currentQuestion.getRequired()) {
+                        if (isInputValid(currentQuestion)) {
+                            displayCurrentInputValue(questions); // Display current input value
+                            if (currentQuestionIndex < questions.size() - 1) {
+                                currentQuestionIndex++; // Aller à la question suivante
+                                displayQuestion(questions); // Actualiser l'affichage
+                            }
+                        }
+                    } else {
+                        displayCurrentInputValue(questions); // Display current input value
+                        if (currentQuestionIndex < questions.size() - 1) {
+                            currentQuestionIndex++; // Aller à la question suivante
+                            displayQuestion(questions); // Actualiser l'affichage
+                        }
                     }
                 });
 
@@ -512,7 +535,10 @@ public class EditInstanceView extends DialogWindow {
 
 
 
-            }
+
+
+
+        }
 
 
 
