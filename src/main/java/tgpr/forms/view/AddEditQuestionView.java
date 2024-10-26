@@ -140,7 +140,6 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void handleCancel() {
-        // Fermer la fenêtre sans rien faire
         close();
     }
     private void questionTypes() {
