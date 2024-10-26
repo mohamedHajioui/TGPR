@@ -308,10 +308,53 @@ public class EditInstanceView extends DialogWindow {
             return radioList; // Return the created RadioBoxList for further use
         }
 
-
         // Méthode pour créer les boutons et les ajouter au panel buttonPanel
         private Label errorMessageLabel; // Add a field for the error message label
 
+        private boolean isInputValid(Question currentQuestion) {
+            Component currentComponent = questionPanel.getChildren().stream()
+                    .filter(component -> component instanceof TextBox || component instanceof ComboBox ||
+                            component instanceof CheckBoxList || component instanceof RadioBoxList)
+                    .findFirst().orElse(null);
+
+            if (currentComponent instanceof TextBox) {
+                String text = ((TextBox) currentComponent).getText().trim();
+                if (text.isEmpty()) {
+                    showError("This field cannot be empty.");
+                    return false;
+                }
+                // Additional checks based on question type
+                if ("email".equalsIgnoreCase(currentQuestion.getType().toString()) && !isValidEmail(text)) {
+                    showError("Invalid email format.");
+                    return false;
+                }  else if ("date".equalsIgnoreCase(currentQuestion.getType().toString()) && !isValidDate(text)) {
+                    showError("Invalid date format.");
+                    return false;
+                }
+                return true;
+            } else if (currentComponent instanceof ComboBox) {
+                if (((ComboBox<?>) currentComponent).getSelectedItem() == null ||
+                        "Please select one".equals(((ComboBox<?>) currentComponent).getSelectedItem())) {
+                    showError("Please select an option.");
+                    return false;
+                }
+                return true;
+            } else if (currentComponent instanceof CheckBoxList) {
+                if (((CheckBoxList<?>) currentComponent).getCheckedItems().isEmpty()) {
+                    showError("Please select at least one option.");
+                    return false;
+                }
+                return true;
+            } else if (currentComponent instanceof RadioBoxList) {
+                if (((RadioBoxList<?>) currentComponent).getCheckedItem() == null) {
+                    showError("Please select an option.");
+                    return false;
+                }
+                return true;
+            }
+
+            return true; // Default case for unsupported components
+        }
 
 
     }
