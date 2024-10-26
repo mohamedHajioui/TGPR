@@ -631,6 +631,25 @@ public class EditInstanceView extends DialogWindow {
 
             }
 
+            private void displayAnswerList() {
+                System.out.println("----- Submitted Answers -----");
+
+
+
+                for (Object[] entry : answerList) {
+                    // Assuming entry[0] is questionId, entry[1] is response, and entry[2] is instanceId
+                    int questionId = (int) entry[1]; // Get the question ID
+                    Object response = entry[2]; // Get the response
+                    int instanceId = (int) entry[0]; // Get the instance ID
+
+                    System.out.println("Question ID: " + questionId);
+
+                    // Check if the response is a List (as returned by CheckBoxList)
+                }
+            }
+
+
+
 
 
 
