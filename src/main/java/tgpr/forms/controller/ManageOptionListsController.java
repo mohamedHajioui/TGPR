@@ -15,4 +15,8 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
     public List<OptionList> getOptionLists() {
         return OptionList.getAll();
     }
+    public void navigateToOptinList(OptionList optionList){
+        navigateTo(new TestController());
+
+    }
 }
