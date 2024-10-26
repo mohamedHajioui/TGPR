@@ -272,7 +272,7 @@ public class EditInstanceView extends DialogWindow {
         options.setId(optionListId);
         ComboBox<String> comboInput = new ComboBox<>();
 
-        private ComboBox<String> addComboBoxInput (OptionList options,int optionListId){
+        private ComboBox<String> addComboBoxInput(OptionList options, int optionListId) {
             options.setId(optionListId);
             ComboBox<String> comboInput = new ComboBox<>();
 
@@ -289,7 +289,7 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(comboInput);
             return comboInput; // Return the created ComboBox for further use
         }
-        private CheckBoxList<String> addCheckBoxListInput (OptionList options,int optionListId){
+        private CheckBoxList<String> addCheckBoxListInput(OptionList options, int optionListId) {
             options.setId(optionListId);
             CheckBoxList<String> checkBoxList = new CheckBoxList<>(new TerminalSize(55, 10));
             for (OptionValue optionValue : options.getOptionValues()) {
@@ -298,7 +298,7 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(checkBoxList);
             return checkBoxList; // Return the created CheckBoxList for further use
         }
-        private RadioBoxList<String> addRadioBoxListInput (OptionList options,int optionListId){
+        private RadioBoxList<String> addRadioBoxListInput(OptionList options, int optionListId) {
             options.setId(optionListId);
             RadioBoxList<String> radioList = new RadioBoxList<>(new TerminalSize(55, 10));
             for (OptionValue optionValue : options.getOptionValues()) {
@@ -307,6 +307,12 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(radioList);
             return radioList; // Return the created RadioBoxList for further use
         }
+
+
+        // Méthode pour créer les boutons et les ajouter au panel buttonPanel
+        private Label errorMessageLabel; // Add a field for the error message label
+
+
 
     }
 
