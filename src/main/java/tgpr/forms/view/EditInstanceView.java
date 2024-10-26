@@ -365,6 +365,26 @@ public class EditInstanceView extends DialogWindow {
             String emailRegex = "^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,4}$"; // Simple regex for email validation
             return email.matches(emailRegex);
         }
+        private boolean isValidDate(String date) {
+            String[] dateFormats = {
+                    "yyyy-MM-dd",
+                    "dd-MM-yyyy",
+                    "MM/dd/yyyy",
+                    "dd/MM/yyyy"
+            };
+
+            for (String format : dateFormats) {
+                try {
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(format);
+                    LocalDate.parse(date, dateFormatter);
+                    return true; // Valid date found
+                } catch (DateTimeParseException e) {
+                    // Continue checking the next format
+                }
+            }
+            return false; // All formats failed
+        }
+
 
 
 
