@@ -215,6 +215,51 @@ public class EditInstanceView extends DialogWindow {
         // Clear previous input components to avoid carryover
         questionPanel.removeAllComponents(); // Clear the previous inputs
 
+        switch (type) {
+            case "short":
+            case "email":
+            case "date":
+                TextBox textBox = addTextBoxInput(45);
+                // If there's an answer, populate the TextBox
+                if (currentAnswer != null && currentAnswer[2] instanceof String) {
+                    textBox.setText((String) currentAnswer[2]);
+                }
+                break;
+            case "long":
+                TextBox longTextBox = addTextBoxInput(55);
+                // If there's an answer, populate the TextBox
+                if (currentAnswer != null && currentAnswer[2] instanceof String) {
+                    longTextBox.setText((String) currentAnswer[2]);
+                }
+                break;
+            case "combo":
+                ComboBox<String> comboInput = addComboBoxInput(options, question.getOptionListId());
+                // If there's an answer, set the selected item
+                if (currentAnswer != null && currentAnswer[2] instanceof String) {
+                    comboInput.setSelectedItem((String) currentAnswer[2]);
+                }
+                break;
+            case "check":
+                CheckBoxList<String> checkBoxList = addCheckBoxListInput(options, question.getOptionListId());
+                // If there's an answer and it's a List, check the corresponding boxes
+                if (currentAnswer != null && currentAnswer[2] instanceof List) {
+                    List<?> responses = (List<?>) currentAnswer[2];
+                    for (Object item : responses) {
+                        checkBoxList.setChecked(item.toString(), true); // Check each item based on previous answers
+                    }
+                }
+                break;
+            case "radio":
+                RadioBoxList<String> radioList = addRadioBoxListInput(options, question.getOptionListId());
+                // If there's an answer, set the checked item
+                if (currentAnswer != null && currentAnswer[2] instanceof String) {
+                    radioList.setCheckedItem((String) currentAnswer[2]);
+                }
+                break;
+            default:
+                System.out.println("Unknown question type: " + type);
+        }
+
 
     }
 
