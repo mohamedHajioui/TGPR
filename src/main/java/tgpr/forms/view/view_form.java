@@ -187,6 +187,7 @@ public class view_form extends DialogWindow{
 
     private void EditForm(){
         controller.versEditForm();
+        affichage(true);
     }
 
     private void shares(){

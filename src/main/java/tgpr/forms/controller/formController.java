@@ -39,6 +39,7 @@ public class formController extends Controller<view_form> {
 
     public void versEditForm(){
         Controller.navigateTo(new AddEditFormController(form.getOwner(), form));
+        form.save();
     }
 
     public void versNouvelleQuestion(){
