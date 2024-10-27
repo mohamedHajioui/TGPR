@@ -19,7 +19,7 @@ public class ManageOptionListsView extends BasicWindow { ;
         this.controller = controller;
         setTitle("Manage Option Lists");
         setHints(List.of(Hint.CENTERED));
-        setFixedSize(new TerminalSize(80, 30));
+        setFixedSize(new TerminalSize(70, 15));
 
         Panel root = new Panel();
         setComponent(root);
@@ -36,6 +36,8 @@ public class ManageOptionListsView extends BasicWindow { ;
         table.setPreferredSize(new TerminalSize(ViewManager.getTerminalColumns(), 15));
 
         reloadData();
+        // Action pour ouvrir une liste d'options avec la touche Enter
+        //table.setSelectAction(() -> handleEditList(table.getSelectedObject()));
 
     }
     private void reloadData() {
@@ -43,6 +45,14 @@ public class ManageOptionListsView extends BasicWindow { ;
         table.clear();
         table.add(optionLists);
         table.invalidate();
+    }
+    private void handleNewList() {
+        controller.navigateToOptinList(new OptionList());
+    }
+    private void handleEditList(OptionList optionList) {
+        if(optionList != null) {
+            controller.navigateToOptinList(optionList);
+        }
     }
 
 
