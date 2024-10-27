@@ -1,13 +1,9 @@
 package tgpr.forms;
 
-import tgpr.forms.controller.AddEditQuestionController;
-import tgpr.forms.controller.LoginController;
-import tgpr.forms.controller.SignupController;
-import tgpr.forms.controller.TestController;
+import tgpr.forms.controller.*;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
-import tgpr.forms.controller.formController;
 import tgpr.framework.Model;
 import tgpr.forms.model.User;
 import tgpr.forms.model.Form;
@@ -19,7 +15,7 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Form form = Form.getByKey(14);
+            Form form = Form.getByTitleAndUser("Aaa", User.getByFullName("Benoît Penelle"));
             Controller.navigateTo(new AnalyseController(form));
 
 

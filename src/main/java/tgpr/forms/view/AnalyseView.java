@@ -24,7 +24,7 @@ public class AnalyseView extends DialogWindow {
 
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
         Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Label titleLabel = new Label("Title:                       ");
+        Label titleLabel = new Label("Title:                        ");
         Label titleForm = new Label(currentForm.getTitle());
         titlePanel.addComponent(titleLabel);
         titlePanel.addComponent(titleForm);
@@ -32,12 +32,14 @@ public class AnalyseView extends DialogWindow {
 
 
         Panel descriptionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Label description = new Label("Description:                 ");
+        Label description = new Label("Description:                  ");
         descriptionPanel.addComponent(description);
         Label descriptionForm = new Label(currentForm.getDescription());
         descriptionPanel.addComponent(descriptionForm);
         mainPanel.addComponent(descriptionPanel);
-        Label nbInstances = new Label("Number of Submitted Instances:");
+        Panel instancesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Label nbInstances = new Label("Number of Submitted Instances: " + controller.getSubmittedInstancesCount());
+
         mainPanel.addComponent(nbInstances);
 
     }
