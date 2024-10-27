@@ -29,13 +29,38 @@ public class formController extends Controller<view_form> {
         }
     }
 
+    public void versAnalyse(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versShare(){
+        Controller.navigateTo(new TestController());
+    }
+
+    public void versEditForm(){
+        Controller.navigateTo(new AddEditFormController(form.getOwner(), form));
+        form.save();
+    }
+
+    public void versNouvelleQuestion(){
+        Controller.navigateTo(new AddEditQuestionController(null,form));
+        form.save();
+    }
+
+    public void versEditQuestion(Question question){
+        Controller.navigateTo(new AddEditQuestionController(question,form));
+        form.save();
+    }
+
     public view_form getView() {return view;}
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
+            User owner = form.getOwner();
             form.delete();
             view.close();
             form = null;
+            Controller.navigateTo(new ViewFormsController(owner));
         }
     }
 
