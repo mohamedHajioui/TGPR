@@ -56,9 +56,11 @@ public class formController extends Controller<view_form> {
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
+            User owner = form.getOwner();
             form.delete();
             view.close();
             form = null;
+            Controller.navigateTo(new ViewFormsController(owner));
         }
     }
 
