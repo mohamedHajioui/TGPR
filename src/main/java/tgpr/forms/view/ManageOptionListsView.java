@@ -14,8 +14,7 @@ public class ManageOptionListsView extends BasicWindow { ;
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;
     private final Button newListButton;
-    private final Button closeButton;
-    //private final Button Cancel;
+    private final Button cancelButton;
     public ManageOptionListsView(ManageOptionListsController controller) {
         this.controller = controller;
         setTitle("Manage Option Lists");
@@ -28,17 +27,20 @@ public class ManageOptionListsView extends BasicWindow { ;
         Panel content = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
         table = new ObjectTable<>(
-                new ColumnSpec<>("Name",OptionList::getName),
+                new ColumnSpec<>("Name",OptionList::getName).setMinWidth(45),
                 new ColumnSpec<>("Values", optionList -> String.valueOf(optionList.getOptionValues().size())),
                 new ColumnSpec<>("Owner",optionList -> optionList.getOwner() != null ? optionList.getOwner().getName() : "System")
         );
+
+        //table.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+        table.setPreferredSize(new TerminalSize(ViewManager.getTerminalColumns(), 15));
 
         content.addComponent(table);
 
         content.addComponent(new EmptySpace(new TerminalSize(80, 6)));
         Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         newListButton = new Button("New list", this::handleNewList).addTo(buttonsPanel);
-        closeButton = new Button("Close", this::close).addTo(buttonsPanel);
+        cancelButton = new Button("Cancel", this::close).addTo(buttonsPanel);
         buttonsPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         content.addComponent(buttonsPanel);
 
