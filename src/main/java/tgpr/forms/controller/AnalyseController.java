@@ -31,23 +31,32 @@ public class AnalyseController extends Controller<AnalyseView> {
 
     public Map<String, Long> getAnswerStatistics(Question question) {
         List<Answer> answers = question.getAnswers();
+
         return answers.stream()
-                .collect(Collectors.groupingBy(answer -> {
+                .map(answer -> {
                     String value = answer.getValue();
-                    return (value == null || value.isBlank()) ? "--- vide ---" : value;
-                }, Collectors.counting()));
+                    if (isNumeric(value)) {
+                        // Si la value est numérique, récupérer le label de l'OptionValue correspondant
+                        OptionValue optionValue = OptionValue.getByKey(Integer.parseInt(value), question.getOptionListId());
+                        return optionValue != null ? optionValue.getLabel() : "--- vide ---";
+                    } else {
+                        // Si ce n'est pas un identifiant, utiliser la valeur elle-même
+                        return value != null && !value.isEmpty() ? value : "--- vide ---";
+                    }
+                })
+                .collect(Collectors.groupingBy(label -> label, Collectors.counting()));
     }
 
-    // Méthode pour obtenir la valeur à afficher pour chaque réponse
-    private String getDisplayValue(Answer answer, Question question) {
+    // Méthode utilitaire pour vérifier si une chaîne est numérique
+    private boolean isNumeric(String str) {
         try {
-            int index = Integer.parseInt(answer.getValue());
-            OptionValue optionValue = OptionValue.getByKey(index, question.getOptionListId());
-            return optionValue != null ? optionValue.getLabel() : "Unknown value";
+            Integer.parseInt(str);
+            return true;
         } catch (NumberFormatException e) {
-            return answer.getValue();
+            return false;
         }
     }
+
 
     //Obtenir le nombre total de réponses pour une question
     public long getTotalResponses(Question question) {
