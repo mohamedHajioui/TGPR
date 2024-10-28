@@ -1,17 +1,25 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.gui2.table.TableRenderer;
 import org.slf4j.helpers.LegacyAbstractLogger;
 import tgpr.forms.controller.AnalyseController;
 import tgpr.forms.model.Form;
+import tgpr.forms.model.Question;
 
 import java.util.List;
+import java.util.Map;
 
 public class AnalyseView extends DialogWindow {
     private final AnalyseController controller;
     private Panel mainPanel;
+    private Table<String> answersTable;
 
     public AnalyseView(AnalyseController controller, Form currentForm) {
         super("Statistical Analysis of Submitted Instances");
@@ -39,8 +47,32 @@ public class AnalyseView extends DialogWindow {
         mainPanel.addComponent(descriptionPanel);
         Panel instancesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Label nbInstances = new Label("Number of Submitted Instances: " + controller.getSubmittedInstancesCount());
-
         mainPanel.addComponent(nbInstances);
+        mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+        displayQuestionsTable(currentForm.getQuestions());
 
     }
+
+    public void displayQuestionsTable(List<Question> questions){
+        Table<String> questionsTable = new Table<>("Index", "Title                         ");
+        questionsTable.setPreferredSize(new TerminalSize(60, 10));
+        //remplissage du tableau avec les questions
+        for (Question question : questions) {
+            questionsTable.getTableModel().addRow(
+                    String.valueOf("    " + question.getIdx()),
+                    question.getTitle()
+            );
+        }
+        //configurer la selections
+        questionsTable.setSelectAction(() -> {
+            //action lors de la sélection d'une question
+            int selectedRow = questionsTable.getSelectedRow();
+            Question selectedQuestion = questions.get(selectedRow - 1);
+            System.out.println("Selected question: " + selectedQuestion.getTitle());
+
+        });
+        mainPanel.addComponent(questionsTable);
+    }
+
+
 }
