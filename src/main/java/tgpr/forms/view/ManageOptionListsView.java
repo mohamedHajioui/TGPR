@@ -13,7 +13,8 @@ import java.util.List;
 public class ManageOptionListsView extends BasicWindow { ;
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;
-    //private final Button NewList;
+    private final Button newListButton;
+    private final Button closeButton;
     //private final Button Cancel;
     public ManageOptionListsView(ManageOptionListsController controller) {
         this.controller = controller;
@@ -34,10 +35,14 @@ public class ManageOptionListsView extends BasicWindow { ;
 
         content.addComponent(table);
         table.setPreferredSize(new TerminalSize(ViewManager.getTerminalColumns(), 15));
+        Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        newListButton = new Button("New list", this::handleNewList).addTo(buttonsPanel);
+        closeButton = new Button("Close", this::close).addTo(buttonsPanel);
+        content.addComponent(buttonsPanel);
 
         reloadData();
         // Action pour ouvrir une liste d'options avec la touche Enter
-        //table.setSelectAction(() -> handleEditList(table.getSelectedObject()));
+        table.setSelectAction(() -> handleEditList(table.getSelected()));
 
     }
     private void reloadData() {
@@ -47,13 +52,15 @@ public class ManageOptionListsView extends BasicWindow { ;
         table.invalidate();
     }
     private void handleNewList() {
-        controller.navigateToOptinList(new OptionList());
+        controller.navigateToOptionList(new OptionList());
     }
     private void handleEditList(OptionList optionList) {
         if(optionList != null) {
-            controller.navigateToOptinList(optionList);
+            controller.navigateToOptionList(optionList);
         }
     }
+
+
 
 
 }
