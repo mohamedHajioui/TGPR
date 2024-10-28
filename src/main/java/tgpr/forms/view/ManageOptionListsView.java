@@ -19,17 +19,17 @@ public class ManageOptionListsView extends BasicWindow { ;
         this.controller = controller;
         setTitle("Manage Option Lists");
         setHints(List.of(Hint.CENTERED));
-        setFixedSize(new TerminalSize(70, 15));
+        setFixedSize(new TerminalSize(60, 15));
 
         Panel root = new Panel();
         setComponent(root);
 
         Panel content = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
-        table = new ObjectTable<>(
-                new ColumnSpec<>("Name",OptionList::getName).setMinWidth(45),
-                new ColumnSpec<>("Values", optionList -> String.valueOf(optionList.getOptionValues().size())),
-                new ColumnSpec<>("Owner",optionList -> optionList.getOwner() != null ? optionList.getOwner().getName() : "System")
+        table =  new ObjectTable<>(
+                new ColumnSpec<>("Name",OptionList::getName).setMinWidth(35),
+                new ColumnSpec<>("Values", (OptionList optionList) -> String.valueOf(optionList.getOptionValues().size())).setMaxWidth(10),
+                new ColumnSpec<>("Owner",(OptionList optionList) -> optionList.getOwner() != null ? optionList.getOwner().getName() : "System").setMinWidth(15)
         );
 
         //table.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
