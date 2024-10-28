@@ -6,6 +6,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.gui2.table.DefaultTableRenderer;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableRenderer;
 import org.slf4j.helpers.LegacyAbstractLogger;
@@ -21,6 +22,7 @@ public class AnalyseView extends DialogWindow {
     private Panel mainPanel;
     private Panel tablesPanel;
     private Table<String> answersTable;
+    private Table<String> questionsTable;
 
     public AnalyseView(AnalyseController controller, Form currentForm) {
         super("Statistical Analysis of Submitted Instances");
@@ -54,12 +56,16 @@ public class AnalyseView extends DialogWindow {
         displayQuestionsTable(currentForm.getQuestions());
         displayAnswersTable();
         mainPanel.addComponent(tablesPanel);
+        if (!currentForm.getQuestions().isEmpty()) {
+            questionsTable.setSelectedRow(0);
+            updateAnswersTable(currentForm.getQuestions().get(0));
+        }
 
 
     }
 
     public void displayQuestionsTable(List<Question> questions){
-        Table<String> questionsTable = new Table<>("Index", "Title                         ");
+        questionsTable = new Table<>("Index", "Title                         ");
         questionsTable.setPreferredSize(new TerminalSize(60, 10));
         //remplissage du tableau avec les questions
         for (Question question : questions) {
@@ -69,22 +75,28 @@ public class AnalyseView extends DialogWindow {
             );
         }
         //configurer la selections
-        questionsTable.setSelectAction(() -> {
-            //action lors de la sélection d'une question
-            int selectedRow = questionsTable.getSelectedRow();
-            Question selectedQuestion = questions.get(selectedRow);
-            System.out.println("Selected question: " + selectedQuestion.getTitle());
-            updateAnswersTable(selectedQuestion);
-            updateAnswersTable(selectedQuestion);
+        questionsTable.setRenderer(new DefaultTableRenderer<String>() {
+            @Override
+            public void drawComponent(TextGUIGraphics graphics, Table<String> component) {
+                super.drawComponent(graphics, component);
+                int selectedRow = questionsTable.getSelectedRow();
+                if (selectedRow >= 0 && selectedRow < questions.size()) {
+                    Question selectedQuestion = questions.get(selectedRow);
+                    updateAnswersTable(selectedQuestion);
+                }
+            }
         });
         tablesPanel.addComponent(questionsTable);
     }
 
     public void displayAnswersTable(){
-
-
         answersTable = new Table<>("Value                ", "Nb Occ", "   Ratio");
         answersTable.setPreferredSize(new TerminalSize(50, 10));
+        answersTable.setRenderer(new DefaultTableRenderer<String>() {
+            public boolean isCellSelectable(int columnIndex, int rowIndex) {
+                return false;
+            }
+        });
         tablesPanel.addComponent(answersTable);
     }
 
