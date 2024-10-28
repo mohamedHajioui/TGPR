@@ -19,6 +19,7 @@ import java.util.Map;
 public class AnalyseView extends DialogWindow {
     private final AnalyseController controller;
     private Panel mainPanel;
+    private Panel tablesPanel;
     private Table<String> answersTable;
 
     public AnalyseView(AnalyseController controller, Form currentForm) {
@@ -49,7 +50,11 @@ public class AnalyseView extends DialogWindow {
         Label nbInstances = new Label("Number of Submitted Instances: " + controller.getSubmittedInstancesCount());
         mainPanel.addComponent(nbInstances);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+        tablesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         displayQuestionsTable(currentForm.getQuestions());
+        displayAnswersTable();
+        mainPanel.addComponent(tablesPanel);
+
 
     }
 
@@ -67,12 +72,39 @@ public class AnalyseView extends DialogWindow {
         questionsTable.setSelectAction(() -> {
             //action lors de la sélection d'une question
             int selectedRow = questionsTable.getSelectedRow();
-            Question selectedQuestion = questions.get(selectedRow - 1);
+            Question selectedQuestion = questions.get(selectedRow);
             System.out.println("Selected question: " + selectedQuestion.getTitle());
-
+            updateAnswersTable(selectedQuestion);
+            updateAnswersTable(selectedQuestion);
         });
-        mainPanel.addComponent(questionsTable);
+        tablesPanel.addComponent(questionsTable);
     }
 
+    public void displayAnswersTable(){
 
+
+        answersTable = new Table<>("Value                ", "Nb Occ", "   Ratio");
+        answersTable.setPreferredSize(new TerminalSize(50, 10));
+        tablesPanel.addComponent(answersTable);
+    }
+
+    public void updateAnswersTable(Question question) {
+        answersTable.getTableModel().clear();
+        Map<String, Long> answerStats = controller.getAnswerStatistics(question);
+        long totalResponses = controller.getTotalResponses(question);
+
+        // Tri des réponses en fonction du nombre d'occurrences (du plus grand au plus petit)
+        answerStats.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .forEach(entry -> {
+                    String answerText = entry.getKey();
+                    Long occurrences = entry.getValue();
+                    double ratio = totalResponses > 0 ? (double) occurrences / totalResponses * 100 : 0;
+                    answersTable.getTableModel().addRow(
+                            answerText,
+                            "     " + occurrences.toString(),
+                            String.format("%.2f", ratio)
+                    );
+                });
+    }
 }
