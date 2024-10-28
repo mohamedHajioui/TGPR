@@ -34,10 +34,12 @@ public class ManageOptionListsView extends BasicWindow { ;
         );
 
         content.addComponent(table);
-        table.setPreferredSize(new TerminalSize(ViewManager.getTerminalColumns(), 15));
+
+        content.addComponent(new EmptySpace(new TerminalSize(80, 6)));
         Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         newListButton = new Button("New list", this::handleNewList).addTo(buttonsPanel);
         closeButton = new Button("Close", this::close).addTo(buttonsPanel);
+        buttonsPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         content.addComponent(buttonsPanel);
 
         reloadData();
