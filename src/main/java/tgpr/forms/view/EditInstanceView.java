@@ -83,7 +83,7 @@ public class EditInstanceView extends DialogWindow {
     private Button previousButton;
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
-    private int idForm = 1;
+    private int idForm = 15;
     private int userId = 1;
     private int instanceID;
     private LocalDateTime started ;
@@ -145,7 +145,6 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(dateLabel);
-
 
         questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         questionPanel.setPreferredSize(new TerminalSize(55, 25)); // Taille du panneau
@@ -794,7 +793,7 @@ public class EditInstanceView extends DialogWindow {
         IndicateFormSubmitted();
     }
     private void ButtonConfirmNo() {
-     close();
+        close();
     }
 
     private void displayAnswerList() {
@@ -928,7 +927,7 @@ public class EditInstanceView extends DialogWindow {
         close();
     }
     private void ButtonCancelNo() {
-        close();
+       close();
     }
 
 
@@ -943,7 +942,7 @@ public class EditInstanceView extends DialogWindow {
 
     private void ViewSubmission() {
 
-        setViewTitle("View Answers"); // Titre spécifique pour ViewAnswers
+        setViewTitle("View Answers"); // Titre spécifique pour AnswerForm
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
 
@@ -1000,129 +999,109 @@ public class EditInstanceView extends DialogWindow {
 
         setComponent(mainPanel);
 
+    }
 
+    private void displayQuestionViewSubmition(List<Question> questions) {
+        // Clear all components from questionPanel
 
+        questionPanel.removeAllComponents();
+        addSpacingLabel(questionPanel, 1);
 
-        private void displayQuestionViewSubmition(List<Question> questions) {
-            // Clear all components from questionPanel
-
-            questionPanel.removeAllComponents();
-            addSpacingLabel(questionPanel, 1);
-
-            // Validate questions list
-            if (questions == null || questions.isEmpty()) {
-                System.out.println("No questions available.");
-                return;
-            }
-
-            // Check that currentQuestionIndex is valid
-            if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.size()) {
-                System.out.println("Invalid question index: " + currentQuestionIndex);
-                return;
-            }
-            // Get the current question
-            Question question = questions.get(currentQuestionIndex);
-
-            if (question == null) {
-                System.out.println("Question object is null.");
-                return;
-            }
-            // Display question number and total
-            Label questionNumberLabel = new Label("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
-            questionPanel.addComponent(questionNumberLabel);
-            addSpacingLabel(questionPanel, 1);
-
-            // Render the appropriate input fields based on question type
-            addSpacingLabel(questionPanel, 1);
-
-            addQuestionTitleWithRequiredMarker(question);
-
-            createOrUpdateButtonsViewSubmission(questions);
-
-            List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
-
-            Label answer = new Label(Answer.getFirst().getValue());
-            questionPanel.addComponent(answer);
-
-            // Utility method to get answers for a given instance
-            public List<Answer> getAnswersForInstance(int instanceId) {
-                // Create an instance object to call the existing getAnswers() method
-                Instance instance = new Instance();
-                instance.setId(instanceId); // Set the id if not already set
-
-                // Retrieve the answers list using the getAnswers() method
-                return instance.getAnswers();
-            }
-            / Use this utility method elsewhere to get answers for a specific instance
-            public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
-                // Retrieve all answers for the specified instance
-                List<Answer> answers = getAnswersForInstance(instanceId);
-
-                // Filter answers by question ID
-                List<Answer> filteredAnswers = answers.stream()
-                        .filter(answer -> answer.getQuestionId() == question.getId())
-                        .collect(Collectors.toList());
-
-                // Return the filtered list of answers
-                return filteredAnswers;
-            }
-
-            private void createOrUpdateButtonsViewSubmission(List<Question> questions) {
-                // Réinitialiser le panneau de boutons
-                buttonPanel.removeAllComponents();
-
-                // Vérifier si nous ne sommes pas à la première question
-                if (currentQuestionIndex > 0) {
-                    Button previousButton = new Button("Previous", () -> {
-                        currentQuestionIndex--; // Décrémenter l'index de la question
-                        displayQuestionViewSubmition(questions); // Afficher la question précédente
-                        createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
-                    });
-                    buttonPanel.addComponent(previousButton); // Ajouter le bouton "Previous"
-                }
-                // Vérifier si nous ne sommes pas à la dernière question
-                if (currentQuestionIndex < questions.size() - 1) {
-                    Button nextButton = new Button("Next", () -> {
-                        currentQuestionIndex++; // Incrémenter l'index de la question
-                        displayQuestionViewSubmition(questions); // Afficher la question suivante
-                        createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
-                    });
-                    buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
-                }
-                // Bouton "Cancel" (affiché dans tous les cas)
-                Button cancelButton = new Button("Cancel", () -> {
-                    // Logique pour annuler ou fermer le formulaire
-                    System.out.println("Action canceled.");
-                    // Fermez ou retournez à l'écran précédent ici
-                    // par exemple : setComponent(previousScreen);
-                });
-                buttonPanel.addComponent(cancelButton); // Ajouter le bouton "Cancel"
-            }
-
-
-
-
-
-
-
+        // Validate questions list
+        if (questions == null || questions.isEmpty()) {
+            System.out.println("No questions available.");
+            return;
         }
 
+        // Check that currentQuestionIndex is valid
+        if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.size()) {
+            System.out.println("Invalid question index: " + currentQuestionIndex);
+            return;
+        }
+
+        // Get the current question
+        Question question = questions.get(currentQuestionIndex);
+
+        if (question == null) {
+            System.out.println("Question object is null.");
+            return;
+        }
+
+        // Display question number and total
+        Label questionNumberLabel = new Label("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
+        questionPanel.addComponent(questionNumberLabel);
+        addSpacingLabel(questionPanel, 1);
+
+
+        // Render the appropriate input fields based on question type
+        addSpacingLabel(questionPanel, 1);
+
+        addQuestionTitleWithRequiredMarker(question);
+
+        createOrUpdateButtonsViewSubmission(questions);
+
+        List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
+
+        Label answer = new Label(Answer.getFirst().getValue());
+        questionPanel.addComponent(answer);
+    }
+
+    // Utility method to get answers for a given instance
+    public List<Answer> getAnswersForInstance(int instanceId) {
+        // Create an instance object to call the existing getAnswers() method
+        Instance instance = new Instance();
+        instance.setId(instanceId); // Set the id if not already set
+
+        // Retrieve the answers list using the getAnswers() method
+        return instance.getAnswers();
+    }
+
+    // Use this utility method elsewhere to get answers for a specific instance
+    public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
+        // Retrieve all answers for the specified instance
+        List<Answer> answers = getAnswersForInstance(instanceId);
+
+        // Filter answers by question ID
+        List<Answer> filteredAnswers = answers.stream()
+                .filter(answer -> answer.getQuestionId() == question.getId())
+                .collect(Collectors.toList());
+
+        // Return the filtered list of answers
+        return filteredAnswers;
+    }
 
 
 
 
 
+    private void createOrUpdateButtonsViewSubmission(List<Question> questions) {
+        // Réinitialiser le panneau de boutons
+        buttonPanel.removeAllComponents();
 
+        // Vérifier si nous ne sommes pas à la première question
+        if (currentQuestionIndex > 0) {
+            Button previousButton = new Button("Previous", () -> {
+                currentQuestionIndex--; // Décrémenter l'index de la question
+                displayQuestionViewSubmition(questions); // Afficher la question précédente
+                createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
+            });
+            buttonPanel.addComponent(previousButton); // Ajouter le bouton "Previous"
+        }
 
+        // Vérifier si nous ne sommes pas à la dernière question
+        if (currentQuestionIndex < questions.size() - 1) {
+            Button nextButton = new Button("Next", () -> {
+                currentQuestionIndex++; // Incrémenter l'index de la question
+                displayQuestionViewSubmition(questions); // Afficher la question suivante
+                createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
+            });
+            buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
+        }
 
-
-
-
-
-
-
-
-
+        // Bouton "Cancel" (affiché dans tous les cas)
+        Button cancelButton = new Button("Cancel", this::close );
+        ;
+        buttonPanel.addComponent(cancelButton); // Ajouter le bouton "Cancel"
     }
 
 
