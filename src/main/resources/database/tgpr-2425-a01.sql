@@ -1,8 +1,8 @@
 drop database if exists `tgpr-2425-a01`;
 CREATE
-    DATABASE IF NOT EXISTS `tgpr-2425-a01`;
+DATABASE IF NOT EXISTS `tgpr-2425-a01`;
 USE
-    `tgpr-2425-a01`;
+`tgpr-2425-a01`;
 
 CREATE TABLE users
 (

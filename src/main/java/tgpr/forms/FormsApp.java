@@ -1,6 +1,8 @@
 package tgpr.forms;
 
-import tgpr.forms.controller.EditInstanceController;
+import tgpr.forms.controller.*;
+import tgpr.forms.model.User;
+import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
 import tgpr.framework.Model;
 
@@ -13,6 +15,5 @@ public class FormsApp {
         else {
             Controller.navigateTo(new EditInstanceController());
         }
-
     }
 }
