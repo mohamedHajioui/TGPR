@@ -1080,12 +1080,22 @@ public class EditInstanceView extends DialogWindow {
                     });
                     buttonPanel.addComponent(previousButton); // Ajouter le bouton "Previous"
                 }
+                // Vérifier si nous ne sommes pas à la dernière question
+                if (currentQuestionIndex < questions.size() - 1) {
+                    Button nextButton = new Button("Next", () -> {
+                        currentQuestionIndex++; // Incrémenter l'index de la question
+                        displayQuestionViewSubmition(questions); // Afficher la question suivante
+                        createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
+                    });
+                    buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
+                }
 
 
 
 
 
-        }
+
+            }
 
 
 
