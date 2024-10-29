@@ -1,21 +1,19 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import org.apache.ibatis.annotations.Delete;
+import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+
 import tgpr.forms.controller.ManageSharesController;
 import tgpr.forms.model.*;
-import tgpr.framework.Controller;
-import tgpr.framework.ViewManager;
+import static tgpr.forms.model.AccessType.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static tgpr.forms.model.AccessType.*;
+import tgpr.framework.ViewManager;
 import static tgpr.framework.Controller.askConfirmation;
-import static tgpr.framework.Tools.ifNull;
 
 public class ManageSharesView extends DialogWindow {
 
@@ -46,13 +44,18 @@ public class ManageSharesView extends DialogWindow {
         setComponent(root);
         getList().addTo(root);
 
-        comboboxes().addTo(root);
+
+        if (!absent().isEmpty()){
+            selection().addTo(root);
+        }
+
+        new Button("Close", this::closeManageShares).addTo(root);
 
 
+    }
 
-        Button button = new Button("Add",this::Add);
-        button.addTo(root);
-
+    private void closeManageShares() {
+        controller.versForm();
     }
 
     //absent est la liste de User qui n'ont pas acces au form
@@ -64,7 +67,6 @@ public class ManageSharesView extends DialogWindow {
             present.add(tgpr.forms.model.User.getByKey(a.getUserId()));
         }
         for(User user : tgpr.forms.model.User.getAll()) {
-            System.out.println(user.getFullName());
             if (!present.contains(user)) {
                 absent.add(user);
             }
@@ -72,10 +74,11 @@ public class ManageSharesView extends DialogWindow {
     }
 
 
-    //comboboxes() est responsable de la cration des comboboxe: 1-cbUsesr qui donne le choix de user a partire de la liste de absent() et 2-cbAcces donne le choix des AccessType
+    //selectiom() est responsable de la cration des comboboxe: 1-cbUsesr qui donne le choix de user a partire de la liste de absent() et 2-cbAcces donne le choix des AccessType et pour raison d'alignement le button add
 
-    private Panel comboboxes(){
-        Panel panel =  Panel.gridPanel(2);
+    private Panel selection(){
+        Panel panel =  Panel.gridPanel(3);
+
         cbUser = new ComboBox<>();
         for(User user : absent()) {
             cbUser.addItem(user);
@@ -88,6 +91,8 @@ public class ManageSharesView extends DialogWindow {
         cbAccess.addItem(User);
         cbAccess.addTo(panel);
 
+        Button button = new Button("Add",this::Add);
+        button.addTo(panel);
 
         return panel;
     }
@@ -126,15 +131,17 @@ public class ManageSharesView extends DialogWindow {
     //getList() est la methode qui affiche dans la fenetre la liste des utilisateur avec leur role et accesType.
 
     private ObjectTable<UserFormAccess> getList(){
+
         table = new ObjectTable<UserFormAccess>(
                 new ColumnSpec<>("Beneficiary", userFormAccess -> userFormAccess.getUser().getFullName() ),
                 new ColumnSpec<>("Type", userFormAccess -> userFormAccess.getUser().getRole()),
                 new ColumnSpec<>("Acess Right", UserFormAccess ::getAccessType )
         );
+
         table.sizeTo(ViewManager.getTerminalColumns(),10);
         table.add(refrenceList());
 
-        table.setSelectAction(this::enterCommande);
+        table.setSelectAction((this::enterCommande));
         return table;
     }
 
@@ -145,10 +152,14 @@ public class ManageSharesView extends DialogWindow {
 
     private void enterCommande(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
+
             if (table.getSelected().getAccessType() == Editor){
                 table.getSelected().setAccessType(User);
                 table.getSelected().save();
-            }else{
+
+            }
+
+            else{
                 table.getSelected().setAccessType(Editor);
                 table.getSelected().save();
             }
@@ -156,6 +167,4 @@ public class ManageSharesView extends DialogWindow {
 
         affichage();
     }
-
-
 }

@@ -34,7 +34,7 @@ public class formController extends Controller<view_form> {
     }
 
     public void versShare(){
-        Controller.navigateTo(new TestController());
+        Controller.navigateTo(new ManageSharesController(form));
     }
 
     public void versEditForm(){
