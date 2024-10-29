@@ -1043,6 +1043,35 @@ public class EditInstanceView extends DialogWindow {
 
             Label answer = new Label(Answer.getFirst().getValue());
             questionPanel.addComponent(answer);
+
+            // Utility method to get answers for a given instance
+            public List<Answer> getAnswersForInstance(int instanceId) {
+                // Create an instance object to call the existing getAnswers() method
+                Instance instance = new Instance();
+                instance.setId(instanceId); // Set the id if not already set
+
+                // Retrieve the answers list using the getAnswers() method
+                return instance.getAnswers();
+            }
+            / Use this utility method elsewhere to get answers for a specific instance
+            public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
+                // Retrieve all answers for the specified instance
+                List<Answer> answers = getAnswersForInstance(instanceId);
+
+                // Filter answers by question ID
+                List<Answer> filteredAnswers = answers.stream()
+                        .filter(answer -> answer.getQuestionId() == question.getId())
+                        .collect(Collectors.toList());
+
+                // Return the filtered list of answers
+                return filteredAnswers;
+            }
+
+
+
+
+
+
         }
 
 
