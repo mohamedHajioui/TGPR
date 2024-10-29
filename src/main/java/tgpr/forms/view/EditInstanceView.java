@@ -1009,6 +1009,11 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.removeAllComponents();
             addSpacingLabel(questionPanel, 1);
 
+            // Validate questions list
+            if (questions == null || questions.isEmpty()) {
+                System.out.println("No questions available.");
+                return;
+            }
 
 
 
