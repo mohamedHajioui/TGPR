@@ -142,6 +142,9 @@ public class ManageSharesView extends DialogWindow {
         table.add(refrenceList());
 
         table.setSelectAction((this::enterCommande));
+        boolean answer;
+        addKeyboardListener(table, KeyType.Delete, this::deleteUser);
+
         return table;
     }
 
@@ -166,5 +169,14 @@ public class ManageSharesView extends DialogWindow {
         }
 
         affichage();
+    }
+
+    //deleteUser() efface un user choisie avec la commande Delete de la liste.
+    private boolean deleteUser(){
+        if (askConfirmation("Are you sure you want to delete this share?","Delete Share")){
+            table.getSelected().delete();
+            affichage();
+
+        }return true;
     }
 }
