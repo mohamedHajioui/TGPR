@@ -976,6 +976,34 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.addComponent(dateLabel);
         mainPanel.addComponent(submitterLabel);
 
+        // Créer un panneau pour afficher la reponse actuelle
+        questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        questionPanel.setPreferredSize(new TerminalSize(55, 25)); // Taille du panneau
+
+        Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        container.addComponent(new EmptySpace(new TerminalSize(20, 1))); // Espace vide avant
+        container.addComponent(questionPanel);
+        container.addComponent(new EmptySpace(new TerminalSize(3, 1))); // Espace vide après
+
+
+
+        // Créer un panel pour organiser les boutons horizontalement
+        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)); // Initialisation du buttonPanel
+
+        // Ajouter les boutons "Previous", "Next", "Close", et "Cancel"
+
+
+        mainPanel.addComponent(questionPanel);
+        mainPanel.addComponent(buttonPanel);
+
+        displayQuestionViewSubmition(questions);
+
+        setComponent(mainPanel);
+
+
+
+
+
 
 
 
