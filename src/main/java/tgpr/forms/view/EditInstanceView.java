@@ -947,6 +947,23 @@ public class EditInstanceView extends DialogWindow {
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
 
+        Form form = new Form();
+
+        form.setId(idForm);
+
+        List<Question> questions = form.getQuestions();
+
+        List<Instance> value = form.getInstances();
+
+        latestInstanceByForm = getLatestInstance(value);
+
+        Instance FirstInstance = getFirstInstance(value);
+
+        User user = User.getByKey(userId);
+
+        Form formData = Form.getByKey(idForm);
+
+
 
     }
 
