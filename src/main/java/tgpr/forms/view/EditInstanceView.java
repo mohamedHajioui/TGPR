@@ -1067,6 +1067,19 @@ public class EditInstanceView extends DialogWindow {
                 return filteredAnswers;
             }
 
+            private void createOrUpdateButtonsViewSubmission(List<Question> questions) {
+                // Réinitialiser le panneau de boutons
+                buttonPanel.removeAllComponents();
+
+                // Vérifier si nous ne sommes pas à la première question
+                if (currentQuestionIndex > 0) {
+                    Button previousButton = new Button("Previous", () -> {
+                        currentQuestionIndex--; // Décrémenter l'index de la question
+                        displayQuestionViewSubmition(questions); // Afficher la question précédente
+                        createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
+                    });
+                    buttonPanel.addComponent(previousButton); // Ajouter le bouton "Previous"
+                }
 
 
 
