@@ -1015,6 +1015,11 @@ public class EditInstanceView extends DialogWindow {
                 return;
             }
 
+            // Check that currentQuestionIndex is valid
+            if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.size()) {
+                System.out.println("Invalid question index: " + currentQuestionIndex);
+                return;
+            }
 
 
 
@@ -1026,7 +1031,9 @@ public class EditInstanceView extends DialogWindow {
 
 
 
-    }
+
+
+        }
 
 
 
