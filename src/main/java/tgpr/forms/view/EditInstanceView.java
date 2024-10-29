@@ -1089,13 +1089,23 @@ public class EditInstanceView extends DialogWindow {
                     });
                     buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
                 }
-
-
-
-
-
-
+                // Bouton "Cancel" (affiché dans tous les cas)
+                Button cancelButton = new Button("Cancel", () -> {
+                    // Logique pour annuler ou fermer le formulaire
+                    System.out.println("Action canceled.");
+                    // Fermez ou retournez à l'écran précédent ici
+                    // par exemple : setComponent(previousScreen);
+                });
+                buttonPanel.addComponent(cancelButton); // Ajouter le bouton "Cancel"
             }
+
+
+
+
+
+
+
+        }
 
 
 
