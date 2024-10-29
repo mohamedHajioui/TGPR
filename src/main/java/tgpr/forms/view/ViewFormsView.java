@@ -108,7 +108,6 @@ public class ViewFormsView extends BasicWindow {
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
         //forms.sort(Comparator.comparing(Form::getTitle, String.CASE_INSENSITIVE_ORDER));
-
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
         GridLayout gridLayout = new GridLayout(3);
