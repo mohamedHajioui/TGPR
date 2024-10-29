@@ -1032,23 +1032,36 @@ public class EditInstanceView extends DialogWindow {
             questionPanel.addComponent(questionNumberLabel);
             addSpacingLabel(questionPanel, 1);
 
+            // Render the appropriate input fields based on question type
+            addSpacingLabel(questionPanel, 1);
 
+            addQuestionTitleWithRequiredMarker(question);
 
+            createOrUpdateButtonsViewSubmission(questions);
 
+            List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
 
-
-
-
-
-
-
-
-
-
-
-
-
+            Label answer = new Label(Answer.getFirst().getValue());
+            questionPanel.addComponent(answer);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 
 
 
