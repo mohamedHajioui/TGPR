@@ -29,7 +29,7 @@ public class AnalyseView extends DialogWindow {
         this.controller = controller;
 
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(90, 23));
+        mainPanel.setPreferredSize(new TerminalSize(100, 25));
         setHints(List.of(Hint.CENTERED));
         setComponent(mainPanel);
 
@@ -53,9 +53,11 @@ public class AnalyseView extends DialogWindow {
         mainPanel.addComponent(nbInstances);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
         tablesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        tablesPanel.setPreferredSize(new TerminalSize(100, 20));
         displayQuestionsTable(currentForm.getQuestions());
         displayAnswersTable();
         mainPanel.addComponent(tablesPanel);
+        mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 7)));
 
         buttonsCloseAndViewInstance(controller);
     }
@@ -64,23 +66,24 @@ public class AnalyseView extends DialogWindow {
         Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Button closeButton = new Button("Close", this::close);
         Button viewInstanceButton = new Button("View Instance", () -> controller.viewInstance());
-        buttonsPanel.addComponent(viewInstanceButton);
         buttonsPanel.addComponent(closeButton);
+        buttonsPanel.addComponent(viewInstanceButton);
         buttonsPanel.center();
+        mainPanel.addComponent(buttonsPanel);
     }
 
 
     public void displayQuestionsTable(List<Question> questions){
         questionsTable = new Table<>("Index", "Title                         ");
         questionsTable.setPreferredSize(new TerminalSize(60, 10));
-        //remplissage du tableau avec les questions
+
         for (Question question : questions) {
             questionsTable.getTableModel().addRow(
                     String.valueOf("    " + question.getIdx()),
                     question.getTitle()
             );
         }
-        //configurer la selections
+
         questionsTable.setRenderer(new DefaultTableRenderer<String>() {
             @Override
             public void drawComponent(TextGUIGraphics graphics, Table<String> component) {
@@ -96,8 +99,9 @@ public class AnalyseView extends DialogWindow {
     }
 
     public void displayAnswersTable(){
-        answersTable = new Table<>("Value                ", "Nb Occ", "   Ratio");
-        answersTable.setPreferredSize(new TerminalSize(50, 10));
+        answersTable = new Table<>("Value                ", "Nb Occ.", "   Ratio");
+        answersTable.setPreferredSize(new TerminalSize(50, 20));
+        answersTable.setEnabled(false);
         tablesPanel.addComponent(answersTable);
     }
 
@@ -105,8 +109,6 @@ public class AnalyseView extends DialogWindow {
         answersTable.getTableModel().clear();
         Map<String, Long> answerStats = controller.getAnswerStatistics(question);
         long totalResponses = controller.getTotalResponses(question);
-
-        // Tri des réponses en fonction du nombre d'occurrences (du plus grand au plus petit)
         answerStats.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEach(entry -> {
@@ -115,8 +117,8 @@ public class AnalyseView extends DialogWindow {
                     double ratio = totalResponses > 0 ? (double) occurrences / totalResponses * 100 : 0;
                     answersTable.getTableModel().addRow(
                             answerText,
-                            "     " + occurrences.toString(),
-                            String.format("  %.2f", ratio)
+                            "      " + occurrences.toString(),
+                            String.format("   %.1f%%", ratio)
                     );
                 });
     }
