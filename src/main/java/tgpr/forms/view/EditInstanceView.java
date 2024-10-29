@@ -1003,6 +1003,20 @@ public class EditInstanceView extends DialogWindow {
 
 
 
+        private void displayQuestionViewSubmition(List<Question> questions) {
+            // Clear all components from questionPanel
+
+            questionPanel.removeAllComponents();
+            addSpacingLabel(questionPanel, 1);
+
+
+
+
+
+
+
+
+
 
 
 
