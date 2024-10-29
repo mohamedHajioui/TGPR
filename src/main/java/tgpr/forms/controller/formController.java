@@ -14,7 +14,7 @@ import java.util.List;
 public class formController extends Controller<view_form> {
 
     private final view_form view;
-<<<<<<< HEAD
+
     private Form form;
     private User logedUser;
     private boolean normal = true;
@@ -22,13 +22,7 @@ public class formController extends Controller<view_form> {
     public formController(Form form,User logedUser) {
         this.form = form;
         this.logedUser = logedUser;
-=======
-    private  Form form;
-    private boolean normal = true;
 
-    public formController(Form form) {
-        this.form = form;
->>>>>>> feat_view_edit_instance
         view = new view_form(this,form,normal);
     }
 
@@ -40,7 +34,7 @@ public class formController extends Controller<view_form> {
     }
 
     public void versAnalyse(){
-<<<<<<< HEAD
+
 
         Controller.navigateTo(new AnalyseController(form));
     }
@@ -49,14 +43,14 @@ public class formController extends Controller<view_form> {
 
     public void versShare(){
         Controller.navigateTo(new ManageSharesController(form,logedUser));
-=======
+
         Controller.navigateTo(new TestController());
     }
 
-    public void versShare(){
-        Controller.navigateTo(new TestController());
->>>>>>> feat_view_edit_instance
-    }
+    //public void versShare(){
+      //  Controller.navigateTo(new TestController());
+
+    //}
 
     public void versEditForm(){
         Controller.navigateTo(new AddEditFormController(form.getOwner(), form));
@@ -85,13 +79,11 @@ public class formController extends Controller<view_form> {
         }
     }
 
-<<<<<<< HEAD
     public void versViewForms(){
         view.close();
         Controller.navigateTo(new ViewFormsController(logedUser));
     }
 
-=======
->>>>>>> feat_view_edit_instance
+
 
 }
