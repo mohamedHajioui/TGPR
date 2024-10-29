@@ -963,6 +963,20 @@ public class EditInstanceView extends DialogWindow {
 
         Form formData = Form.getByKey(idForm);
 
+        // Créer et ajouter les labels principaux (Title, Description, and Date)
+        Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
+        Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
+        Label startedOn = new Label("Started On: " + (FirstInstance.getStarted() != null ? FirstInstance.getStarted() : "null"));
+        Label dateLabel = new Label("Submitted on: " +  (latestInstanceByForm.getCompleted() != null ? latestInstanceByForm.getCompleted() : "null"));
+        Label submitterLabel = new Label("Submitted by: " + user.getFullName());
+
+        mainPanel.addComponent(titleLabel);
+        mainPanel.addComponent(descriptionLabel);
+        mainPanel.addComponent(startedOn);
+        mainPanel.addComponent(dateLabel);
+        mainPanel.addComponent(submitterLabel);
+
+
 
 
     }
