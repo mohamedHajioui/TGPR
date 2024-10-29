@@ -17,7 +17,35 @@ import static tgpr.framework.Tools.ifNull;
 
 //import static jdk.internal.net.http.common.Utils.close;
 
+/*
+1 - Toute en haut a gauche on veu le message "View Form detail"
 
+2- la partie superieure affichera:
+                                Title : form.getTitle()
+                                Description : form.getDiscription
+                                Created by: user.Name
+                                IS public : form.getIsPublic
+3- la partie inferieure affichera:
+                                 Index: question.getIdx
+                                 Title: question.getTitle
+                                 Type : question.getType
+                                 Required : question.getRequired
+                                 Option List: question.getOptionList
+4 - les bouttons toute en bas:
+                                -New Question
+                                -Edit Form
+                                -Delete Form
+                                -Share
+                                -Reorder
+                                -Analyse
+                                -Close
+
+
+3 modes:
+    1 - la vue normal avec une instance sauvegarder
+    2 - la vue normal avec sans instance suvegarder
+    3 - la vue reorder
+ */
 public class view_form extends DialogWindow{
 
     private final formController controller;
@@ -67,8 +95,6 @@ public class view_form extends DialogWindow{
             }
         }else createButtonsReorder().addTo(root);
     }
-//----------------------------------------------------------------------------------------------------------------------
-//Affichage de la partie superieure du Panel
 
     private Panel title(){
         Panel panel = Panel.gridPanel(2);
@@ -118,9 +144,6 @@ public class view_form extends DialogWindow{
     }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//Creation du tableau (Liste de question)
-
 
     private Component questionList(){
         System.out.println("questionList");
@@ -143,8 +166,7 @@ public class view_form extends DialogWindow{
         return table;
     }
 
-//----------------------------------------------------------------------------------------------------------------------
-//Les Bouttons pour un affichage par default
+
 
     private Panel createButtonsNormal(){
         form.reorderQuestions(table.getItems());
@@ -155,14 +177,12 @@ public class view_form extends DialogWindow{
         new Button("Share",this::shares).addTo(panel);
         new Button("Reorder",this::reOrder).addTo(panel);
         new Button("Analyse",this::Analyse).addTo(panel);
-        new Button("Cancel", this::closeForm).addTo(panel);
+        new Button("Cancel", this::close).addTo(panel);
 
         return panel;
     }
-
-    private void nouvelleQuestion(){
-        controller.versNouvelleQuestion();
-        affichage(true);
+    private void Analyse(){
+        controller.versAnalyse();
     }
 
     private void EditForm(){
@@ -170,28 +190,14 @@ public class view_form extends DialogWindow{
         affichage(true);
     }
 
-    private void delete() {
-        controller.delete();
-    }
-
     private void shares(){
         controller.versShare();
     }
 
-
-    private void Analyse(){
-        controller.versAnalyse();
+    private void nouvelleQuestion(){
+        controller.versNouvelleQuestion();
+        affichage(true);
     }
-
-    private void closeForm(){
-        controller.versViewForms();
-    }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//Affichage des bouttons en mode reOrder()
-
-
 
     private Panel createButtonsReorder(){
         var panel = Panel.horizontalPanel().right().right().center();
@@ -199,21 +205,6 @@ public class view_form extends DialogWindow{
         new Button("Cancel", this::returnNormal).addTo(panel);
         return panel;
     }
-
-    private void save(){
-        System.out.println("save");
-        form.reorderQuestions(table.getItems());
-        normal = true;
-        affichage(true);
-    }
-
-    private void returnNormal(){
-        normal = true;
-        affichage(true);
-    }
-
-//----------------------------------------------------------------------------------------------------------------------
-//Affichage si il existe des instances
 
     private Panel createButtonsInstance(){
         var panel = Panel.horizontalPanel().right().right().center();
@@ -223,7 +214,7 @@ public class view_form extends DialogWindow{
         }else new Button("Make Public", this::makePublic).addTo(panel);
 
         new Button("Clear Instances", this::clearInstances).addTo(panel);
-        new Button("Analyse").addTo(panel);
+        new Button("Analyse", this::Analyse).addTo(panel);
         new Button("Close", this::close).addTo(panel);
         return panel;
     }
@@ -246,11 +237,21 @@ public class view_form extends DialogWindow{
         affichage(normal);
     }
 
+    private void save(){
+        System.out.println("save");
+        form.reorderQuestions(table.getItems());
+        normal = true;
+        affichage(true);
+    }
 
+    private void returnNormal(){
+        normal = true;
+        affichage(true);
+    }
 
-
-
-
+    private void delete() {
+        controller.delete();
+    }
 
 
 
