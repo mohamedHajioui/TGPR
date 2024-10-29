@@ -28,7 +28,7 @@ public class LoginController extends Controller<LoginView> {
             var member = User.checkCredentials(mail, password);
             if (member != null) {
                 Security.login(member);
-                navigateTo(new TestController());
+                navigateTo(new ViewFormsController(member));
             } else
                 showError(new Error("invalid credentials"));
         } else
@@ -36,13 +36,10 @@ public class LoginController extends Controller<LoginView> {
 
         return errors;
     }
-    public void loginAsGuest() {
-        User guestUser = new User("","bepenelle@epfc.eu","Password1", User.Role.Guest); // Exemple d'utilisateur invité
-        Security.login(guestUser); // Connecter l'utilisateur invité
-
-
-        navigateTo(new TestController());
+    public void navigateToSignup() {
+        navigateTo(new SignupController());
     }
+
 
     public void seedData() {
         Model.seedData(FormsApp.DATABASE_SCRIPT_FILE);

@@ -1,10 +1,14 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import tgpr.framework.Configuration;
 import tgpr.forms.controller.LoginController;
 
 import java.util.List;
+
+import static tgpr.forms.model.User.Role.User;
+
 
 public class LoginView extends BasicWindow {
 
@@ -12,7 +16,7 @@ public class LoginView extends BasicWindow {
     private final TextBox txtMail;
     private final TextBox txtPassword;
     private final Button btnLogin;
-
+    private final Button btnSignup;
     private final Button btnExit;
     private final Button btnLoginAsGuest;
 
@@ -29,24 +33,40 @@ public class LoginView extends BasicWindow {
         Panel panel = new Panel().setLayoutManager(new GridLayout(2).setTopMarginSize(1).setVerticalSpacing(1))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         panel.addComponent(new Label("Mail :"));
-        txtMail = new TextBox().addTo(panel);
+        txtMail = new TextBox(new TerminalSize(19,1)).addTo(panel);
         panel.addComponent(new Label("Password:"));
-        txtPassword = new TextBox().setMask('*').addTo(panel);
+        txtPassword = new TextBox(new TerminalSize(19,1)).setMask('*').addTo(panel);
+        panel = new Panel();
+        panel.setLayoutManager(new GridLayout(2));
+
+
+
+
 
         new EmptySpace().addTo(root);
 
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
         btnLogin = new Button("Login", this::login).addTo(buttons);
-        //btnSignup = new Button("signup", this::signup).addTo(buttons);
+        btnSignup = new Button("Signup", this::signup).addTo(buttons);
         btnExit = new Button("Exit", this::exit).addTo(buttons);
-        btnLoginAsGuest = new Button("Login as Guest", this::loginasguest).addTo(buttons);
+
+
+
+        buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
+                .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
+        btnLoginAsGuest = new Button("Login as Guest", this::loginAsGuest).addTo(buttons);
+
+
 
         new EmptySpace().addTo(root);
 
         Button btnSeedData = new Button("Reset Database", this::seedData);
         Panel debug = Panel.verticalPanel(LinearLayout.Alignment.Center,
                 new Button("Login as default admin", this::logAsDefaultAdmin),
+                new Button("Login as xapigeolet@epfc.eu", () -> loginAs("xapigeolet@epfc.eu")),
+                new Button("Login as bepenelle@epfc.eu", () -> loginAs("bepenelle@epfc.eu")),
+                new Button("Login as mamichel@epfc.eu", () -> loginAs("mamichel@epfc.eu")),
                 btnSeedData
         );
         debug.withBorder(Borders.singleLine(" For debug purpose ")).addTo(root);
@@ -71,10 +91,21 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsDefaultAdmin() {
-        controller.login(Configuration.get("default.admin.pseudo"), Configuration.get("default.admin.password"));
+        controller.login(Configuration.get("default.admin.mail"), Configuration.get("default.admin.password"));
     }
 
-    private void loginasguest() {
-        controller.login(Configuration.get("guest.fullname"), Configuration.get("guest.password"));
+    private void loginAsGuest() {
+        controller.login(Configuration.get("default.user.mail"), Configuration.get("default.user.password"));
     }
+    private void loginAs(String email) {
+        controller.login(email, Configuration.get("default.user.password"));
+    }
+    private void signup() {
+        controller.navigateToSignup();
+    }
+
+
+
+
+
 }
