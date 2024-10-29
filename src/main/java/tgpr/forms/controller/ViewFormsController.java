@@ -55,7 +55,11 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageOptionListMenu(){
+<<<<<<< HEAD
         navigateTo(new ManageOptionListsController());
+=======
+        navigateTo(new TestController());
+>>>>>>> feat_view_edit_instance
     }
 
     public void logout() {
@@ -120,7 +124,11 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageForm(Form form) {
+<<<<<<< HEAD
         navigateTo(new formController(form,currentUser));
+=======
+        navigateTo(new formController(form));
+>>>>>>> feat_view_edit_instance
     }
 
     public void createForm(){

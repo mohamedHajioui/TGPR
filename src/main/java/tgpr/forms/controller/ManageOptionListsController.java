@@ -10,13 +10,11 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
     private List<OptionList> optionLists;
     @Override
     public ManageOptionListsView getView() {
-        return new ManageOptionListsView(this);
+        return new ManageOptionListsView();
     }
-
     public List<OptionList> getOptionLists() {
         return OptionList.getAll();
     }
-
     public void navigateToOptionList(OptionList optionList){
         navigateTo(new TestController());
 
