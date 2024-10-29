@@ -1020,6 +1020,21 @@ public class EditInstanceView extends DialogWindow {
                 System.out.println("Invalid question index: " + currentQuestionIndex);
                 return;
             }
+            // Get the current question
+            Question question = questions.get(currentQuestionIndex);
+
+            if (question == null) {
+                System.out.println("Question object is null.");
+                return;
+            }
+            // Display question number and total
+            Label questionNumberLabel = new Label("Question " + (currentQuestionIndex + 1) + " of " + questions.size());
+            questionPanel.addComponent(questionNumberLabel);
+            addSpacingLabel(questionPanel, 1);
+
+
+
+
 
 
 
