@@ -66,6 +66,7 @@ public class AnalyseView extends DialogWindow {
         Button viewInstanceButton = new Button("View Instance", () -> controller.viewInstance());
         buttonsPanel.addComponent(viewInstanceButton);
         buttonsPanel.addComponent(closeButton);
+        buttonsPanel.center();
     }
 
 
