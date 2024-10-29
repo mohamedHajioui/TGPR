@@ -57,9 +57,12 @@ public class AnalyseController extends Controller<AnalyseView> {
         }
     }
 
-
     //Obtenir le nombre total de réponses pour une question
     public long getTotalResponses(Question question) {
         return question.getAnswers().size();
+    }
+
+    public void viewInstance(){
+        navigateTo(new TestController());
     }
 }

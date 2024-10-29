@@ -56,13 +56,18 @@ public class AnalyseView extends DialogWindow {
         displayQuestionsTable(currentForm.getQuestions());
         displayAnswersTable();
         mainPanel.addComponent(tablesPanel);
-        if (!currentForm.getQuestions().isEmpty()) {
-            questionsTable.setSelectedRow(0);
-            updateAnswersTable(currentForm.getQuestions().get(0));
-        }
 
-
+        buttonsCloseAndViewInstance(controller);
     }
+
+    private void buttonsCloseAndViewInstance(AnalyseController controller) {
+        Panel buttonsPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Button closeButton = new Button("Close", this::close);
+        Button viewInstanceButton = new Button("View Instance", () -> controller.viewInstance());
+        buttonsPanel.addComponent(viewInstanceButton);
+        buttonsPanel.addComponent(closeButton);
+    }
+
 
     public void displayQuestionsTable(List<Question> questions){
         questionsTable = new Table<>("Index", "Title                         ");
@@ -92,11 +97,6 @@ public class AnalyseView extends DialogWindow {
     public void displayAnswersTable(){
         answersTable = new Table<>("Value                ", "Nb Occ", "   Ratio");
         answersTable.setPreferredSize(new TerminalSize(50, 10));
-        answersTable.setRenderer(new DefaultTableRenderer<String>() {
-            public boolean isCellSelectable(int columnIndex, int rowIndex) {
-                return false;
-            }
-        });
         tablesPanel.addComponent(answersTable);
     }
 
@@ -115,7 +115,7 @@ public class AnalyseView extends DialogWindow {
                     answersTable.getTableModel().addRow(
                             answerText,
                             "     " + occurrences.toString(),
-                            String.format("%.2f", ratio)
+                            String.format("  %.2f", ratio)
                     );
                 });
     }
