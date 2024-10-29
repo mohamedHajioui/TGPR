@@ -34,24 +34,11 @@ public class AnalyseView extends DialogWindow {
         setComponent(mainPanel);
 
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
-        Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Label titleLabel = new Label("Title:                        ");
-        Label titleForm = new Label(currentForm.getTitle());
-        titlePanel.addComponent(titleLabel);
-        titlePanel.addComponent(titleForm);
-        mainPanel.addComponent(titlePanel);
-
-
-        Panel descriptionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Label description = new Label("Description:                  ");
-        descriptionPanel.addComponent(description);
-        Label descriptionForm = new Label(currentForm.getDescription());
-        descriptionPanel.addComponent(descriptionForm);
-        mainPanel.addComponent(descriptionPanel);
-        Panel instancesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        Label nbInstances = new Label("Number of Submitted Instances: " + controller.getSubmittedInstancesCount());
-        mainPanel.addComponent(nbInstances);
+        titlePanel(currentForm);
+        descriptionPanel(currentForm);
+        nbInstancesPanel(controller);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 1)));
+
         tablesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         tablesPanel.setPreferredSize(new TerminalSize(100, 20));
         displayQuestionsTable(currentForm.getQuestions());
@@ -60,6 +47,36 @@ public class AnalyseView extends DialogWindow {
         mainPanel.addComponent(new EmptySpace(new TerminalSize(1, 7)));
 
         buttonsCloseAndViewInstance(controller);
+    }
+
+    private void nbInstancesPanel(AnalyseController controller) {
+        Panel instancesPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Label instancesLabel = new Label("Number of Submitted Instances:");
+        Label nbInstances = new Label("" + controller.getSubmittedInstancesCount());
+        nbInstances.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        instancesPanel.addComponent(instancesLabel);
+        instancesPanel.addComponent(nbInstances);
+        mainPanel.addComponent(instancesPanel);
+    }
+
+    private void descriptionPanel(Form currentForm) {
+        Panel descriptionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Label description = new Label("Description:                  ");
+        descriptionPanel.addComponent(description);
+        Label descriptionForm = new Label(currentForm.getDescription());
+        descriptionForm.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        descriptionPanel.addComponent(descriptionForm);
+        mainPanel.addComponent(descriptionPanel);
+    }
+
+    private void titlePanel(Form currentForm) {
+        Panel titlePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        Label titleLabel = new Label("Title:                        ");
+        Label titleForm = new Label(currentForm.getTitle());
+        titleForm.setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
+        titlePanel.addComponent(titleLabel);
+        titlePanel.addComponent(titleForm);
+        mainPanel.addComponent(titlePanel);
     }
 
     private void buttonsCloseAndViewInstance(AnalyseController controller) {
