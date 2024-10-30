@@ -163,15 +163,9 @@ public class EditInstanceView extends DialogWindow {
 
 
         if(latestInstanceByForm.getCompleted()==null){
-<<<<<<< HEAD
             displayQuestion(questions, Boolean.valueOf(false));
         }else{
             displayQuestion(questions, Boolean.valueOf(true));
-=======
-            displayQuestion(questions, false);
-        }else{
-            displayQuestion(questions, true);
->>>>>>> feat_view_edit_instance
         }
 
 
@@ -272,13 +266,9 @@ public class EditInstanceView extends DialogWindow {
         // Mettre les réponses triées dans answerList
         for (Answer answer : sortedAnswers) {
             Object[] newEntry = new Object[3];
-<<<<<<< HEAD
             newEntry[0] = (Object) answer.getInstanceId(); // Instance ID
             newEntry[1] = (Object) answer.getQuestionId(); // Question ID
-=======
-            newEntry[0] = answer.getInstanceId(); // Instance ID
-            newEntry[1] = answer.getQuestionId(); // Question ID
->>>>>>> feat_view_edit_instance
+
             newEntry[2] = answer.getValue();       // Response
             answerList.add(newEntry); // Ajouter à la liste
         }
@@ -298,11 +288,8 @@ public class EditInstanceView extends DialogWindow {
 
         // Compter le nombre de réponses distinctes par questionId
         long distinctCount = filteredAnswers.stream()
-<<<<<<< HEAD
                 .map(answer -> Integer.valueOf(answer.getQuestionId()))
-=======
-                .map(Answer::getQuestionId) // Récupérer le questionId
->>>>>>> feat_view_edit_instance
+
                 .distinct() // Filtrer pour obtenir des questionId distincts
                 .count(); // Compter le nombre de questionId distincts
 
@@ -542,13 +529,9 @@ public class EditInstanceView extends DialogWindow {
                 existingEntry[2] = inputValue; // Update response
             } else {
                 Object[] newEntry = new Object[3];
-<<<<<<< HEAD
                 newEntry[0] = (Object) instanceID;        // Instance ID
                 newEntry[1] = (Object) question.getId(); // Question ID
-=======
-                newEntry[0] = instanceID;        // Instance ID
-                newEntry[1] = question.getId(); // Question ID
->>>>>>> feat_view_edit_instance
+
                 newEntry[2] = inputValue;       // Response
                 answerList.add(newEntry);       // Add new entry
             }
@@ -562,13 +545,9 @@ public class EditInstanceView extends DialogWindow {
                 existingEntry[2] = selectedOption; // Update response
             } else {
                 Object[] newEntry = new Object[3];
-<<<<<<< HEAD
                 newEntry[0] = (Object) instanceID;
                 newEntry[1] = (Object) question.getId();
-=======
-                newEntry[0] = instanceID;
-                newEntry[1] = question.getId();
->>>>>>> feat_view_edit_instance
+
                 newEntry[2] = selectedOption;
                 answerList.add(newEntry);
             }
@@ -589,13 +568,9 @@ public class EditInstanceView extends DialogWindow {
             } else {
                 // Create a new entry for the answerList
                 Object[] newEntry = new Object[3];
-<<<<<<< HEAD
                 newEntry[0] = (Object) instanceID; // Assuming this is the ID of the instance
                 newEntry[1] = (Object) question.getId(); // Get the question ID
-=======
-                newEntry[0] = instanceID; // Assuming this is the ID of the instance
-                newEntry[1] = question.getId(); // Get the question ID
->>>>>>> feat_view_edit_instance
+
                 newEntry[2] = selectedItemsString; // Store the concatenated string of selected items
                 answerList.add(newEntry); // Add the new entry to the list
             }
@@ -610,13 +585,9 @@ public class EditInstanceView extends DialogWindow {
                 existingEntry[2] = selectedOption; // Update response
             } else {
                 Object[] newEntry = new Object[3];
-<<<<<<< HEAD
                 newEntry[0] = (Object) instanceID;
                 newEntry[1] = (Object) question.getId();
-=======
-                newEntry[0] = instanceID;
-                newEntry[1] = question.getId();
->>>>>>> feat_view_edit_instance
+
                 newEntry[2] = selectedOption;
                 answerList.add(newEntry);
             }
@@ -660,11 +631,8 @@ public class EditInstanceView extends DialogWindow {
                 }
 
                 currentQuestionIndex--; // Go to the previous question
-<<<<<<< HEAD
                 displayQuestion(questions, Boolean.valueOf(true)); // Update the display for the previous question
-=======
-                displayQuestion(questions,true); // Update the display for the previous question
->>>>>>> feat_view_edit_instance
+
             }
         });
 
@@ -681,11 +649,8 @@ public class EditInstanceView extends DialogWindow {
                     displayCurrentInputValue(questions); // Display current input value
                     if (currentQuestionIndex < questions.size() - 1) {
                         currentQuestionIndex++; // Aller à la question suivante
-<<<<<<< HEAD
                         displayQuestion(questions, Boolean.valueOf(true)); // Actualiser l'affichage
-=======
-                        displayQuestion(questions,true); // Actualiser l'affichage
->>>>>>> feat_view_edit_instance
+
                         printAnswerList();
                     }
                 }
@@ -693,11 +658,8 @@ public class EditInstanceView extends DialogWindow {
                 displayCurrentInputValue(questions); // Display current input value
                 if (currentQuestionIndex < questions.size() - 1) {
                     currentQuestionIndex++; // Aller à la question suivante
-<<<<<<< HEAD
                     displayQuestion(questions, Boolean.valueOf(true)); // Actualiser l'affichage
-=======
-                    displayQuestion(questions, true); // Actualiser l'affichage
->>>>>>> feat_view_edit_instance
+
                 }
             }
 
@@ -974,11 +936,8 @@ public class EditInstanceView extends DialogWindow {
         close();
     }
     private void ButtonCancelNo() {
-<<<<<<< HEAD
         close();
-=======
-       close();
->>>>>>> feat_view_edit_instance
+
     }
 
 
@@ -1159,8 +1118,5 @@ public class EditInstanceView extends DialogWindow {
 
     public Panel getMainPanel() {
         return mainPanel;
-<<<<<<< HEAD
     }}
-=======
-    }}
->>>>>>> feat_view_edit_instance
+
