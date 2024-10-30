@@ -49,7 +49,7 @@ public class ManageSharesView extends DialogWindow {
             selection().addTo(root);
         }
 
-        new Button("Close", this::closeManageShares).addTo(root);
+        new Button("Close", this::closeManageShares).addTo(root).center();
 
 
     }
@@ -67,7 +67,7 @@ public class ManageSharesView extends DialogWindow {
             present.add(tgpr.forms.model.User.getByKey(a.getUserId()));
         }
         for(User user : tgpr.forms.model.User.getAll()) {
-            if (!present.contains(user)) {
+            if (!present.contains(user) && user != tgpr.forms.model.User.getByKey(1) && user != form.getOwner()) {
                 absent.add(user);
             }
         }return absent;
@@ -78,7 +78,6 @@ public class ManageSharesView extends DialogWindow {
 
     private Panel selection(){
         Panel panel =  Panel.gridPanel(3);
-
         cbUser = new ComboBox<>();
         for(User user : absent()) {
             cbUser.addItem(user);
@@ -138,12 +137,12 @@ public class ManageSharesView extends DialogWindow {
                 new ColumnSpec<>("Acess Right", UserFormAccess ::getAccessType )
         );
 
-        table.sizeTo(ViewManager.getTerminalColumns(),10);
+        table.sizeTo(90,10);
         table.add(refrenceList());
 
         table.setSelectAction((this::enterCommande));
-        boolean answer;
         addKeyboardListener(table, KeyType.Delete, this::deleteUser);
+        addKeyboardListener(table, KeyType.Backspace, this::deleteUser);
 
         return table;
     }
@@ -154,7 +153,7 @@ public class ManageSharesView extends DialogWindow {
     //enterCommande() est la methode qui se declanche lors de l'appui du button enter grace a table.setSelectionAction() elle rend switch le accesType d'un User
 
     private void enterCommande(){
-        if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
+        if (askConfirmation("Are you sure you want to modify this share?","Modify Share")){
 
             if (table.getSelected().getAccessType() == Editor){
                 table.getSelected().setAccessType(User);
