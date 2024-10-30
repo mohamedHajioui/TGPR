@@ -1,17 +1,22 @@
 package tgpr.forms.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static tgpr.forms.model.OptionList.getByNameAndUser;
 public class OptionListValidator {
 
-    public static String isValidOptionListName(String name, User owner, OptionList optionList) {
+    public static String validateOptionListName(String name, User owner, OptionList optionList) {
+        List<String> errors = new ArrayList<>();
+
         if (name == null || name.isBlank()) {
-            return "name required";
+            errors.add("Name required");
         }
         if (name.length() < 3) {
-            return "min 3 characters required";
+            errors.add("min 3 characters required");
         }
         if (!name.equals(optionList.getName()) && !isUniqueForOwner(name, owner)) {
-            return " optionList name must be unique for this owner";
+            errors.add("Name must be unique for this owner");
         }
         return null;
     }
