@@ -2,10 +2,7 @@ package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-<<<<<<< HEAD
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-=======
->>>>>>> feat_view_edit_instance
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.table.Table;
 import tgpr.forms.controller.ManageOptionListsController;
@@ -14,23 +11,25 @@ import tgpr.framework.ViewManager;
 
 import java.util.List;
 
-<<<<<<< HEAD
-public class ManageOptionListsView extends DialogWindow { ;
-=======
+
 public class ManageOptionListsView extends BasicWindow { ;
->>>>>>> feat_view_edit_instance
+
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;
     private final Button newListButton;
     private final Button cancelButton;
+
     public ManageOptionListsView(ManageOptionListsController controller) {
-<<<<<<< HEAD
         super("Manage Option Lists");
-        this.controller = controller;
-=======
-        this.controller = controller;
+
+        ManageOptionListsController controller1;
+
+        controller1 = controller;
+
+        controller1 = controller;
+        this.controller = controller1;
         setTitle("Manage Option Lists");
->>>>>>> feat_view_edit_instance
+
         setHints(List.of(Hint.CENTERED));
         setFixedSize(new TerminalSize(60, 15));
 
