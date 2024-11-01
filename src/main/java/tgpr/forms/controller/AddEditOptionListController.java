@@ -12,10 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
-    private final AddEditOptionListView view;
+    private AddEditOptionListView view;
     private OptionList optionList;
     private User owner;
     private final List<OptionValue> options;
+
+    public AddEditOptionListController() {
+        this.options = new ArrayList<>();
+    }
+    public void initialize(User owner, OptionList optionList) {
+        this.owner = owner;
+        this.optionList = optionList;
+        view = new AddEditOptionListView(this, owner, optionList);
+    }
 
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
