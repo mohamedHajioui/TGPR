@@ -102,7 +102,6 @@ public class ViewInstancesView extends DialogWindow {
     }
     private void ButtonConfirmYes()
     {
-
     }
     private void ButtonConfirmNo() {
         close();
@@ -149,6 +148,45 @@ public class ViewInstancesView extends DialogWindow {
     }
 
 
+    private void ConfirmationDeleteAllofClear() {
+        setViewTitle("Delete All Instances");
+        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+        mainPanel.setPreferredSize(new TerminalSize(80, 4)); // Définir une taille préférée pour le panel
+
+        Label textLabel = new Label("Are you sure you want to delete all the instances ?\nNote : This will also delete instances currently being edited (not submitted).");
+        mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
+
+        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+
+        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        buttonPanel.addComponent(new Button("Yes", this::ButtonDeleteAllClearYes));
+        buttonPanel.addComponent(new Button("No", this::ButtonDeleteAllClearNo));
+
+        setHints(List.of(Hint.CENTERED));
+
+        buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+        mainPanel.addComponent(buttonPanel);
+
+        Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+        container.addComponent(mainPanel);
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+        // Définir le panneau de conteneur comme composant principal de la fenêtre
+        setComponent(container);
+
+    }
+    private void ButtonDeleteAllClearYes()
+    {
+
+    }
+    private void ButtonDeleteAllClearNo() {
+        close();
+    }
 
 
 
