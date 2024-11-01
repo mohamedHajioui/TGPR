@@ -1,12 +1,10 @@
 
 package tgpr.forms.controller;
 
-import tgpr.forms.model.OptionList;
-import tgpr.forms.model.OptionListValidator;
-import tgpr.forms.model.User;
-import tgpr.forms.model.OptionValue;
+import tgpr.forms.model.*;
 import tgpr.forms.view.AddEditOptionListView;
 import tgpr.framework.Controller;
+import tgpr.framework.ErrorList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,26 +33,30 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     @Override
     public AddEditOptionListView getView() {
-        return new AddEditOptionListView(this, owner, optionList);
+        return view;
     }
 
     public OptionList getOptionList() {
         return optionList;
     }
 
+    public ErrorList validate(String optionListName) {
+        var errors = new ErrorList();
+
+        var nameError = OptionListValidator.validateOptionListName(optionListName, owner, optionList);
+        if (nameError != null) {
+            errors.add(nameError, Form.Fields.Name);
+        }
+        return errors;
+    }
+
     public void addOptionList(String name, User owner) {
-        var errors = OptionListValidator.validateOptionListName(name, owner, optionList);
+        var errors = validate(name);
         if (errors.isEmpty()) {
             optionList = new OptionList(name);
             optionList.save();
             view.close();
         }
-    }
-
-    public void validate(String optionListName) {
-    }
-    public void saveOptionList(OptionList optionList) {
-
     }
 
     public void updateOptionList(OptionList optionList) {

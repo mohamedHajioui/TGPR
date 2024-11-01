@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
+import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.OptionValue;
 import tgpr.forms.model.User;
@@ -62,7 +63,6 @@ public class AddEditOptionListView extends DialogWindow {
                 .setTextChangeListener((txt, byUser) -> validate());
         new EmptySpace().addTo(namePanel);
         errName = new Label("name required").addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
-        errName.setVisible(false);
 
         tablePanel = new Panel().addTo(root)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, false))
@@ -110,12 +110,6 @@ public class AddEditOptionListView extends DialogWindow {
         }
     }
 
-    private void validate() {
-        boolean isNameValid = txtName != null && !txtName.getText().isBlank();
-        errName.setVisible(!isNameValid);
-        btnAddOption.setEnabled(isNameValid);
-    }
-
     private void addOption() {
         String label = txtAddOption.getText().trim();
         if (label.isEmpty()) {
@@ -156,4 +150,15 @@ public class AddEditOptionListView extends DialogWindow {
         controller.updateOptionList(optionList);
         close();
     }
+
+    private void validate() {
+        var errors = controller.validate(
+                txtName.getText()
+        );
+
+        errName.setText(errors.getFirstErrorMessage(Form.Fields.Name));
+
+        btnCreate.setEnabled(errors.isEmpty());
+    }
+
 }
