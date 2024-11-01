@@ -342,7 +342,7 @@ public class EditInstanceView extends DialogWindow {
 
         // Display "Input Required" label if the question is required
         if (question.getRequired()) {
-            Label requiredLabelText = new Label("Input Required (*)").setForegroundColor(TextColor.ANSI.RED);
+            Label requiredLabelText = new Label("This question is Required ").setForegroundColor(TextColor.ANSI.RED);
             questionPanel.addComponent(requiredLabelText);
         }
 
@@ -604,9 +604,16 @@ public class EditInstanceView extends DialogWindow {
         // Initialize the error message label
         // Add the error message label to the panel
 
-        Button cancelButton = new Button("Cancel", () -> {
-            System.out.println("Cancel clicked");
+
+
+        Button closeButton = new Button("Close", () -> {
+            displayCurrentInputValue(questions);
+            displayAnswerList(); // Display the answer list
+            close();    // Close the application
         });
+
+
+
 
         previousButton = new Button("Previous", () -> {
             if (currentQuestionIndex > 0) {
@@ -628,6 +635,9 @@ public class EditInstanceView extends DialogWindow {
                 displayQuestion(questions,true); // Update the display for the previous question
             }
         });
+
+
+
 
 
 
@@ -656,12 +666,15 @@ public class EditInstanceView extends DialogWindow {
 
 
         });
-
-        Button closeButton = new Button("Close", () -> {
-            displayCurrentInputValue(questions);
-            displayAnswerList(); // Display the answer list
-            close();    // Close the application
+        Button cancelButton = new Button("Cancel", () -> {
+            System.out.println("Cancel clicked");
         });
+
+
+
+
+
+
 
 // Assuming mainPanel is the main container panel for your UI
 
@@ -669,6 +682,7 @@ public class EditInstanceView extends DialogWindow {
         // Add buttons to the buttonPanel
         buttonPanel.addComponent(closeButton);
         buttonPanel.addComponent(cancelButton);
+
 
 
 
