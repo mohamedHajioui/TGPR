@@ -13,21 +13,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private AddEditOptionListView view;
     private OptionList optionList;
     private User owner;
-    private final List<OptionValue> options;
-
-    public AddEditOptionListController() {
-        this.options = new ArrayList<>();
-    }
-    public void initialize(User owner, OptionList optionList) {
-        this.owner = owner;
-        this.optionList = optionList;
-        view = new AddEditOptionListView(this, owner, optionList);
-    }
+    private List<OptionValue> options;
 
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
         this.optionList = optionList;
-        this.options = options;
+        this.options = (options != null) ? options : new ArrayList<>();
         view = new AddEditOptionListView(this, owner, optionList);
     }
 
@@ -50,24 +41,36 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return errors;
     }
 
-    public void addOptionList(String name, User owner) {
+    public void addOptionList(String name) {
         var errors = validate(name);
-        if (errors.isEmpty()) {
+        if (errors.isEmpty() && canCreateOptionList()) {
             optionList = new OptionList(name);
+            optionList.setOwnerId(owner.getId());
             optionList.save();
+            for (OptionValue optionValue : options) {
+                optionValue.setOptionListId(optionList.getId());
+                optionValue.save();
+            }
             view.close();
         }
     }
 
-    public void updateOptionList(OptionList optionList) {
+    public void updateOptionList(String newName) {
+        optionList.setName(newName);
         optionList.save();
     }
 
     public boolean addOption(OptionValue option) {
+        if (options == null) {
+            options = new ArrayList<>();
+        }
         boolean exists = options.stream()
                 .anyMatch(existingOption -> existingOption.getLabel().equals(option.getLabel()));
         if (!exists) {
+            option.setIdx(options.size() + 1);
             options.add(option);
+            option.setOptionListId(optionList.getId());
+            option.save();
             return true;
         }
         return false;
@@ -78,6 +81,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public boolean canCreateOptionList() {
-        return !options.isEmpty();
+        return options != null && !options.isEmpty();
     }
 }
