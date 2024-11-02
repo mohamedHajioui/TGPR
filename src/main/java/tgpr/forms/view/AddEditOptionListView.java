@@ -33,10 +33,10 @@ public class AddEditOptionListView extends DialogWindow {
     private final Panel addOptionPanel;
     private final Label errAddOption;
     private TextBox txtAddOption;
-    private final Button btnAddOption;
+    private Button btnAddOption;
     private final Panel btnPanel;
     private final Panel btnContainer;
-    private final Button btnCreate;
+    private Button btnCreate;
     private final Button btnClose;
 
     private List<OptionValue> options = new ArrayList<>();
@@ -85,7 +85,11 @@ public class AddEditOptionListView extends DialogWindow {
         errAddOption.setVisible(false);
 
         txtAddOption = new TextBox(new TerminalSize(40, 1)).addTo(addOptionPanel)
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Beginning));
+                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Beginning))
+                .setTextChangeListener((txt, byUser) -> {
+                    btnAddOption.setEnabled(!txt.isEmpty());
+                    btnCreate.setEnabled(controller.canCreateOptionList());
+                });
 
         btnAddOption = new Button("Add", this::addOption).addTo(addOptionPanel)
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.End));
@@ -99,7 +103,7 @@ public class AddEditOptionListView extends DialogWindow {
         btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL));
         btnCreate = new Button(optionList == null ? "Create" : "Save", this::createOrUpdateOptionList)
                 .addTo(btnContainer).setEnabled(false);
-        btnClose = new Button("Close", this::close).addTo(btnContainer);
+        btnClose = new Button("Close", this::cancelCreation).addTo(btnContainer);
 
         btnContainer.addTo(btnPanel);
 
@@ -111,18 +115,18 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     private void addOption() {
-        String label = txtAddOption.getText().trim();
-        if (label.isEmpty()) {
+        String optionLabel = txtAddOption.getText().trim();
+        if (optionLabel.isEmpty()) {
             errAddOption.setVisible(true);
             btnAddOption.setEnabled(false);
         } else {
-            OptionValue newOption = new OptionValue(optionList, options.size(), label);
+            OptionValue newOption = new OptionValue(optionList, options.size(), optionLabel);
             boolean added = controller.addOption(newOption);
             if (added) {
                 errAddOption.setVisible(false);
-                table.setItems(controller.getOptions());
                 txtAddOption.setText("");
-                btnAddOption.setEnabled(controller.canCreateOptionList());
+                table.setItems(controller.getOptions());
+                btnCreate.setEnabled(controller.canCreateOptionList());
             } else {
                 errAddOption.setVisible(true);
             }
@@ -131,34 +135,46 @@ public class AddEditOptionListView extends DialogWindow {
 
     private void createOrUpdateOptionList() {
         if (optionList == null) {
-            addOptionList();
+            controller.addOptionList(txtName.getText());
+            optionList.setOwnerId(owner.getId());
         } else {
-            updateOptionList();
+            optionList.setName(txtName.getText());
+            controller.updateOptionList(txtName.getText());
+            close();
+            return;
+        }
+        addOptionList(optionList);
+    }
+
+    private void addOptionList(OptionList optionList) {
+        var errors = controller.validate(optionList.getName());
+        if (errors.isEmpty()) {
+            optionList.save();
+            for (OptionValue optionValue : options) {
+                optionValue.setOptionListId(optionList.getId());
+                optionValue.save();
+            }
+            close();
         }
     }
 
-    private void addOptionList() {
-        controller.addOptionList(
-                txtName.getText(),
-                owner
-        );
-        close();
-    }
-
-    private void updateOptionList() {
-        optionList.setName(txtName.getText());
-        controller.updateOptionList(optionList);
+    private void cancelCreation() {
         close();
     }
 
     private void validate() {
-        var errors = controller.validate(
-                txtName.getText()
-        );
+        var errors = controller.validate(txtName.getText());
+
+        boolean hasOptions = !options.isEmpty();
+
+        if (!hasOptions) {
+            errAddOption.setVisible(true);
+            btnCreate.setEnabled(false);
+        } else {
+            errAddOption.setVisible(false);
+        }
 
         errName.setText(errors.getFirstErrorMessage(Form.Fields.Name));
-
-        btnCreate.setEnabled(errors.isEmpty());
+        btnCreate.setEnabled(errors.isEmpty() && hasOptions);
     }
-
 }
