@@ -14,6 +14,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private OptionList optionList;
     private User owner;
     private List<OptionValue> options;
+    private  List<OptionValue> optionValues = new ArrayList<>();
 
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
@@ -74,6 +75,28 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             return true;
         }
         return false;
+    }
+
+    public boolean addOptionValue(String valueName) {
+        if (valueName == null || valueName.trim().isEmpty()) {
+            return false;
+        }
+        int newIdx = optionValues.size() + 1;
+        OptionValue newOption = new OptionValue(this.getOptionList(), newIdx, valueName);
+        optionValues.add(newOption);
+        updateIndexes();
+        return true;
+    }
+
+    public void removeOptionValue(int indexToRemove) {
+        optionValues.removeIf(option -> option.getIdx() == indexToRemove);
+        updateIndexes();
+    }
+
+    private void updateIndexes() {
+        for (int i = 0; i < optionValues.size(); i++) {
+            optionValues.get(i).setIdx(i + 1);
+        }
     }
 
     public List<OptionValue> getOptions() {
