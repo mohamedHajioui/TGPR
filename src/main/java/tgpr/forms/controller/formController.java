@@ -48,12 +48,12 @@ public class formController extends Controller<view_form> {
     }
 
     public void versNouvelleQuestion(){
-        Controller.navigateTo(new AddEditQuestionController(null,form));
+        Controller.navigateTo(new AddEditQuestionController(null,form,logedUser));
         form.save();
     }
 
     public void versEditQuestion(Question question){
-        Controller.navigateTo(new AddEditQuestionController(question,form));
+        Controller.navigateTo(new AddEditQuestionController(question,form,logedUser));
         form.save();
     }
 
