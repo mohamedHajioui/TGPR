@@ -65,7 +65,13 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public OptionList createOptionList(String name) {
+        int newIdx = 1;
+        List<OptionList> existingOptionLists = OptionList.getAll();
+        if (!existingOptionLists.isEmpty()) {
+            newIdx = existingOptionLists.getLast().getId() + 1;
+        }
         OptionList newOptionList = new OptionList();
+        newOptionList.setId(newIdx);
         newOptionList.setName(name);
         newOptionList.save();
         return newOptionList;
