@@ -95,8 +95,6 @@ public class Instance extends Model {
         save();
     }
 
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -144,7 +142,6 @@ public class Instance extends Model {
     public static List<Instance> getAll() {
         return queryList(Instance.class, "select * from instances");
     }
-
 
     public Instance save() {
         int c;
