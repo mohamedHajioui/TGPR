@@ -60,9 +60,9 @@ public class Form extends Model {
                 new Params("id", id));
     }
 
-    private static String title;
+    private String title;
 
-    public static String getTitle() {
+    public String getTitle() {
         return title;
     }
 
@@ -70,9 +70,9 @@ public class Form extends Model {
         this.title = title;
     }
 
-    private static String description;
+    private String description;
 
-    public static String getDescription() {
+    public String getDescription() {
         return description;
     }
 

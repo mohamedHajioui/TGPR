@@ -3,7 +3,6 @@ package tgpr.forms.view;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.table.Table;
 import tgpr.forms.controller.ManageOptionListsController;
@@ -13,7 +12,6 @@ import tgpr.framework.ViewManager;
 import java.util.List;
 
 public class ManageOptionListsView extends DialogWindow { ;
-
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;
     private final Button newListButton;
