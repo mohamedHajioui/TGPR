@@ -108,6 +108,7 @@ public class Question extends Model {
         this.description = description;
     }
 
+    private String answer;
     private Type type;
 
     public Type getType() {
@@ -137,6 +138,14 @@ public class Question extends Model {
     public void setOptionListId(Integer optionListId) {
         this.optionListId = optionListId == null || optionListId == 0 ? null : optionListId;
     }
+    public boolean isRequired() {
+        return required; // Renvoie si la question est obligatoire
+    }
+
+    public boolean isAnswered() {
+        return answer != null && !answer.isEmpty(); // Renvoie si la réponse à la question n'est pas vide
+    }
+
 
     public OptionList getOptionList() {
         if (optionListId == null)
