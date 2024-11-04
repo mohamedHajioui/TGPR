@@ -5,12 +5,15 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.menu.MenuItem;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
 import tgpr.framework.Configuration;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ViewFormsView extends BasicWindow {
     private Button createNewFormButton;
@@ -38,7 +41,6 @@ public class ViewFormsView extends BasicWindow {
         } else {
             setTitle("MyForms (" + email + " - " + currentUser.getRole() + ")");
         }
-
 
         // Ajouter les boutons "File" et "Parameters" en haut à gauche
         Panel topPanel = buttonsFileAndParameters();
@@ -240,15 +242,24 @@ public class ViewFormsView extends BasicWindow {
 
     public void openParameterMenu(){
         Window parameterMenu = new BasicWindow("");
+        parameterMenu.setHints(List.of());
         Panel parameterMenuPanel = new Panel();
 
         MenuItem optionList = new MenuItem("Manage your Option Lists", () ->
                 controller.manageOptionListMenu());
         MenuItem distributionList = new MenuItem("Manage your Distribution Lists");
-
         parameterMenuPanel.addComponent(optionList);
         parameterMenuPanel.addComponent(distributionList);
         parameterMenu.setComponent(parameterMenuPanel);
+        parameterMenu.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    basePane.close();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
         this.getTextGUI().addWindowAndWait(parameterMenu);
     }
 
