@@ -10,10 +10,7 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.AddEditOptionListController;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.OptionList;
-import tgpr.forms.model.OptionValue;
-import tgpr.forms.model.User;
+import tgpr.forms.model.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +20,8 @@ import java.util.regex.Pattern;
 import static tgpr.framework.ViewManager.getTerminalColumns;
 
 public class AddEditOptionListView extends DialogWindow {
+    private boolean normal = true;
+    private boolean moving = false;
     private final AddEditOptionListController controller;
     private final User owner;
     private OptionList optionList;
@@ -36,14 +35,7 @@ public class AddEditOptionListView extends DialogWindow {
     private TextBox txtAddOption;
     private Button btnAddOption;
     private final Panel btnPanel;
-    private final Panel btnContainer;
-    private final Button btnReorder;
-    private final Button btnDuplicate;
-    private final Button btnAlpha;
-    private final Button btnConfirm;
-//    private final Button btnCancel;
     private Button btnCreate;
-    private final Button btnClose;
     private List<OptionValue> options = new ArrayList<>();
 
     public AddEditOptionListView(AddEditOptionListController controller, User owner, OptionList optionList) {
@@ -70,10 +62,7 @@ public class AddEditOptionListView extends DialogWindow {
         new EmptySpace().addTo(namePanel);
         errName = new Label("name required").addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
 
-        table = new ObjectTable<>(
-                new ColumnSpec<>("Index", optionValue -> options.indexOf(optionValue) + 1),
-                new ColumnSpec<>("Label", OptionValue::getLabel)
-        );
+        table = getTable();
         root.addComponent(table);
         table.setPreferredSize(new TerminalSize(getTerminalColumns(), 8));
         table.setKeyStrokeHandler(keyStroke -> {
@@ -111,33 +100,87 @@ public class AddEditOptionListView extends DialogWindow {
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.END, GridLayout.Alignment.BEGINNING))
                 .setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-
-        btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(btnPanel);
-
-        btnReorder = new Button("Reorder", this::reorder).addTo(btnContainer);
-
-        btnDuplicate = new Button("Duplicate", this::duplicate).addTo(btnContainer);
-
-        btnAlpha = new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
-
-        btnConfirm = new Button("Confirm", this::confirmOrder).addTo(btnContainer);
-
-//        btnCancel = new Button("Cancel", this::cancelOrder).addTo(btnContainer);
-
-        btnCreate = new Button(optionList == null ? "Create" : "Save", this::createOrUpdateOptionList)
-                .addTo(btnContainer).setEnabled(false);
-
-        btnClose = new Button("Close", this::close).addTo(btnContainer);
-
         if (optionList != null) {
             txtName.setText(optionList.getName());
             reloadData();
         }
     }
 
-    private void reorder() {
-        controller.reorder();
+    private  void affichageDesButtons(boolean normal){
+        Panel btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(btnPanel);
+
+        if (normal){
+            new Button("Reorder", this::reorder).addTo(btnContainer);
+
+            new Button("Duplicate", this::duplicate).addTo(btnContainer);
+
+            new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
+
+
+//        btnCancel = new Button("Cancel", this::cancelOrder).addTo(btnContainer);
+
+            new Button(optionList == null ? "Create" : "Save", this::createOrUpdateOptionList)
+                    .addTo(btnContainer).setEnabled(false);
+
+            new Button("Close", this::close).addTo(btnContainer);
+        }else{
+            new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
+
+            new Button("Confirm", this::confirmOrder).addTo(btnContainer);
+
+            //new Button("Cancel", this::cancelOrder).addTo(btnContainer);
+        }
+
     }
+
+    private ObjectTable<OptionValue> getTable() {
+        final ObjectTable<OptionValue> table;
+        table = new ObjectTable<>(
+                new ColumnSpec<>("Index", optionValue -> options.indexOf(optionValue) + 1),
+                new ColumnSpec<>("Label", OptionValue::getLabel)
+        );
+        table.setSelectAction(this::choice);
+        table.addSelectionChangeListener(this::change);
+        if(!normal){
+            reorder();
+        }
+        addKeyboardListener(table,KeyType.Backspace,this::deleteValue);
+        return table;
+    }
+
+    private void choice(){
+        if (!normal){
+            //on change juste l'etat de moving pour dire si on bouge ou paS
+            moving = !moving;
+        }else{
+            return;
+        }
+    }
+
+    private void change(int prec, int current,boolean byUser ){
+        if (!moving) return;
+        System.out.println("sectionChanged");
+        swap(prec, current);
+        System.out.println("return");
+    }
+
+    private void swap(int prec, int current){
+        System.out.println("swap");
+        OptionValue tmp = table.getItem(current);
+        table.setItem(current, table.getItem(prec));
+        table.setItem(prec, tmp);
+        table.refresh();
+    }
+
+    private boolean deleteValue() {
+        table.getSelected().delete();
+        return true;
+    }
+    private void reorder() {
+        normal = false;
+        affichageDesButtons(normal);
+    }
+
 
     private void duplicate() {
         controller.duplicate();
@@ -189,6 +232,13 @@ public class AddEditOptionListView extends DialogWindow {
         String label = txtAddOption.getText();
         controller.addOptionValue(label);
         txtAddOption.setText("");
+    }
+
+    private void save(){
+        System.out.println("save");
+        optionList.reorderValues(table.getItems());
+        normal = true;
+        affichageDesButtons(true);
     }
 
 
