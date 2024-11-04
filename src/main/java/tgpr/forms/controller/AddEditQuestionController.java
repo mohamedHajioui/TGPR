@@ -3,6 +3,7 @@ package tgpr.forms.controller;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
+import tgpr.forms.model.User;
 import tgpr.forms.view.AddEditQuestionView;
 import tgpr.framework.Controller;
 
@@ -12,11 +13,13 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     private final Question question;
     private final Form form;
     private int formId;
+    private final User user;
 
-    public AddEditQuestionController(Question question,Form form) {
+    public AddEditQuestionController(Question question,Form form,User user) {
         this.question = question; // Question à modifier ou null pour une nouvelle question
         this.form = form;
         this.formId = form.getId();
+        this.user = user;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
         // Save the new question in the database
         newQuestion.save();
-        getView().close();
+        navigateTo(new formController(form,user));
     }
 
     public void updateQuestion(Question question, String title, String description, Question.Type type, OptionList optionList, boolean required) {
@@ -64,7 +67,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
         // Save the updated question in the database
         question.save();
-        getView().close();
+        navigateTo(new formController(form,user));
     }
 
     public void deleteQuestion(Question question) {
