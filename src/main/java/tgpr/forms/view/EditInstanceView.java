@@ -64,7 +64,38 @@ public class EditInstanceView extends DialogWindow {
         role = user.getRole().toString();
 
         if(exists && role == "Guest" ) {
-            System.out.println("Instance already exists!");
+            setViewTitle("Error"); // Titre spécifique pour RequestConfirmation
+            mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+            mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
+
+
+
+            Label textLabel = new Label("Instance Already Exists for the guest");
+            mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+
+
+            mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+
+            Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+            buttonPanel.addComponent(new Button("OK", this::close));
+            setHints(List.of(Hint.CENTERED));
+
+            buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+            mainPanel.addComponent(buttonPanel);
+
+            Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+            container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+            container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+            container.addComponent(mainPanel);
+            container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+            // Définir le panneau de conteneur comme composant principal de la fenêtre
+            setComponent(container);
+
+
         }else{
             System.out.println(role);
             if (role != "Guest") {
@@ -116,7 +147,7 @@ public class EditInstanceView extends DialogWindow {
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
     private int idForm = 15;
-    private int userId = 1;
+    private int userId = 9;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
@@ -173,7 +204,7 @@ public class EditInstanceView extends DialogWindow {
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label dateLabel = new Label("Submitted on: " + (latestInstanceByForm.getStarted() != null ? latestInstanceByForm.getStarted() : "null"));
+        Label dateLabel = new Label("Started on: " + (latestInstanceByForm.getStarted() != null ? latestInstanceByForm.getStarted() : "null"));
 
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
@@ -375,7 +406,7 @@ public class EditInstanceView extends DialogWindow {
 
         // Display "Input Required" label if the question is required
         if (question.getRequired()) {
-            Label requiredLabelText = new Label("Input Required (*)").setForegroundColor(TextColor.ANSI.RED);
+            Label requiredLabelText = new Label("This question is required").setForegroundColor(TextColor.ANSI.RED);
             questionPanel.addComponent(requiredLabelText);
         }
 
