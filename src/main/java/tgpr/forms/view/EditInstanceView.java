@@ -63,7 +63,7 @@ public class EditInstanceView extends DialogWindow {
         boolean exists = checkInstanceExists(userId, idForm);
         role = user.getRole().toString();
 
-        if(exists && role == "Guest") {
+        if(exists && role == "Guest" ) {
             System.out.println("Instance already exists!");
         }else{
             System.out.println(role);
