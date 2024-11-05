@@ -26,10 +26,13 @@ import static java.awt.SystemColor.window;
 public class EditInstanceView extends DialogWindow {
     private EditInstanceController controller;
     private Panel mainPanel;
+    private User loggedUser;
 
-    public EditInstanceView(EditInstanceController controller) {
+    public EditInstanceView(EditInstanceController controller, User loggedUser) {
         super("Open a form");
         this.controller = controller;
+        System.out.println(loggedUser.getFullName());
+        this.loggedUser = loggedUser;
         setCloseWindowWithEscape(true);
         RequestConfirmation();
         //AnswerForm();
@@ -58,9 +61,9 @@ public class EditInstanceView extends DialogWindow {
     private void RequestConfirmation() {
 
 
-        User user = User.getByKey(userId);
+        User user = User.getByKey(loggedUser.getId());
 
-        boolean exists = checkInstanceExists(userId, idForm);
+        boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
         role = user.getRole().toString();
 
         if(exists && role == "Guest" ) {
@@ -147,7 +150,6 @@ public class EditInstanceView extends DialogWindow {
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
     private int idForm = 15;
-    private int userId = 9;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
@@ -881,7 +883,7 @@ public class EditInstanceView extends DialogWindow {
         System.out.println("----- Submitted Answers -----");
 
 
-        saveInstance(idForm, userId, started, complited); // Assuming this will set a new instance ID for the latest submission
+        saveInstance(idForm, loggedUser.getId(), started, complited); // Assuming this will set a new instance ID for the latest submission
 
         for (Object[] entry : answerList) {
             int questionId = (int) entry[1]; // Get the question ID (first element)
@@ -1039,7 +1041,7 @@ public class EditInstanceView extends DialogWindow {
 
         Instance FirstInstance = getFirstInstance(value);
 
-        User user = User.getByKey(userId);
+        User user = User.getByKey(loggedUser.getId());
 
         Form formData = Form.getByKey(idForm);
 

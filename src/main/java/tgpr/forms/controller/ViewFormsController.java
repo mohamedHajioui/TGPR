@@ -116,7 +116,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void openForm(){
-        navigateTo(new TestController());
+        navigateTo(new EditInstanceController(currentUser));
     }
 
     public void manageForm(Form form) {

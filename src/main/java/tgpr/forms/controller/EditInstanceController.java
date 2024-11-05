@@ -12,9 +12,12 @@ import java.util.List;
 public class EditInstanceController extends Controller<EditInstanceView> {
 
     private EditInstanceView view;
+    private User loggedUser;
 
-    public EditInstanceController() {
-        this.view = new EditInstanceView(this);
+    public EditInstanceController(User user) {
+        this.loggedUser = user;
+        this.view = new EditInstanceView(this,this .loggedUser);
+
     }
 
     @Override
