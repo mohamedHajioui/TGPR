@@ -39,39 +39,71 @@ public class EditInstanceView extends DialogWindow {
         setTitle(title); // Méthode pour changer le titre dynamiquement
     }
 
+    private  boolean checkInstanceExists(int userId, int formId) {
+        // Récupère la liste des instances
+        List<Instance> instances = Instance.getAll();
+
+        // Parcourt chaque instance pour vérifier si userId et formId correspondent
+        for (Instance instance : instances) {
+            if (instance.getUserId() == userId && instance.getFormId() == formId) {
+                return true; // Une instance correspondante a été trouvée
+            }
+        }
+
+        // Aucune instance ne correspond
+        return false;
+    }
+
+
     private void RequestConfirmation() {
 
-        setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
-        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
+
+        User user = User.getByKey(userId);
+
+        boolean exists = checkInstanceExists(userId, idForm);
+        role = user.getRole().toString();
+
+        if(exists && role == "Guest") {
+            System.out.println("Instance already exists!");
+        }else{
+            System.out.println(role);
+            if (role != "Guest") {
+                setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
+                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
 
 
 
-        Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
-        mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+                Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
+                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
 
 
-        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
 
-        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
-        buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
-        buttonPanel.addComponent(new Button("cancel", this::close));
-        setHints(List.of(Hint.CENTERED));
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
+                buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
+                buttonPanel.addComponent(new Button("cancel", this::close));
+                setHints(List.of(Hint.CENTERED));
 
-        buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-        mainPanel.addComponent(buttonPanel);
+                mainPanel.addComponent(buttonPanel);
 
-        Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
-        container.addComponent(mainPanel);
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                container.addComponent(mainPanel);
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
 
-        // Définir le panneau de conteneur comme composant principal de la fenêtre
-        setComponent(container);
+                // Définir le panneau de conteneur comme composant principal de la fenêtre
+                setComponent(container);
+            }else{
+                SubmitAgain();
+                setHints(List.of(Hint.CENTERED));
+            }
+        }
 
     }
 
@@ -85,6 +117,7 @@ public class EditInstanceView extends DialogWindow {
     private List<Object[]> answerList = new ArrayList<>();
     private int idForm = 15;
     private int userId = 1;
+    private String role;
     private int instanceID;
     private LocalDateTime started ;
     private LocalDateTime complited = null;
@@ -140,7 +173,7 @@ public class EditInstanceView extends DialogWindow {
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label dateLabel = new Label("Started on: " + (latestInstanceByForm.getStarted() != null ? latestInstanceByForm.getStarted() : "null"));
+        Label dateLabel = new Label("Submitted on: " + (latestInstanceByForm.getStarted() != null ? latestInstanceByForm.getStarted() : "null"));
 
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
@@ -342,7 +375,7 @@ public class EditInstanceView extends DialogWindow {
 
         // Display "Input Required" label if the question is required
         if (question.getRequired()) {
-            Label requiredLabelText = new Label("This question is Required ").setForegroundColor(TextColor.ANSI.RED);
+            Label requiredLabelText = new Label("Input Required (*)").setForegroundColor(TextColor.ANSI.RED);
             questionPanel.addComponent(requiredLabelText);
         }
 
@@ -461,6 +494,7 @@ public class EditInstanceView extends DialogWindow {
             return true;
         } else if (currentComponent instanceof RadioBoxList) {
             if (((RadioBoxList<?>) currentComponent).getCheckedItem() == null) {
+                showError("Please select an option.");
                 showError("Please select an option.");
                 return false;
             }
@@ -604,16 +638,9 @@ public class EditInstanceView extends DialogWindow {
         // Initialize the error message label
         // Add the error message label to the panel
 
-
-
-        Button closeButton = new Button("Close", () -> {
-            displayCurrentInputValue(questions);
-            displayAnswerList(); // Display the answer list
-            close();    // Close the application
+        Button cancelButton = new Button("Cancel", () -> {
+            System.out.println("Cancel clicked");
         });
-
-
-
 
         previousButton = new Button("Previous", () -> {
             if (currentQuestionIndex > 0) {
@@ -635,9 +662,6 @@ public class EditInstanceView extends DialogWindow {
                 displayQuestion(questions,true); // Update the display for the previous question
             }
         });
-
-
-
 
 
 
@@ -666,23 +690,24 @@ public class EditInstanceView extends DialogWindow {
 
 
         });
-        Button cancelButton = new Button("Cancel", () -> {
-            System.out.println("Cancel clicked");
-        });
 
+        Button closeButton;
 
+        if (!role.equals("Guest")) {
+            closeButton = new Button("Close", () -> {
+                displayCurrentInputValue(questions);
+                displayAnswerList(); // Display the answer list
+                close(); // Close the application
+            });
+        } else {
+            closeButton = new Button("Close", () -> {
+                close(); // Close the application
+            });
+        }
 
-
-
-
-
-// Assuming mainPanel is the main container panel for your UI
-
-
-        // Add buttons to the buttonPanel
         buttonPanel.addComponent(closeButton);
-        buttonPanel.addComponent(cancelButton);
 
+        buttonPanel.addComponent(cancelButton);
 
 
 
@@ -725,17 +750,28 @@ public class EditInstanceView extends DialogWindow {
     private void updateButtonPanel(int totalQuestions, List<Question> questions) {
         // Supprimer tous les boutons actuels du buttonPanel sauf "Close" et "Cancel"
         buttonPanel.removeAllComponents();
+        Button closeButton;
 
-        // Ajouter conditionnellement les boutons "Previous" et "Save"
-        Button closeButton = new Button("Close", ()->{ displayCurrentInputValue(questions);
-            displayAnswerList(); // Display the answer list
-            close(); });
+        if (!role.equals("Guest")) {
+            closeButton = new Button("Close", () -> {
+                displayCurrentInputValue(questions);
+                displayAnswerList(); // Display the answer list
+                close(); // Close the application
+            });
+        } else {
+            closeButton = new Button("Close", () -> {
+                close(); // Close the application
+            });
+        }
+
+        buttonPanel.addComponent(closeButton);
+
+
 
         Button cancelButton = new Button("Cancel", () -> {
             ConfirmationCancel();
         });
 
-        buttonPanel.addComponent(closeButton); // Ajouter bouton "Close"
         buttonPanel.addComponent(cancelButton); // Ajouter bouton "Cancel"
 
         if (currentQuestionIndex > 0) {
@@ -941,7 +977,7 @@ public class EditInstanceView extends DialogWindow {
         close();
     }
     private void ButtonCancelNo() {
-       close();
+        close();
     }
 
 
@@ -1107,7 +1143,8 @@ public class EditInstanceView extends DialogWindow {
             Button nextButton = new Button("Next", () -> {
                 currentQuestionIndex++; // Incrémenter l'index de la question
                 displayQuestionViewSubmition(questions); // Afficher la question suivante
-                createOrUpdateButtonsViewSubmission(questions); // Mettre à jour les boutons
+                createOrUpdateButtonsViewSubmission(questions); // Met
+                // tre à jour les boutons
             });
             buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
         }
