@@ -12,7 +12,6 @@ import tgpr.framework.ViewManager;
 import java.util.List;
 
 
-
 public class ManageOptionListsView extends DialogWindow { ;
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;

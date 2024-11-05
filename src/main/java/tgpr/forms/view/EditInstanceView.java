@@ -67,7 +67,7 @@ public class EditInstanceView extends DialogWindow {
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
         role = user.getRole().toString();
 
-        if(exists && role == "Guest" ) {
+        if(exists && Security.isGuest()  ) {
             setViewTitle("Error"); // Titre spécifique pour RequestConfirmation
             mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
             mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel

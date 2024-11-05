@@ -149,8 +149,10 @@ public class view_form extends DialogWindow{
         System.out.println("questionList");
         form.reload();
         table = new ObjectTable<Question>(
-                new ColumnSpec<>("index title", question -> Integer.valueOf(question.getIdx())),                new ColumnSpec<>("Type", Question::getType),
-                new ColumnSpec<>("Required", question -> Boolean.valueOf(question.getRequired())),                new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
+                new ColumnSpec<>("index title", Question::getIdx),
+                new ColumnSpec<>("Type", Question::getType),
+                new ColumnSpec<>("Required", Question::getRequired),
+                new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
         );
         table.sizeTo(ViewManager.getTerminalColumns(),10);
         table.add(form.getQuestions());
