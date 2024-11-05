@@ -11,7 +11,6 @@ import tgpr.framework.ViewManager;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import static tgpr.forms.model.Form.getDescription;
 
 public class ViewInstanceView extends DialogWindow {
     private ViewInstancesController controller;

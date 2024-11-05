@@ -7,9 +7,7 @@ import tgpr.forms.model.UserFormAccess;
 import tgpr.forms.model.UserValidator;
 
 import tgpr.forms.view.LoginView;
-import tgpr.framework.Controller;
-import tgpr.framework.ErrorList;
-import tgpr.framework.Model;
+import tgpr.framework.*;
 import tgpr.framework.Error;
 
 import java.util.List;
@@ -35,6 +33,22 @@ public class LoginController extends Controller<LoginView> {
             showErrors(errors);
 
         return errors;
+    }
+
+    public void loginAsGuest() {
+        var guestUser = User.getByEmail(Configuration.get("default.user.mail"));
+        if (guestUser != null) {
+            guestUser.setRole(User.Role.Guest); // Assure que le rôle est défini sur Guest
+            Security.login(guestUser);
+            navigateToGuestView(guestUser); // Redirige vers une vue limitée pour les guests
+        } else {
+            showError(new Error("Guest account not found"));
+        }
+    }
+
+    // Méthode pour naviguer vers la vue guest
+    private void navigateToGuestView(User guestUser) {
+        navigateTo(new ViewFormsController(guestUser));
     }
     public void navigateToSignup() {
         navigateTo(new SignupController());

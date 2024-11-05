@@ -212,7 +212,7 @@ public class view_form extends DialogWindow{
         }else new Button("Make Public", this::makePublic).addTo(panel);
 
         new Button("Clear Instances", this::clearInstances).addTo(panel);
-        new Button("Analyse").addTo(panel);
+        new Button("Analyse", this::Analyse).addTo(panel);
         new Button("Close", this::close).addTo(panel);
         return panel;
     }
