@@ -177,10 +177,14 @@ public class view_form extends DialogWindow{
         new Button("Share",this::shares).addTo(panel);
         new Button("Reorder",this::reOrder).addTo(panel);
         new Button("Analyse",this::Analyse).addTo(panel);
-        new Button("Cancel", this::close).addTo(panel);
+        new Button("Cancel", this::backToForms).addTo(panel);
 
         return panel;
     }
+    private void backToForms(){
+        controller.versViewForms();
+    }
+
     private void Analyse(){
         controller.versAnalyse();
     }
