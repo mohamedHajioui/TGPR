@@ -25,6 +25,7 @@ public class AddEditOptionListView extends DialogWindow {
     private final AddEditOptionListController controller;
     private final User owner;
     private OptionList optionList;
+    private OptionValue optionValue;
     private final Panel root;
     private final Panel namePanel;
     private TextBox txtName;
@@ -47,14 +48,16 @@ public class AddEditOptionListView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
 //        setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(50, 20));
+        setFixedSize(new TerminalSize(50, 17));
 
-        root = new Panel().setLayoutManager(new GridLayout(1));
+        root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         setComponent(root);
 
         namePanel = getNamePanel();
         table = getTable();
         addOptionPanel = getAddOptionPanel();
+        new EmptySpace().addTo(root);
+        new EmptySpace().addTo(root);
         btnPanel = affichageDesButtons(normal);
 
         if (optionList != null) {
@@ -65,12 +68,11 @@ public class AddEditOptionListView extends DialogWindow {
     private Panel getNamePanel() {
         final Panel namePanel;
         namePanel = new Panel().addTo(root)
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Beginning))
                 .setLayoutManager(new GridLayout(2)
-                        .setTopMarginSize(1).setLeftMarginSize(1));
+                        .setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
         new Label("Name:").addTo(namePanel)
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING));
-        txtName = new TextBox(new TerminalSize(40, 1)).addTo(namePanel)
+        txtName = new TextBox(new TerminalSize(35, 1)).addTo(namePanel)
                 .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
                 .setTextChangeListener((txt, byUser) -> validate())
                 .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING));;
@@ -91,44 +93,46 @@ public class AddEditOptionListView extends DialogWindow {
         if(!normal){
             reorder();
         }
-        addKeyboardListener(table,KeyType.Backspace,this::deleteValue);
+        addKeyboardListener(table,KeyType.Backspace,this::deleteSelectedOption);
         return table;
     }
 
     private Panel getAddOptionPanel() {
         final Panel addOptionPanel;
-        addOptionPanel = new Panel().addTo(root)
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.BEGINNING, true, false))
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         errAddOption = new Label("at least one value required").addTo(root)
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.BEGINNING, true, false))
                 .setForegroundColor(TextColor.ANSI.RED);
         errAddOption.setVisible(false);
-        txtAddOption = new TextBox(new TerminalSize(35, 1)).addTo(root)
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Beginning))
+
+        addOptionPanel = new Panel().addTo(root)
+                .setLayoutManager(new GridLayout(2).setLeftMarginSize(1).setRightMarginSize(1));
+
+        txtAddOption = new TextBox(new TerminalSize(35, 1)).addTo(addOptionPanel)
                 .setTextChangeListener((txt, byUser) -> {
                     btnAddOption.setEnabled(!txt.isEmpty());
                     //btnCreate.setEnabled(controller.canCreateOptionList());
                 });
-        btnAddOption = new Button("Add", this::addOptionValue).addTo(root)
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.End));
+        btnAddOption = new Button("Add", this::addOptionValue).addTo(addOptionPanel);
+
         return addOptionPanel;
     }
 
     private Panel affichageDesButtons(boolean normal){
-        Panel btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL));
-
-        if (normal) {
-            new Button("Reorder", this::reorder).addTo(btnContainer);
-            new Button("Duplicate", this::duplicate).addTo(btnContainer);
-//          new Button("Cancel", this::cancelOrder).addTo(btnContainer);
-            new Button(optionList == null ? "Create" : "Save", this::createOrUpdateOptionList)
-                    .addTo(btnContainer).setEnabled(false);
-            new Button("Close", this::close).addTo(btnContainer);
+        Panel btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
+        if (optionList != null) {
+            if (normal) {
+                new Button("Reorder", this::reorder).addTo(btnContainer);
+                new Button("Delete", this::deleteValue).addTo(btnContainer);
+                new Button("Duplicate", this::duplicate).addTo(btnContainer);
+                new Button("Save", this::saveOptionList).addTo(btnContainer).setEnabled(false);
+                new Button("Close", this::close).addTo(btnContainer);
+            } else {
+                new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
+                new Button("Confirm", this::confirmOrder).addTo(btnContainer);
+                new Button("Cancel", this::cancelOrder).addTo(btnContainer);
+            }
         } else {
-            new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
-            new Button("Confirm", this::confirmOrder).addTo(btnContainer);
-//          new Button("Cancel", this::cancelOrder).addTo(btnContainer);
+            new Button("Create", this::createOptionList).addTo(btnContainer);
+            new Button("Close", this::close).addTo(btnContainer);
         }
         return btnContainer;
     }
@@ -136,18 +140,16 @@ public class AddEditOptionListView extends DialogWindow {
         if (!normal){
             //on change juste l'etat de moving pour dire si on bouge ou paS
             moving = !moving;
-        }else{
+        } else {
             return;
         }
     }
-
     private void change(int prec, int current, boolean byUser){
         if (!moving) return;
         System.out.println("sectionChanged");
         swap(prec, current);
         System.out.println("return");
     }
-
     private void swap(int prec, int current){
         System.out.println("swap");
         OptionValue tmp = table.getItem(current);
@@ -155,36 +157,29 @@ public class AddEditOptionListView extends DialogWindow {
         table.setItem(prec, tmp);
         table.refresh();
     }
-
-    private boolean deleteValue() {
-        table.getSelected().delete();
-        return true;
+    private void deleteSelectedOption() {
+        OptionValue selectedOption = table.getSelected();
+        if (selectedOption != null) {
+            options.remove(selectedOption);
+            reindexOptions();  // changer la table en optionList
+            table.clear();
+            table.add(options);
+        }
+    }
+    private void reindexOptions() {
+        for (int i = 0; i < options.size(); i++) {
+            options.get(i).setIdx(i + 1);
+        }
     }
     private void reorder() {
         normal = false;
-        affichageDesButtons(normal);
-    }
-
-    private void duplicate() {
-        controller.duplicate();
-    }
-    private void alphabetically() {
-        controller.alphabetically();
-    }
-    private void confirmOrder() {
-        controller.confirmOrder();
-    }
-/*  private void cancelOrder() {controller.cancelOrder(options);} */
-
-    private void createOrUpdateOptionList() {
-        if (optionList == null) {
-            optionList = controller.createOptionList(txtName.getText());
-        } else {
-            controller.updateOptionList(optionList);
-        }
-        controller.saveOptionValues();
-    }
-
+        affichageDesButtons(normal);}
+    private void duplicate() {controller.duplicate();}
+    private void alphabetically() {controller.alphabetically();}
+    private void confirmOrder() {controller.confirmOrder();}
+    private void cancelOrder() {controller.cancelOrder();}
+    private void createOptionList() {controller.createOptionList(txtName.getText(), optionValue);}
+    private void saveOptionList() {controller.saveOptionList(optionList);}
     private void validate() {
         var errors = controller.validate(txtName.getText());
         boolean hasOptions = !options.isEmpty();
