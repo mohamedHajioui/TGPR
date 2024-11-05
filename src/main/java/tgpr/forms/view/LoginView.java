@@ -55,7 +55,7 @@ public class LoginView extends BasicWindow {
 
         buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
-        btnLoginAsGuest = new Button("Login as Guest", this::loginAsGuest).addTo(buttons);
+        btnLoginAsGuest = new Button("Login as Guest", controller::loginAsGuest).addTo(buttons);
 
 
 

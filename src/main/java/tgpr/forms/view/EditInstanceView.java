@@ -37,6 +37,7 @@ public class EditInstanceView extends DialogWindow {
         RequestConfirmation();
         //AnswerForm();
 
+
     }
     private void setViewTitle(String title) {
         setTitle(title); // Méthode pour changer le titre dynamiquement
