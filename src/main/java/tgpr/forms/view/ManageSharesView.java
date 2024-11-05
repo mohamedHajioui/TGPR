@@ -66,9 +66,16 @@ public class ManageSharesView extends DialogWindow {
         for(UserFormAccess a : refrenceList()){
             present.add(tgpr.forms.model.User.getByKey(a.getUserId()));
         }
+
+        //Vu que Admnistrator a access a tous les fomrs et le owner du form a toujours access aussi
+        present.add(tgpr.forms.model.User.getByKey(5));
+        present.add(form.getOwner());
+
+
         for(User user : tgpr.forms.model.User.getAll()) {
-            if (!present.contains(user) && user != tgpr.forms.model.User.getByKey(1) && user != form.getOwner()) {
+            if (!present.contains(user)){
                 absent.add(user);
+
             }
         }return absent;
     }
@@ -86,8 +93,8 @@ public class ManageSharesView extends DialogWindow {
 
 
         cbAccess = new ComboBox<>();
-        cbAccess.addItem(Editor);
         cbAccess.addItem(User);
+        cbAccess.addItem(Editor);
         cbAccess.addTo(panel);
 
         Button button = new Button("Add",this::Add);

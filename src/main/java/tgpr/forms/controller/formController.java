@@ -14,11 +14,13 @@ import java.util.List;
 public class formController extends Controller<view_form> {
 
     private final view_form view;
-    private  Form form;
+    private Form form;
+    private User logedUser;
     private boolean normal = true;
 
-    public formController(Form form) {
+    public formController(Form form,User logedUser) {
         this.form = form;
+        this.logedUser = logedUser;
         view = new view_form(this,form,normal);
     }
 
@@ -30,11 +32,14 @@ public class formController extends Controller<view_form> {
     }
 
     public void versAnalyse(){
-        Controller.navigateTo(new TestController());
+
+        Controller.navigateTo(new AnalyseController(form));
     }
 
+
+
     public void versShare(){
-        Controller.navigateTo(new ManageSharesController(form));
+        Controller.navigateTo(new ManageSharesController(form,logedUser));
     }
 
     public void versEditForm(){
@@ -43,12 +48,12 @@ public class formController extends Controller<view_form> {
     }
 
     public void versNouvelleQuestion(){
-        Controller.navigateTo(new AddEditQuestionController(null,form));
+        Controller.navigateTo(new AddEditQuestionController(null,form,logedUser));
         form.save();
     }
 
     public void versEditQuestion(Question question){
-        Controller.navigateTo(new AddEditQuestionController(question,form));
+        Controller.navigateTo(new AddEditQuestionController(question,form,logedUser));
         form.save();
     }
 
@@ -56,10 +61,17 @@ public class formController extends Controller<view_form> {
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
+            User owner = form.getOwner();
             form.delete();
             view.close();
             form = null;
+            Controller.navigateTo(new ViewFormsController(owner));
         }
+    }
+
+    public void versViewForms(){
+        view.close();
+        Controller.navigateTo(new ViewFormsController(logedUser));
     }
 
 

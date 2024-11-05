@@ -5,14 +5,18 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.menu.MenuItem;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
+import tgpr.framework.Configuration;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ViewFormsView extends BasicWindow {
-    private final Button createNewFormButton = new Button("Create a new form");
+    private Button createNewFormButton;
     private final Button firstButton = new Button("First");
     private final Button previousButton = new Button("Previous");
     private final Button nextButton = new Button("Next");
@@ -32,9 +36,11 @@ public class ViewFormsView extends BasicWindow {
         // Initialisation de mainPanel
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(111, 32));
-        setTitle("MyForms (" + email + " - " + currentUser.getRole() + ")");
-        setHints(List.of(Hint.CENTERED, Hint.MODAL));
-        setCloseWindowWithEscape(true);
+        if (Security.isGuest()) {
+            setTitle("MyForms (guest)");
+        } else {
+            setTitle("MyForms (" + email + " - " + currentUser.getRole() + ")");
+        }
 
         // Ajouter les boutons "File" et "Parameters" en haut à gauche
         Panel topPanel = buttonsFileAndParameters();
@@ -44,14 +50,17 @@ public class ViewFormsView extends BasicWindow {
 
         //zone de texte pour le filtre
         Panel filterPanel = filterBox(controller);
-        Panel buttonCreateNewForm = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonCreateNewForm.addComponent(createNewFormButton);
-        createNewFormButton.addListener(button -> controller.createForm());
-        buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(40, 1)));
-
-        // Panneau de navigation en bas
         Panel navigationPanel = buttonsNavigation(controller);
-        buttonCreateNewForm.addComponent(navigationPanel);
+        createNewFormButton = new Button("Create New Form", () -> controller.createForm());
+        Panel buttonCreateNewForm = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        if (!Security.isGuest()){
+            buttonCreateNewForm.addComponent(createNewFormButton);
+            buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(41, 0)));
+            buttonCreateNewForm.addComponent(navigationPanel);
+        } else {
+            buttonCreateNewForm.addComponent(new EmptySpace(new TerminalSize(60, 0)));
+            buttonCreateNewForm.addComponent(navigationPanel);
+        }
 
         // Initialisation du formsPanel avec une taille préférée
         formsPanel = new Panel(new GridLayout(3));
@@ -70,9 +79,13 @@ public class ViewFormsView extends BasicWindow {
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         MenuItem fileButton = new MenuItem("File", () -> openFileMenu());
-        MenuItem parametersButton = new MenuItem("Parameters", () -> openParameterMenu());
         topPanel.addComponent(fileButton);
-        topPanel.addComponent(parametersButton);
+        if (!Security.isGuest()){
+            MenuItem parametersButton = new MenuItem("Parameters", () -> openParameterMenu());
+            topPanel.addComponent(parametersButton);
+        }
+
+
         return topPanel;
     }
 
@@ -107,6 +120,7 @@ public class ViewFormsView extends BasicWindow {
     // Méthode pour afficher les formulaires
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
+
         forms.sort(Comparator.comparing(Form::getTitle, String.CASE_INSENSITIVE_ORDER));
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
@@ -114,6 +128,11 @@ public class ViewFormsView extends BasicWindow {
         gridLayout.setVerticalSpacing(0);
 
         formsPanel.setLayoutManager(gridLayout);
+        if (Security.isGuest()){
+            forms = forms.stream()
+                    .filter(Form::getIsPublic)
+                    .toList();
+        }
         if (forms.isEmpty()) {
             Label noFormLabel = new Label("No form found");
             noFormLabel.setForegroundColor(TextColor.ANSI.RED);
@@ -168,7 +187,7 @@ public class ViewFormsView extends BasicWindow {
 
         if (!form.getQuestions().isEmpty()) {
             Button openButton = new Button("Open");
-            openButton.addListener(button -> controller.openForm());
+            openButton.addListener(button -> controller.openForm(form));
             buttonPanel.addComponent(openButton);
         }
         if (hasEditorAccess(form, currentUser)){
@@ -224,15 +243,24 @@ public class ViewFormsView extends BasicWindow {
 
     public void openParameterMenu(){
         Window parameterMenu = new BasicWindow("");
+        parameterMenu.setHints(List.of());
         Panel parameterMenuPanel = new Panel();
 
         MenuItem optionList = new MenuItem("Manage your Option Lists", () ->
                 controller.manageOptionListMenu());
         MenuItem distributionList = new MenuItem("Manage your Distribution Lists");
-
         parameterMenuPanel.addComponent(optionList);
         parameterMenuPanel.addComponent(distributionList);
         parameterMenu.setComponent(parameterMenuPanel);
+        parameterMenu.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    basePane.close();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
         this.getTextGUI().addWindowAndWait(parameterMenu);
     }
 

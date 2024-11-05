@@ -1,9 +1,10 @@
 package tgpr.forms;
 
-import tgpr.forms.controller.*;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.Question;
+
+import tgpr.forms.controller.LoginController;
+
 import tgpr.framework.Controller;
+import tgpr.forms.controller.formController;
 import tgpr.framework.Model;
 import tgpr.forms.model.User;
 import tgpr.forms.model.Form;
