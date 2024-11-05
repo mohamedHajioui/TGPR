@@ -6,7 +6,6 @@ import tgpr.forms.view.AddEditOptionListView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -64,38 +63,26 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return options != null && !options.isEmpty();
     }
 
-    public OptionList createOptionList(String name) {
-        int newIdx = 1;
-        List<OptionList> existingOptionLists = OptionList.getAll();
-        if (!existingOptionLists.isEmpty()) {
-            newIdx = existingOptionLists.getLast().getId() + 1;
-        }
-        OptionList newOptionList = new OptionList();
-        newOptionList.setId(newIdx);
-        newOptionList.setName(name);
-        newOptionList.save();
-        return newOptionList;
+    public OptionList createOptionList(String name, OptionValue optionValue) {
+        optionList = new OptionList(name);
+        optionList.addValue(optionValue);
+        optionList.save();
+        return optionList;
     }
 
-    public void updateOptionList(OptionList optionList) {
-        optionList.setName(optionList.getName());
+    public void saveOptionList(OptionList optionList) {
+        optionList.setValues(options);
+        optionList.reorderValues(options);
         optionList.save();
+        view.reloadData();
     }
-    public void saveOptionValues() {
-        for (OptionValue optionValue : options) {
-            optionValue.save();
-        }
-    }
+
     public void addOptionValue(String label) {
         List<OptionValue> currentOptions = optionList.getOptionValues();
         int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.get(currentOptions.size() - 1).getIdx() + 1;
         OptionValue newOptionValue = new OptionValue(optionList, newIdx, label);
         optionList.addValue(newOptionValue);
         view.reloadData();
-    }
-
-    public void editOptionValue(OptionValue optionValues) {
-        navigateTo(new AddEditOptionListController());
     }
 
     public void optionValueDelete(OptionValue optionValue) {
@@ -107,21 +94,17 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
 
-    private void renumberOptionValues() {
-        for (int i = 0; i < options.size(); i++) {
-            options.get(i).setIdx(i + 1);
-        }
-    }
-
     public void reorder() {
         optionList.reorderValues(options);
     }
+
     public void duplicate() {
         optionList.duplicate(owner);
         //navigateTo(manageOptionLists);
         //Une fois la copie créée, on revient à la vue de gestion des listes d'options
         // (voir manage_option_lists).
     }
+
     public void alphabetically() {
         options.sort(Comparator.comparing(OptionValue::getLabel));
         reorder();
@@ -129,9 +112,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public void confirmOrder() {
         reorder();
     }
-    /*
-    public void cancelOrder(List<OptionValue> originalValues) {
-        updateOptionListDisplay(optionValues);
+
+    public void cancelOrder() {
     }
-     */
+
 }
