@@ -27,6 +27,7 @@ public class EditInstanceView extends DialogWindow {
     private EditInstanceController controller;
     private Panel mainPanel;
     private User loggedUser;
+    //private Form idform;
 
 
     public EditInstanceView(EditInstanceController controller, User loggedUser) {
@@ -34,6 +35,7 @@ public class EditInstanceView extends DialogWindow {
         this.controller = controller;
         System.out.println(loggedUser.getFullName());
         this.loggedUser = loggedUser;
+        //this.form = form;
         setCloseWindowWithEscape(true);
         RequestConfirmation();
         //AnswerForm();
@@ -60,11 +62,20 @@ public class EditInstanceView extends DialogWindow {
         return false;
     }
 
+   // private boolean redirectionOpen(){
+   //     for (Instance a : loggedUser.getInstances()) {
+   //         if (a.getFormId() == this.form.getId()) {
+   //             return true;
+   //         }
+   //     }return false;
+   // }
 
     private void RequestConfirmation() {
 
 
         User user = User.getByKey(loggedUser.getId());
+
+        //boolean redirection = redirectionOpen();
 
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
         role = user.getRole().toString();
@@ -105,6 +116,7 @@ public class EditInstanceView extends DialogWindow {
         }else{
             System.out.println(role);
             if (role != "Guest") {
+
                     setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
                     mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
                     mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
@@ -173,19 +185,17 @@ public class EditInstanceView extends DialogWindow {
 
     public Instance getLatestInstance(List<Instance> instances) {
         return instances.stream()
-                .filter(instance -> instance.getFormId() == this.idForm) // Assuming 'this.id' is the desired formId
+                .filter(instance -> instance.getFormId() == idForm) // Assuming 'this.id' is the desired formId
                 .max(Comparator.comparing(Instance::getStarted)) // Get the latest instance based on 'started' time
                 .orElse(null); // Return null if no instance is found
     }
 
     public Instance getFirstInstance(List<Instance> instances) {
         return instances.stream()
-                .filter(instance -> instance.getFormId() == this.idForm) // Filtrer par idForm
+                .filter(instance -> instance.getFormId() == idForm) // Filtrer par idForm
                 .findFirst() // Obtenir la première instance trouvée
                 .orElse(null); // Retourner null si aucune instance n'est trouvée
     }
-
-
 
     private void AnswerForm() {
 
@@ -196,7 +206,7 @@ public class EditInstanceView extends DialogWindow {
 
         Form form = new Form();
 
-        form.setId(idForm);
+        form.setId(form.getId());
 
         List<Question> questions = form.getQuestions();
 
@@ -204,7 +214,9 @@ public class EditInstanceView extends DialogWindow {
 
         latestInstanceByForm = getLatestInstance(value);
 
-        Form formData = Form.getByKey(idForm);
+        Form formData = Form.getByKey(form.getId());
+
+
 
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
@@ -1052,7 +1064,7 @@ public class EditInstanceView extends DialogWindow {
 
         Form form = new Form();
 
-        form.setId(idForm);
+        form.setId(form.getId());
 
         List<Question> questions = form.getQuestions();
 
@@ -1064,7 +1076,7 @@ public class EditInstanceView extends DialogWindow {
 
         User user = User.getByKey(loggedUser.getId());
 
-        Form formData = Form.getByKey(idForm);
+        Form formData = Form.getByKey(form.getId());
 
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
