@@ -116,7 +116,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         view.displayForms(filteredForms, 0, 9);  // Réinitialiser à la page 0 et afficher 9 formulaires par page
     }
 
-    public void openForm(Form  form){
+    public void openForm(Form form){
 
         navigateTo(new EditInstanceController(currentUser,form));
     }
