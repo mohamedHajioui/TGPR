@@ -1,5 +1,6 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
@@ -81,6 +82,7 @@ public class view_form extends DialogWindow{
         setHints(List.of(Hint.CENTERED,Hint.MODAL));
         setCloseWindowWithEscape(true);
         Panel root = Panel.verticalPanel();
+        root.setPreferredSize(new TerminalSize(100, 16));
         setComponent(root);
 
         upperDisciption().addTo(root);
@@ -177,10 +179,14 @@ public class view_form extends DialogWindow{
         new Button("Share",this::shares).addTo(panel);
         new Button("Reorder",this::reOrder).addTo(panel);
         new Button("Analyse",this::Analyse).addTo(panel);
-        new Button("Cancel", this::close).addTo(panel);
+        new Button("Cancel", this::backToForms).addTo(panel);
 
         return panel;
     }
+    private void backToForms(){
+        controller.versViewForms();
+    }
+
     private void Analyse(){
         controller.versAnalyse();
     }
