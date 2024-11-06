@@ -11,14 +11,19 @@ import tgpr.framework.ViewManager;
 
 import java.util.List;
 
+
 public class ManageOptionListsView extends DialogWindow { ;
     private final ObjectTable<OptionList> table;
     private final ManageOptionListsController controller;
     private final Button newListButton;
     private final Button cancelButton;
+
     public ManageOptionListsView(ManageOptionListsController controller) {
         super("Manage Option Lists");
+
+
         this.controller = controller;
+
         setHints(List.of(Hint.CENTERED));
         setFixedSize(new TerminalSize(60, 15));
 

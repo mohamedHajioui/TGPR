@@ -120,6 +120,7 @@ public class ViewFormsView extends BasicWindow {
     // Méthode pour afficher les formulaires
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
+
         forms.sort(Comparator.comparing(Form::getTitle, String.CASE_INSENSITIVE_ORDER));
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
@@ -186,7 +187,7 @@ public class ViewFormsView extends BasicWindow {
 
         if (!form.getQuestions().isEmpty()) {
             Button openButton = new Button("Open");
-            openButton.addListener(button -> controller.openForm());
+            openButton.addListener(button -> controller.openForm(form));
             buttonPanel.addComponent(openButton);
         }
         if (hasEditorAccess(form, currentUser) && !Security.isGuest()){

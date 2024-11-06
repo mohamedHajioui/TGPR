@@ -8,13 +8,14 @@ import tgpr.framework.Controller;
 public class ManageSharesController extends Controller<ManageSharesView> {
     private final Form form;
     private ManageSharesView view;
-    private User logedUser;
+
+    private final User loggeduser;
 
 
     // Vu que Manage Shares depend du form on le demande dans les parametre
-    public ManageSharesController(Form form,User logedUser) {
+    public ManageSharesController(Form form, User loggeduser) {
         this.form = form;
-        this.logedUser = logedUser;
+        this.loggeduser = loggeduser;
         this.view = new ManageSharesView(this,form);
     }
 
@@ -29,6 +30,7 @@ public class ManageSharesController extends Controller<ManageSharesView> {
     //le mediateur vers la view normal de controller
     public void versForm(){
         view.close();
-        Controller.navigateTo(new formController(form,logedUser));
+
+        Controller.navigateTo(new formController(form,loggeduser));
     }
 }
