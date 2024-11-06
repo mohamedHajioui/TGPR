@@ -28,6 +28,7 @@ public class EditInstanceView extends DialogWindow {
     private Panel mainPanel;
     private User loggedUser;
 
+
     public EditInstanceView(EditInstanceController controller, User loggedUser) {
         super("Open a form");
         this.controller = controller;
@@ -39,6 +40,7 @@ public class EditInstanceView extends DialogWindow {
 
 
     }
+
     private void setViewTitle(String title) {
         setTitle(title); // Méthode pour changer le titre dynamiquement
     }
@@ -103,37 +105,37 @@ public class EditInstanceView extends DialogWindow {
         }else{
             System.out.println(role);
             if (role != "Guest") {
-                setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
-                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
+                    setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
+                    mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                    mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
 
 
-
-                Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
-                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
-
-
-                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+                    Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
+                    mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
 
 
-                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
-                buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
-                buttonPanel.addComponent(new Button("cancel", this::close));
-                setHints(List.of(Hint.CENTERED));
+                    mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                mainPanel.addComponent(buttonPanel);
+                    Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                    buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
+                    buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
+                    buttonPanel.addComponent(new Button("cancel", this::close));
+                    setHints(List.of(Hint.CENTERED));
 
-                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
-                container.addComponent(mainPanel);
-                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+                    buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                // Définir le panneau de conteneur comme composant principal de la fenêtre
-                setComponent(container);
+                    mainPanel.addComponent(buttonPanel);
+
+                    Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                    container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                    container.addComponent(mainPanel);
+                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+                    // Définir le panneau de conteneur comme composant principal de la fenêtre
+                    setComponent(container);
+
             }else{
                 SubmitAgain();
                 setHints(List.of(Hint.CENTERED));
@@ -150,7 +152,7 @@ public class EditInstanceView extends DialogWindow {
     private Button previousButton;
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
-    private int idForm = 15;
+    private int idForm = 1;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
@@ -207,7 +209,7 @@ public class EditInstanceView extends DialogWindow {
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label dateLabel = new Label("Started on: " + (latestInstanceByForm.getStarted() != null ? latestInstanceByForm.getStarted() : "null"));
+        Label dateLabel = new Label("Started on: " + (latestInstanceByForm != null ? latestInstanceByForm.getStarted() : "null"));
 
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
@@ -229,7 +231,7 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.addComponent(buttonPanel);
 
 
-        if(latestInstanceByForm.getCompleted()==null){
+        if(latestInstanceByForm ==null || latestInstanceByForm.getStarted() == null) {
             displayQuestion(questions, Boolean.valueOf(false));
         }else{
             displayQuestion(questions, Boolean.valueOf(true));
@@ -363,6 +365,13 @@ public class EditInstanceView extends DialogWindow {
 
         return (int) distinctCount; // Retourner le nombre en tant qu'int
     }
+    public int getLastInstanceId() {
+        List<Instance> instanceList = Instance.getAll();
+        if (instanceList.isEmpty()) {
+            return -1; // Valeur par défaut si la liste est vide
+        }
+        return instanceList.get(instanceList.size() - 1).getId();
+    }
 
 
     private void displayQuestion(List<Question> questions, Boolean complitedBool) {
@@ -370,8 +379,9 @@ public class EditInstanceView extends DialogWindow {
 
         if(complitedBool==false){
             List <Answer> answerInInstance = Answer.getAll();
-            int distinctCount = countDistinctAnswersByInstanceId(answerInInstance, latestInstanceByForm.getId());
-            listDistinctAnswersByInstanceId(answerInInstance, latestInstanceByForm.getId());
+            int lastIdInstance = getLastInstanceId();
+            int distinctCount = countDistinctAnswersByInstanceId(answerInInstance, lastIdInstance);
+            listDistinctAnswersByInstanceId(answerInInstance, lastIdInstance);
             currentQuestionIndex = distinctCount;
         }
 
@@ -744,9 +754,8 @@ public class EditInstanceView extends DialogWindow {
                 close(); // Close the application
             });
         } else {
-            closeButton = new Button("Close", () -> {
-                close(); // Close the application
-            });
+            // Close the application
+            closeButton = new Button("Close", this::close);
         }
 
         buttonPanel.addComponent(closeButton);
@@ -1135,37 +1144,30 @@ public class EditInstanceView extends DialogWindow {
 
         createOrUpdateButtonsViewSubmission(questions);
 
-        List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
-
+        List<Answer> Answer = getAnswersForQuestion(question, latestInstanceByForm.getId());
+//
         Label answer = new Label(Answer.getFirst().getValue());
         questionPanel.addComponent(answer);
     }
 
     // Utility method to get answers for a given instance
-    public List<Answer> getAnswersForInstance(int instanceId) {
-        // Create an instance object to call the existing getAnswers() method
-        Instance instance = new Instance();
-        instance.setId(instanceId); // Set the id if not already set
-
-        // Retrieve the answers list using the getAnswers() method
-        return instance.getAnswers();
-    }
-
-    // Use this utility method elsewhere to get answers for a specific instance
-    public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
-        // Retrieve all answers for the specified instance
-        List<Answer> answers = getAnswersForInstance(instanceId);
-
-        // Filter answers by question ID
-        List<Answer> filteredAnswers = answers.stream()
-                .filter(answer -> answer.getQuestionId() == question.getId())
-                .collect(Collectors.toList());
-
-        // Return the filtered list of answers
-        return filteredAnswers;
-    }
-
-
+   public List<Answer> getAnswersForInstance(int instanceId) {
+       // Create an instance object to call the existing getAnswers() method
+       Instance instance = new Instance();
+       instance.setId(instanceId); // Set the id if not already set
+       // Retrieve the answers list using the getAnswers() method
+       return instance.getAnswers();
+   }// Use this utility method elsewhere to get answers for a specific instance
+   public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
+       // Retrieve all answers for the specified instance
+       List<Answer> answers = getAnswersForInstance(instanceId);
+       // Filter answers by question ID
+       List<Answer> filteredAnswers = answers.stream()
+               .filter(answer -> answer.getQuestionId() == question.getId())
+               .collect(Collectors.toList());
+       // Return the filtered list of answers
+       return filteredAnswers;
+   }
 
 
 
