@@ -727,16 +727,15 @@ public class EditInstanceView extends DialogWindow {
 
         Button closeButton;
 
-        if (!role.equals("Guest")) {
+        if ( Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
                 displayCurrentInputValue(questions);
                 displayAnswerList(); // Display the answer list
                 close(); // Close the application
             });
         } else {
-            closeButton = new Button("Close", () -> {
-                close(); // Close the application
-            });
+            // Close the application
+            closeButton = new Button("Close", this::close);
         }
 
         buttonPanel.addComponent(closeButton);
@@ -902,12 +901,20 @@ public class EditInstanceView extends DialogWindow {
 
                 // Save each response for CheckBoxList under the same instance ID
                 for (Object res : responses) {
-                    saveAnswer(instanceID, questionId, res.toString());
+                    if (res != null) {
+                        saveAnswer(instanceID, questionId, res.toString());
+                    }else {
+                        System.out.println("Null response");
+                    }
                 }
             } else {
+                if (response != null) {
                 // Print response directly (for TextBox, ComboBox, or RadioBoxList)
                 System.out.println("Response: " + response);
                 saveAnswer(instanceID, questionId, response.toString()); // Save response
+               }else {
+                    System.out.println("Null response" + questionId);
+                }
             }
 
             System.out.println("Instance ID: " + instanceID);
