@@ -189,7 +189,7 @@ public class ViewFormsView extends BasicWindow {
             openButton.addListener(button -> controller.openForm());
             buttonPanel.addComponent(openButton);
         }
-        if (hasEditorAccess(form, currentUser)){
+        if (hasEditorAccess(form, currentUser) && !Security.isGuest()){
             Button manageButton = new Button("Manage");
             manageButton.addListener(button -> controller.manageForm(form));
             buttonPanel.addComponent(manageButton);
