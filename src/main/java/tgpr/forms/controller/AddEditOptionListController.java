@@ -16,7 +16,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private User owner;
     private OptionValue optionValue;
     private List<OptionValue> options;
-    private List<OptionValue> optionValues = new ArrayList<>();
+    //private List<OptionValue> optionValues = new ArrayList<>();
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
         this.optionList = optionList;
@@ -25,6 +25,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public AddEditOptionListController() {
+//        view = new AddEditOptionListView(this, owner, optionList);
     }
 
     @Override
@@ -80,7 +81,9 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public void addOptionValue(String label) {
         List<OptionValue> currentOptions = optionList.getOptionValues();
         int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.get(currentOptions.size() - 1).getIdx() + 1;
-        OptionValue newOptionValue = new OptionValue(optionList, newIdx, label);
+        OptionValue newOptionValue = new OptionValue();
+        newOptionValue.setIdx(newIdx);
+        newOptionValue.setLabel(label);
         optionList.addValue(newOptionValue);
         view.reloadData();
     }
@@ -106,14 +109,28 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void alphabetically() {
-        options.sort(Comparator.comparing(OptionValue::getLabel));
-        reorder();
+        if (optionList != null) {
+            optionList.getOptionValues().sort(Comparator.comparing(OptionValue::getLabel));
+            optionList.reorderValues(optionList.getOptionValues());
+            view.reloadData();
+        }
     }
     public void confirmOrder() {
-        reorder();
+        if (optionList != null && options != null && !options.isEmpty()) {
+            optionList.reorderValues(options);
+            optionList.save();
+            view.reloadData();
+        }
     }
 
     public void cancelOrder() {
+        List<OptionValue> originalOptions = optionList.getOptionValues();
+        if (originalOptions != null && !originalOptions.isEmpty()) {
+            options.clear();
+            options.addAll(originalOptions);
+            optionList.reorderValues(options);
+            view.reloadData();
+        }
     }
 
 }
