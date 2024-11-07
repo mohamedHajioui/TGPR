@@ -32,7 +32,6 @@ public class formController extends Controller<view_form> {
     }
 
     public void versAnalyse(){
-
         Controller.navigateTo(new AnalyseController(form));
     }
 

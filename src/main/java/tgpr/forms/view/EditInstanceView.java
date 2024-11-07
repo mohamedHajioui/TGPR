@@ -7,6 +7,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
 
 
@@ -27,22 +28,20 @@ public class EditInstanceView extends DialogWindow {
     private EditInstanceController controller;
     private Panel mainPanel;
     private User loggedUser;
-    //private Form idform;
+    private int idForm;
 
-
-    public EditInstanceView(EditInstanceController controller, User loggedUser) {
+    public EditInstanceView(EditInstanceController controller, User loggedUser, int idForm) {
         super("Open a form");
         this.controller = controller;
         System.out.println(loggedUser.getFullName());
         this.loggedUser = loggedUser;
-        //this.form = form;
+        this.idForm = idForm;
         setCloseWindowWithEscape(true);
         RequestConfirmation();
         //AnswerForm();
 
 
     }
-
     private void setViewTitle(String title) {
         setTitle(title); // Méthode pour changer le titre dynamiquement
     }
@@ -62,20 +61,11 @@ public class EditInstanceView extends DialogWindow {
         return false;
     }
 
-   // private boolean redirectionOpen(){
-   //     for (Instance a : loggedUser.getInstances()) {
-   //         if (a.getFormId() == this.form.getId()) {
-   //             return true;
-   //         }
-   //     }return false;
-   // }
 
     private void RequestConfirmation() {
 
 
         User user = User.getByKey(loggedUser.getId());
-
-        //boolean redirection = redirectionOpen();
 
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
         role = user.getRole().toString();
@@ -116,38 +106,37 @@ public class EditInstanceView extends DialogWindow {
         }else{
             System.out.println(role);
             if (role != "Guest") {
-
-                    setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
-                    mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                    mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
-
-
-                    Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
-                    mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
+                setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
+                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
 
 
-                    mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+                Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
+                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
 
 
-                    Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                    buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
-                    buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
-                    buttonPanel.addComponent(new Button("cancel", this::close));
-                    setHints(List.of(Hint.CENTERED));
+                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-                    buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                    mainPanel.addComponent(buttonPanel);
+                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
+                buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
+                buttonPanel.addComponent(new Button("cancel", this::close));
+                setHints(List.of(Hint.CENTERED));
 
-                    Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                    container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
-                    container.addComponent(mainPanel);
-                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                    // Définir le panneau de conteneur comme composant principal de la fenêtre
-                    setComponent(container);
+                mainPanel.addComponent(buttonPanel);
 
+                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                container.addComponent(mainPanel);
+                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+                // Définir le panneau de conteneur comme composant principal de la fenêtre
+                setComponent(container);
             }else{
                 SubmitAgain();
                 setHints(List.of(Hint.CENTERED));
@@ -156,15 +145,12 @@ public class EditInstanceView extends DialogWindow {
 
     }
 
-
-
     private int currentQuestionIndex = 0; // Pour suivre l'indice de la question actuelle
     private Panel questionPanel; // Panel pour afficher la question actuelle
     private Button nextButton;
     private Button previousButton;
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
-    private int idForm = 1;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
@@ -180,77 +166,71 @@ public class EditInstanceView extends DialogWindow {
         AnswerForm();
     }
 
-    private void buttonCancel() {
-    }
-
     public Instance getLatestInstance(List<Instance> instances) {
         return instances.stream()
-                .filter(instance -> instance.getFormId() == idForm) // Assuming 'this.id' is the desired formId
+                .filter(instance -> instance.getFormId() == this.idForm) // Assuming 'this.id' is the desired formId
                 .max(Comparator.comparing(Instance::getStarted)) // Get the latest instance based on 'started' time
                 .orElse(null); // Return null if no instance is found
     }
 
     public Instance getFirstInstance(List<Instance> instances) {
         return instances.stream()
-                .filter(instance -> instance.getFormId() == idForm) // Filtrer par idForm
+                .filter(instance -> instance.getFormId() == this.idForm) // Filtrer par idForm
                 .findFirst() // Obtenir la première instance trouvée
                 .orElse(null); // Retourner null si aucune instance n'est trouvée
     }
 
+
+
     private void AnswerForm() {
-
-
         setViewTitle("Answer the form"); // Titre spécifique pour AnswerForm
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
 
-        Form form = new Form();
+        Form formData = controller.getForm();
+        idForm = formData.getId();
 
-        form.setId(form.getId());
+        // Récupérer les questions et les instances du formulaire
+        List<Question> questions = formData.getQuestions();
+        List<Instance> instances = formData.getInstances();
 
-        List<Question> questions = form.getQuestions();
+        latestInstanceByForm = getLatestInstance(instances);
 
-        List<Instance> value = form.getInstances();
-
-        latestInstanceByForm = getLatestInstance(value);
-
-        Form formData = Form.getByKey(form.getId());
-
-
-
-        // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label dateLabel = new Label("Started on: " + (latestInstanceByForm != null ? latestInstanceByForm.getStarted() : "null"));
+
+        Label dateLabel;
+        if (latestInstanceByForm != null && latestInstanceByForm.getStarted() != null) {
+            dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().toString());
+        } else {
+            dateLabel = new Label("Started on: Not started");
+        }
 
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(dateLabel);
 
         questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        questionPanel.setPreferredSize(new TerminalSize(55, 25)); // Taille du panneau
+        questionPanel.setPreferredSize(new TerminalSize(55, 25));
 
         Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        container.addComponent(new EmptySpace(new TerminalSize(20, 1))); // Espace vide avant
+        container.addComponent(new EmptySpace(new TerminalSize(20, 1)));
         container.addComponent(questionPanel);
-        container.addComponent(new EmptySpace(new TerminalSize(3, 1))); // Espace vide aprè
+        container.addComponent(new EmptySpace(new TerminalSize(3, 1)));
 
-        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)); // Initialisation du buttonPanel
+        buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
         createButtons(questions);
 
         mainPanel.addComponent(questionPanel);
         mainPanel.addComponent(buttonPanel);
 
-
-        if(latestInstanceByForm ==null || latestInstanceByForm.getStarted() == null) {
-            displayQuestion(questions, Boolean.valueOf(false));
-        }else{
-            displayQuestion(questions, Boolean.valueOf(true));
-
+        // Vérification pour afficher les questions en fonction de l'état de complétion
+        if (latestInstanceByForm != null && latestInstanceByForm.getCompleted() == null) {
+            displayQuestion(questions, false);
+        } else {
+            displayQuestion(questions, true);
         }
-
-
 
         setComponent(mainPanel);
     }
@@ -259,23 +239,20 @@ public class EditInstanceView extends DialogWindow {
         String type = question.getType().toString().toLowerCase();
         OptionList options = new OptionList();
 
-        // Fetch the answer for the current question, if it exists
         Object[] currentAnswer = null;
         if (currentQuestionIndex < answerList.size()) {
             currentAnswer = answerList.get(currentQuestionIndex);
         }
 
-        // Based on the question type, add the appropriate input component
         switch (type) {
             case "short":
             case "email":
             case "date":
                 TextBox textBox = addTextBoxInput(45);
-                // Only populate TextBox if a valid answer exists
                 if (currentAnswer != null && currentAnswer[2] instanceof String ) {
                     textBox.setText((String) currentAnswer[2]);
                 } else {
-                    textBox.setText(""); // Set empty if no answer exists
+                    textBox.setText("");
                 }
                 break;
             case "long":
@@ -283,7 +260,7 @@ public class EditInstanceView extends DialogWindow {
                 if (currentAnswer != null && currentAnswer[2] instanceof String) {
                     longTextBox.setText((String) currentAnswer[2]);
                 } else {
-                    longTextBox.setText(""); // Set empty if no answer exists
+                    longTextBox.setText("");
                 }
                 break;
             case "combo":
@@ -291,7 +268,7 @@ public class EditInstanceView extends DialogWindow {
                 if (currentAnswer != null && currentAnswer[2] instanceof String) {
                     comboInput.setSelectedItem((String) currentAnswer[2]);
                 } else {
-                    comboInput.setSelectedItem("Please select one"); // Set placeholder if no answer exists
+                    comboInput.setSelectedItem("Please select one");
                 }
                 break;
             case "check":
@@ -302,7 +279,6 @@ public class EditInstanceView extends DialogWindow {
                         checkBoxList.setChecked(item.toString(), true);
                     }
                 } else {
-                    // If no answer exists, ensure all checkboxes are unchecked
                     checkBoxList.clearItems();
                     for (OptionValue optionValue : options.getOptionValues()) {
                         checkBoxList.addItem(optionValue.getLabel());
@@ -314,14 +290,14 @@ public class EditInstanceView extends DialogWindow {
                 if (currentAnswer != null && currentAnswer[2] instanceof String) {
                     radioList.setCheckedItem((String) currentAnswer[2]);
                 } else {
-                    radioList.clearSelection(); // Clear selection if no answer exists
+                    radioList.clearSelection();
                 }
                 break;
             default:
                 System.out.println("Unknown question type: " + type);
         }
 
-        // Refresh the question panel display
+
         questionPanel.invalidate();
     }
 
@@ -377,13 +353,6 @@ public class EditInstanceView extends DialogWindow {
 
         return (int) distinctCount; // Retourner le nombre en tant qu'int
     }
-    public int getLastInstanceId() {
-        List<Instance> instanceList = Instance.getAll();
-        if (instanceList.isEmpty()) {
-            return -1; // Valeur par défaut si la liste est vide
-        }
-        return instanceList.get(instanceList.size() - 1).getId();
-    }
 
 
     private void displayQuestion(List<Question> questions, Boolean complitedBool) {
@@ -391,9 +360,8 @@ public class EditInstanceView extends DialogWindow {
 
         if(complitedBool==false){
             List <Answer> answerInInstance = Answer.getAll();
-            int lastIdInstance = getLastInstanceId();
-            int distinctCount = countDistinctAnswersByInstanceId(answerInInstance, lastIdInstance);
-            listDistinctAnswersByInstanceId(answerInInstance, lastIdInstance);
+            int distinctCount = countDistinctAnswersByInstanceId(answerInInstance, latestInstanceByForm.getId());
+            listDistinctAnswersByInstanceId(answerInInstance, latestInstanceByForm.getId());
             currentQuestionIndex = distinctCount;
         }
 
@@ -766,8 +734,9 @@ public class EditInstanceView extends DialogWindow {
                 close(); // Close the application
             });
         } else {
-            // Close the application
-            closeButton = new Button("Close", this::close);
+            closeButton = new Button("Close", () -> {
+                close(); // Close the application
+            });
         }
 
         buttonPanel.addComponent(closeButton);
@@ -984,7 +953,7 @@ public class EditInstanceView extends DialogWindow {
 
 
         Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("OK", this::close));
+        buttonPanel.addComponent(new Button("OK", () -> controller.navigateTo(new ViewFormsController(loggedUser))));
 
 
         setHints(List.of(Hint.CENTERED));
@@ -1064,7 +1033,7 @@ public class EditInstanceView extends DialogWindow {
 
         Form form = new Form();
 
-        form.setId(form.getId());
+        form.setId(idForm);
 
         List<Question> questions = form.getQuestions();
 
@@ -1076,7 +1045,7 @@ public class EditInstanceView extends DialogWindow {
 
         User user = User.getByKey(loggedUser.getId());
 
-        Form formData = Form.getByKey(form.getId());
+        Form formData = Form.getByKey(idForm);
 
         // Créer et ajouter les labels principaux (Title, Description, and Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
@@ -1156,30 +1125,37 @@ public class EditInstanceView extends DialogWindow {
 
         createOrUpdateButtonsViewSubmission(questions);
 
-        List<Answer> Answer = getAnswersForQuestion(question, latestInstanceByForm.getId());
-//
+        List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
+
         Label answer = new Label(Answer.getFirst().getValue());
         questionPanel.addComponent(answer);
     }
 
     // Utility method to get answers for a given instance
-   public List<Answer> getAnswersForInstance(int instanceId) {
-       // Create an instance object to call the existing getAnswers() method
-       Instance instance = new Instance();
-       instance.setId(instanceId); // Set the id if not already set
-       // Retrieve the answers list using the getAnswers() method
-       return instance.getAnswers();
-   }// Use this utility method elsewhere to get answers for a specific instance
-   public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
-       // Retrieve all answers for the specified instance
-       List<Answer> answers = getAnswersForInstance(instanceId);
-       // Filter answers by question ID
-       List<Answer> filteredAnswers = answers.stream()
-               .filter(answer -> answer.getQuestionId() == question.getId())
-               .collect(Collectors.toList());
-       // Return the filtered list of answers
-       return filteredAnswers;
-   }
+    public List<Answer> getAnswersForInstance(int instanceId) {
+        // Create an instance object to call the existing getAnswers() method
+        Instance instance = new Instance();
+        instance.setId(instanceId); // Set the id if not already set
+
+        // Retrieve the answers list using the getAnswers() method
+        return instance.getAnswers();
+    }
+
+    // Use this utility method elsewhere to get answers for a specific instance
+    public List<Answer> getAnswersForQuestion(Question question, int instanceId) {
+        // Retrieve all answers for the specified instance
+        List<Answer> answers = getAnswersForInstance(instanceId);
+
+        // Filter answers by question ID
+        List<Answer> filteredAnswers = answers.stream()
+                .filter(answer -> answer.getQuestionId() == question.getId())
+                .collect(Collectors.toList());
+
+        // Return the filtered list of answers
+        return filteredAnswers;
+    }
+
+
 
 
 

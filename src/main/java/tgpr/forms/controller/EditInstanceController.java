@@ -19,8 +19,12 @@ public class EditInstanceController extends Controller<EditInstanceView> {
     public EditInstanceController(User user, Form form) {
         this.loggedUser = user;
         this.form = form;
-        this.view = new EditInstanceView(this,this .loggedUser);
+        this.view = new EditInstanceView(this,this .loggedUser, this.form.getId());
 
+    }
+
+    public Form getForm() {
+        return this.form;
     }
 
     @Override
