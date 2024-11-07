@@ -66,33 +66,28 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     public OptionList createOptionList(String name, OptionValue optionValue) {
         optionList = new OptionList(name);
+        optionList = optionList.save();
         optionList.addValue(optionValue);
         optionList.save();
         return optionList;
     }
 
     public void saveOptionList(OptionList optionList) {
-        for (OptionValue newValue : options) {
-            OptionValue existingValue = optionList.getValue(newValue.getIdx());
-            if (existingValue == null) {
-                optionList.addValue(newValue);
-            } else {
-                existingValue.setLabel(newValue.getLabel());
-                existingValue.save();
-            }
-        }
-        optionList.reorderValues(options);
         optionList.save();
-        view.reloadData();
+        view.close();
     }
 
     public void addOptionValue(String label) {
+        if (optionList == null) {
+            view.createOptionList();
+        }
         List<OptionValue> currentOptions = optionList.getOptionValues();
-        int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.get(currentOptions.size() - 1).getIdx() + 1;
-        OptionValue newOptionValue = new OptionValue();
-        newOptionValue.setIdx(newIdx);
-        newOptionValue.setLabel(label);
+        int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.getLast().getIdx() + 1;
+        OptionValue newOptionValue = new OptionValue(optionList, newIdx, label);
+//        newOptionValue.setIdx(newIdx);
+//        newOptionValue.setLabel(label);
         optionList.addValue(newOptionValue);
+        newOptionValue.save();
         view.reloadData();
     }
 

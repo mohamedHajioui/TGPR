@@ -68,8 +68,7 @@ public class AddEditOptionListView extends DialogWindow {
     private Panel getNamePanel() {
         final Panel namePanel;
         namePanel = new Panel().addTo(root)
-                .setLayoutManager(new GridLayout(2)
-                        .setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
+                .setLayoutManager(new GridLayout(2).setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
         new Label("Name:").addTo(namePanel);
         txtName = new TextBox(new TerminalSize(37, 1)).addTo(namePanel)
                 .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
@@ -189,7 +188,7 @@ public class AddEditOptionListView extends DialogWindow {
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
     private void cancelOrder() {controller.cancelOrder();}
-    private void createOptionList() {controller.createOptionList(txtName.getText(), optionValue);}
+    public void createOptionList() {controller.createOptionList(txtName.getText(), optionValue);}
     private void saveOptionList() {controller.saveOptionList(optionList);}
     private void validate() {
         var errors = controller.validate(txtName.getText());
@@ -211,16 +210,17 @@ public class AddEditOptionListView extends DialogWindow {
         table.clear();
         table.add(options);
     }
+
+    public void createNewOptionList() {
+        OptionList newOptionList = new OptionList();
+        newOptionList.save();
+        this.optionList = newOptionList;
+        reloadData();
+    }
+
     private void addOptionValue() {
         String label = txtAddOption.getText();
         controller.addOptionValue(label);
         txtAddOption.setText("");
-    }
-
-    private void save(){
-        System.out.println("save");
-        optionList.reorderValues(table.getItems());
-        normal = true;
-        affichageDesButtons(true);
     }
 }
