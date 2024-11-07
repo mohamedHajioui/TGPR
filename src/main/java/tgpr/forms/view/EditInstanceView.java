@@ -1134,6 +1134,7 @@ public class EditInstanceView extends DialogWindow {
         List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
 
         Label answer = new Label(Answer.getFirst().getValue());
+
         questionPanel.addComponent(answer);
     }
 
