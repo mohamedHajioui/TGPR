@@ -35,7 +35,8 @@ public class AddEditOptionListView extends DialogWindow {
     private Label errAddOption;
     private TextBox txtAddOption;
     private Button btnAddOption;
-    private final Panel btnPanel;
+    //private final Panel btnPanel;
+    private Panel btnContainer;
     //private Button btnCreate;
     private List<OptionValue> options = new ArrayList<>();
 
@@ -47,8 +48,7 @@ public class AddEditOptionListView extends DialogWindow {
         this.optionList = optionList;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
-//        setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(50, 17));
+        setFixedSize(new TerminalSize(47, 17));
 
         root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         setComponent(root);
@@ -58,7 +58,7 @@ public class AddEditOptionListView extends DialogWindow {
         addOptionPanel = getAddOptionPanel();
         new EmptySpace().addTo(root);
         new EmptySpace().addTo(root);
-        btnPanel = affichageDesButtons(normal);
+        affichageDesButtons(normal);
 
         if (optionList != null) {
             txtName.setText(optionList.getName());
@@ -70,12 +70,10 @@ public class AddEditOptionListView extends DialogWindow {
         namePanel = new Panel().addTo(root)
                 .setLayoutManager(new GridLayout(2)
                         .setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
-        new Label("Name:").addTo(namePanel)
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING));
-        txtName = new TextBox(new TerminalSize(35, 1)).addTo(namePanel)
+        new Label("Name:").addTo(namePanel);
+        txtName = new TextBox(new TerminalSize(37, 1)).addTo(namePanel)
                 .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
-                .setTextChangeListener((txt, byUser) -> validate())
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING));;
+                .setTextChangeListener((txt, byUser) -> validate());
         new EmptySpace().addTo(namePanel);
         errName = new Label("name required").addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
         return namePanel;
@@ -85,9 +83,9 @@ public class AddEditOptionListView extends DialogWindow {
         final ObjectTable<OptionValue> table;
         table = new ObjectTable<>(
                 new ColumnSpec<>("Index", optionValue -> options.indexOf(optionValue) + 1),
-                new ColumnSpec<>("Label", OptionValue::getLabel)
+                new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
         ).addTo(root);
-        table.setPreferredSize(new TerminalSize(getTerminalColumns(), 10));
+        table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
         table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
         if(!normal){
@@ -99,7 +97,8 @@ public class AddEditOptionListView extends DialogWindow {
 
     private Panel getAddOptionPanel() {
         final Panel addOptionPanel;
-        errAddOption = new Label("at least one value required").addTo(root)
+        errAddOption = new Label("at least one value required")
+                .addTo(root)
                 .setForegroundColor(TextColor.ANSI.RED);
         errAddOption.setVisible(false);
 
@@ -109,33 +108,44 @@ public class AddEditOptionListView extends DialogWindow {
         txtAddOption = new TextBox(new TerminalSize(35, 1)).addTo(addOptionPanel)
                 .setTextChangeListener((txt, byUser) -> {
                     btnAddOption.setEnabled(!txt.isEmpty());
-                    //btnCreate.setEnabled(controller.canCreateOptionList());
+                    errAddOption.setVisible(options.isEmpty());
                 });
         btnAddOption = new Button("Add", this::addOptionValue).addTo(addOptionPanel);
-
+        btnAddOption.setEnabled(!options.isEmpty());
+        //btnCreate.setEnabled(controller.canCreateOptionList());
         return addOptionPanel;
     }
 
-    private Panel affichageDesButtons(boolean normal){
-        Panel btnContainer = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
+    private void affichageDesButtons(boolean normal){
+        if (btnContainer == null) {
+            btnContainer = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+            btnContainer.addTo(root);
+        } else {
+            btnContainer.removeAllComponents();
+        }
         if (optionList != null) {
             if (normal) {
                 new Button("Reorder", this::reorder).addTo(btnContainer);
-                new Button("Delete", this::deleteValue).addTo(btnContainer);
+                //new Button("Delete", this::deleteValue).addTo(btnContainer);
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
-                new Button("Save", this::saveOptionList).addTo(btnContainer).setEnabled(false);
+                new Button("Save", this::saveOptionList).addTo(btnContainer);
                 new Button("Close", this::close).addTo(btnContainer);
             } else {
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
-                new Button("Confirm", this::confirmOrder).addTo(btnContainer);
+                new Button("Confirm order", this::confirmOrder).addTo(btnContainer);
                 new Button("Cancel", this::cancelOrder).addTo(btnContainer);
             }
         } else {
             new Button("Create", this::createOptionList).addTo(btnContainer);
             new Button("Close", this::close).addTo(btnContainer);
         }
-        return btnContainer;
+        root.invalidate();
     }
+
+    public void updateButtonDisplay(boolean normal) {
+        affichageDesButtons(normal);
+    }
+
     private void choice(){
         if (!normal){
             //on change juste l'etat de moving pour dire si on bouge ou paS
@@ -157,14 +167,15 @@ public class AddEditOptionListView extends DialogWindow {
         table.setItem(prec, tmp);
         table.refresh();
     }
-    private void deleteSelectedOption() {
+    private boolean deleteSelectedOption() {
         OptionValue selectedOption = table.getSelected();
         if (selectedOption != null) {
             options.remove(selectedOption);
             reindexOptions();  // changer la table en optionList
-            table.clear();
+            //table.clear();
             table.add(options);
         }
+        return true;
     }
     private void reindexOptions() {
         for (int i = 0; i < options.size(); i++) {
@@ -200,7 +211,6 @@ public class AddEditOptionListView extends DialogWindow {
         table.clear();
         table.add(options);
     }
-
     private void addOptionValue() {
         String label = txtAddOption.getText();
         controller.addOptionValue(label);

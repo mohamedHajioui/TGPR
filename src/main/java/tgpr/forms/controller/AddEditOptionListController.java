@@ -72,7 +72,15 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void saveOptionList(OptionList optionList) {
-        optionList.setValues(options);
+        for (OptionValue newValue : options) {
+            OptionValue existingValue = optionList.getValue(newValue.getIdx());
+            if (existingValue == null) {
+                optionList.addValue(newValue);
+            } else {
+                existingValue.setLabel(newValue.getLabel());
+                existingValue.save();
+            }
+        }
         optionList.reorderValues(options);
         optionList.save();
         view.reloadData();
@@ -98,7 +106,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void reorder() {
-        optionList.reorderValues(options);
+        view.updateButtonDisplay(false);
+        optionList.reorderValues(optionList.getOptionValues());
     }
 
     public void duplicate() {
@@ -121,6 +130,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             optionList.save();
             view.reloadData();
         }
+        view.updateButtonDisplay(true);
     }
 
     public void cancelOrder() {
@@ -131,6 +141,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             optionList.reorderValues(options);
             view.reloadData();
         }
+        view.updateButtonDisplay(true);
     }
 
 }
