@@ -135,6 +135,7 @@ public class AddEditQuestionView extends DialogWindow {
                     cklRequired.isChecked()
             );
         }
+        close();
     }
 
 

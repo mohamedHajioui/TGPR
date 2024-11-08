@@ -24,6 +24,9 @@ public class formController extends Controller<view_form> {
         view = new view_form(this,form,normal);
     }
 
+    public view_form getView() {return view;}
+
+
     public void makePublic(){
         if (askConfirmation("Are you sure you want to delete all instances?"+"\n Note: This will delete instances currently being edited (not submited).", "Delete All Instances")){
             form.deleteAllInstances();
@@ -56,7 +59,6 @@ public class formController extends Controller<view_form> {
         form.save();
     }
 
-    public view_form getView() {return view;}
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
