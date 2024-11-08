@@ -24,12 +24,21 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
     @Override
     public AddEditQuestionView getView() {
-        return new AddEditQuestionView(this, question);
+        return new AddEditQuestionView(this, question,form);
     }
 
     public int getNextIdxForForm() {
         int lastIdx = form.getQuestions().size();
         return lastIdx + 1;
+    }
+    public boolean sameTitle(String title, Form form) {
+        for (Question existingQuestion : form.getQuestions()) {
+            if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
+                System.out.println("Titre en doublon");
+                return true;
+            }
+        }
+        return false;
     }
     public void createQuestion(String title, String description, Question.Type type, OptionList optionList, boolean required) {
 
@@ -75,7 +84,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     public void deleteQuestion(Question question) {
         if(askConfirmation("are you sure you want to delete question","Delete question"))
             question.delete();
-        getView().close();
+        navigateTo(new formController(form,user));
     }
     public List<OptionList> getOptionLists() {
         return OptionList.getAll();
