@@ -21,6 +21,7 @@ public class ManageOptionListsView extends DialogWindow { ;
     public ManageOptionListsView(ManageOptionListsController controller) {
         super("Manage Option Lists");
 
+
         this.controller = controller;
 
         setHints(List.of(Hint.CENTERED));
