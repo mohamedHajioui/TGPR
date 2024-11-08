@@ -48,7 +48,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
         // Save the new question in the database
         newQuestion.save();
-        navigateTo(new formController(form,user));
+        getView().close();
     }
 
     public void updateQuestion(Question question, String title, String description, Question.Type type, OptionList optionList, boolean required) {
@@ -67,7 +67,9 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
         // Save the updated question in the database
         question.save();
-        navigateTo(new formController(form,user));
+        System.out.println("pre");
+        getView().close();
+        System.out.println("post");
     }
 
     public void deleteQuestion(Question question) {
