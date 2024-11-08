@@ -60,6 +60,14 @@ public class EditInstanceView extends DialogWindow {
         // Aucune instance ne correspond
         return false;
     }
+    private boolean RedirectionOpen(User loggedUser, int idForm ) {
+        for (Instance instance : loggedUser.getInstances()) {
+            if (instance.getFormId() == idForm) {
+                return true;
+            }
+
+        }return false;
+    }
 
 
     private void RequestConfirmation() {
@@ -68,9 +76,11 @@ public class EditInstanceView extends DialogWindow {
         User user = User.getByKey(loggedUser.getId());
 
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
+        boolean response = RedirectionOpen(loggedUser, idForm);
         role = user.getRole().toString();
 
-        if(exists && Security.isGuest()  ) {
+        if( exists && Security.isGuest()) {
+
             setViewTitle("Error"); // Titre spécifique pour RequestConfirmation
             mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
             mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
@@ -104,39 +114,43 @@ public class EditInstanceView extends DialogWindow {
 
 
         }else{
-            System.out.println(role);
-            if (role != "Guest") {
-                setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
-                mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-                mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
+            System.out.println(loggedUser.getFullName());
+            if (role != "guest") {
+                if (response) {
+                    setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
+                    mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
+                    mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
 
 
-
-                Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
-                mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
-
-
-                mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+                    Label textLabel = new Label("You Have already answered this form.\nYou can view your submission or submit again.\nWhat would you like to do?");
+                    mainPanel.addComponent(textLabel); // Ajouter le label au panel principal
 
 
-                Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
-                buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
-                buttonPanel.addComponent(new Button("cancel", this::close));
-                setHints(List.of(Hint.CENTERED));
+                    mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-                buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                mainPanel.addComponent(buttonPanel);
+                    Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                    buttonPanel.addComponent(new Button("view submission", this::buttonViewSubmission));
+                    buttonPanel.addComponent(new Button("submit again", this::SubmitAgain));
+                    buttonPanel.addComponent(new Button("cancel", this::close));
+                    setHints(List.of(Hint.CENTERED));
 
-                Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
-                container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
-                container.addComponent(mainPanel);
-                container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+                    buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-                // Définir le panneau de conteneur comme composant principal de la fenêtre
-                setComponent(container);
+                    mainPanel.addComponent(buttonPanel);
+
+                    Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
+                    container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide avant
+                    container.addComponent(mainPanel);
+                    container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Espace vide après
+
+                    // Définir le panneau de conteneur comme composant principal de la fenêtre
+                    setComponent(container);
+                }else {
+                    SubmitAgain();
+                    setHints(List.of(Hint.CENTERED));
+                }
             }else{
                 SubmitAgain();
                 setHints(List.of(Hint.CENTERED));
@@ -151,6 +165,7 @@ public class EditInstanceView extends DialogWindow {
     private Button previousButton;
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
+    private int idGuest = 9;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
@@ -727,16 +742,15 @@ public class EditInstanceView extends DialogWindow {
 
         Button closeButton;
 
-        if (!role.equals("Guest")) {
+        if ( Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
                 displayCurrentInputValue(questions);
                 displayAnswerList(); // Display the answer list
                 close(); // Close the application
             });
         } else {
-            closeButton = new Button("Close", () -> {
-                close(); // Close the application
-            });
+            // Close the application
+            closeButton = new Button("Close", this::close);
         }
 
         buttonPanel.addComponent(closeButton);
@@ -902,12 +916,20 @@ public class EditInstanceView extends DialogWindow {
 
                 // Save each response for CheckBoxList under the same instance ID
                 for (Object res : responses) {
-                    saveAnswer(instanceID, questionId, res.toString());
+                    if (res != null) {
+                        saveAnswer(instanceID, questionId, res.toString());
+                    }else {
+                        System.out.println("Null response");
+                    }
                 }
             } else {
+                if (response != null) {
                 // Print response directly (for TextBox, ComboBox, or RadioBoxList)
                 System.out.println("Response: " + response);
                 saveAnswer(instanceID, questionId, response.toString()); // Save response
+               }else {
+                    System.out.println("Null response" + questionId);
+                }
             }
 
             System.out.println("Instance ID: " + instanceID);
@@ -1128,6 +1150,7 @@ public class EditInstanceView extends DialogWindow {
         List<Answer> Answer = getAnswersForQuestion(question,latestInstanceByForm.getId());
 
         Label answer = new Label(Answer.getFirst().getValue());
+
         questionPanel.addComponent(answer);
     }
 
