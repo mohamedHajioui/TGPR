@@ -79,7 +79,8 @@ public class EditInstanceView extends DialogWindow {
         boolean response = RedirectionOpen(loggedUser, idForm);
         role = user.getRole().toString();
 
-        if(exists && Security.isGuest()  ) {
+        if( exists && Security.isGuest()) {
+
             setViewTitle("Error"); // Titre spécifique pour RequestConfirmation
             mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
             mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
@@ -113,9 +114,9 @@ public class EditInstanceView extends DialogWindow {
 
 
         }else{
-            System.out.println(role);
-            if (role != "Guest") {
-                if (response == true) {
+            System.out.println(loggedUser.getFullName());
+            if (role != "guest") {
+                if (response) {
                     setViewTitle("Open a form"); // Titre spécifique pour RequestConfirmation
                     mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
                     mainPanel.setPreferredSize(new TerminalSize(55, 5)); // Définir une taille préférée pour le panel
@@ -164,6 +165,7 @@ public class EditInstanceView extends DialogWindow {
     private Button previousButton;
     private Panel buttonPanel; // Panel pour les boutons
     private List<Object[]> answerList = new ArrayList<>();
+    private int idGuest = 9;
     private String role;
     private int instanceID;
     private LocalDateTime started ;
