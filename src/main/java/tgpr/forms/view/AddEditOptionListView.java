@@ -40,6 +40,7 @@ public class AddEditOptionListView extends DialogWindow {
     //private final Panel btnPanel;
     private Panel btnContainer;
     //private Button btnCreate;
+    private Button btnDelete;
     private List<OptionValue> options = new ArrayList<>();
     private List<OptionValue> optionsToDelete = new ArrayList<>();
     public AddEditOptionListView(AddEditOptionListController controller, User owner, OptionList optionList) {
@@ -83,9 +84,10 @@ public class AddEditOptionListView extends DialogWindow {
 
     private Panel getCheckbox() {
         final Panel checkBoxPanel = new Panel().addTo(root)
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        new Label("System").addTo(checkBoxPanel);
+                .setLayoutManager(new GridLayout(2).setLeftMarginSize(1));
+        new Label("System: ").addTo(checkBoxPanel);
         checkBoxSystem = new CheckBox().addTo(checkBoxPanel);
+        checkBoxPanel.setVisible(!owner.isAdmin());
         new EmptySpace().addTo(checkBoxPanel);
         return checkBoxPanel;
     }
@@ -136,7 +138,7 @@ public class AddEditOptionListView extends DialogWindow {
         if (optionList != null) {
             if (normal) {
                 new Button("Reorder", this::reorder).addTo(btnContainer);
-                new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
                 new Button("Save", this::save).addTo(btnContainer);
                 new Button("Close", this::close).addTo(btnContainer);
@@ -200,7 +202,10 @@ public class AddEditOptionListView extends DialogWindow {
     private void reorder() {
         normal = false;
         affichageDesButtons(normal);}
-    private void deleteOptionList() {controller.deleteOptionList(optionList);}
+    private void deleteOptionList() {
+        boolean canDelete = controller.canDeleteOptionList(optionList);
+        btnDelete.setVisible(canDelete);
+        controller.deleteOptionList(optionList);}
     private void duplicate() {controller.duplicate();}
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
