@@ -84,7 +84,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void save(OptionList optionList) {
-        for (OptionValue option : optionsToDelete) {
+        optionList.save();
+/*        for (OptionValue option : optionsToDelete) {
             option.delete();
         }
         optionsToDelete.clear();
@@ -96,6 +97,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.save();
         view.reloadData();
         view.close(); //à mettre ou pas???
+*/
     }
     public void initializeOptions() {
         tempOptions = new ArrayList<>(optionList.getOptionValues());
@@ -204,7 +206,20 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
  */
     private boolean changesPending() {
-        // Implémente la logique pour vérifier s'il y a des changements en cours
-        return true; // Exemple simplifié
+        return true;
     }
+
+    public void handleToggleSystem(boolean isSystem) {
+        if (optionList != null) {
+            if (isSystem) {
+                optionList.setOwnerId(null);
+            } else {
+                optionList.setOwnerId(owner.getId());
+            }
+            optionList.save();
+
+            view.reloadData();
+        }
+    }
+
 }

@@ -30,7 +30,8 @@ public class AddEditOptionListView extends DialogWindow {
     private final Panel namePanel;
     private TextBox txtName;
     private Label errName;
-    private CheckBox chkSystem;
+    private Panel systemCheckBox;
+    private CheckBox checkBoxSystem;
     private final ObjectTable<OptionValue> table;
     private final Panel addOptionPanel;
     private Label errAddOption;
@@ -55,7 +56,7 @@ public class AddEditOptionListView extends DialogWindow {
         setComponent(root);
 
         namePanel = getNamePanel();
-        chkSystem = getCheckBoxSystem();
+        systemCheckBox = getCheckbox();
         table = getTable();
         addOptionPanel = getAddOptionPanel();
         new EmptySpace().addTo(root);
@@ -71,7 +72,7 @@ public class AddEditOptionListView extends DialogWindow {
         final Panel namePanel;
         namePanel = new Panel().addTo(root)
                 .setLayoutManager(new GridLayout(2).setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
-        new Label("Name:").addTo(namePanel);
+        new Label("Name: ").addTo(namePanel);
         txtName = new TextBox(new TerminalSize(37, 1)).addTo(namePanel)
                 .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
                 .setTextChangeListener((txt, byUser) -> validate());
@@ -80,6 +81,14 @@ public class AddEditOptionListView extends DialogWindow {
         return namePanel;
     }
 
+    private Panel getCheckbox() {
+        final Panel checkBoxPanel = new Panel().addTo(root)
+                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        new Label("System").addTo(checkBoxPanel);
+        checkBoxSystem = new CheckBox().addTo(checkBoxPanel);
+        new EmptySpace().addTo(checkBoxPanel);
+        return checkBoxPanel;
+    }
     private ObjectTable<OptionValue> getTable() {
         final ObjectTable<OptionValue> table;
         table = new ObjectTable<>(
@@ -90,7 +99,7 @@ public class AddEditOptionListView extends DialogWindow {
         table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
         if(!normal){
-            //reorder();
+            reorder();
         }
         addKeyboardListener(table,KeyType.Backspace,this::deleteSelectedOption);
         return table;
@@ -238,4 +247,32 @@ public class AddEditOptionListView extends DialogWindow {
         controller.addOptionValue(label);
         txtAddOption.setText("");
     }
+/*
+15. Si l'utilisateur courant est un admin, il peut éditer toutes les listes d'options,
+y compris les listes "Système".
+
+public void editOptionList(OptionList optionList) {
+    User currentUser = getCurrentUser(); // Méthode pour récupérer l'utilisateur courant
+
+    // Vérifie si la liste est une liste système et si l'utilisateur n'est pas admin
+    if (optionList.isSystem() && !currentUser.isAdmin()) {
+        throw new SecurityException("Vous n'avez pas l'autorisation de modifier cette liste.");
+    }
+
+    }
+if (!currentUser.isAdmin()) {
+    systemCheckbox.setDisable(true); // Désactiver la checkbox pour les non-admins
+}
+
+    public void initializeView(OptionList optionList) {
+        this.optionList = optionList;
+
+        systemCheckBox.setChecked(optionList.isSystem());
+    systemCheckBox.addListener(e -> onSystemCheckBoxChanged());
+    }
+
+    public void onSystemCheckBoxChanged() {
+        controller.handleToggleSystem(systemCheckBox.isChecked());
+    }
+*/
 }
