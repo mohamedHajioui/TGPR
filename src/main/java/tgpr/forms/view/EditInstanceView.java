@@ -61,7 +61,7 @@ public class EditInstanceView extends DialogWindow {
         return false;
     }
     private boolean RedirectionOpen(User loggedUser, int idForm ) {
-        for (Instance instance : loggedUser.getInstances()) {
+        for (Instance instance : loggedUser.getInstances() ) {
             if (instance.getFormId() == idForm) {
                 return true;
             }
