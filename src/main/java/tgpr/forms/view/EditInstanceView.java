@@ -62,7 +62,7 @@ public class EditInstanceView extends DialogWindow {
     }
     private boolean RedirectionOpen(User loggedUser, int idForm ) {
         for (Instance instance : loggedUser.getInstances()) {
-            if (instance.getFormId() == idForm) {
+            if (instance.getFormId() == idForm && instance.getCompleted() != null) {
                 return true;
             }
 
@@ -1201,7 +1201,8 @@ public class EditInstanceView extends DialogWindow {
             Button nextButton = new Button("Next", () -> {
                 currentQuestionIndex++; // Incrémenter l'index de la question
                 displayQuestionViewSubmition(questions); // Afficher la question suivante
-                createOrUpdateButtonsViewSubmission(questions); // Met
+                createOrUpdateButtonsViewSubmission(questions);
+                // Met
                 // tre à jour les boutons
             });
             buttonPanel.addComponent(nextButton); // Ajouter le bouton "Next"
