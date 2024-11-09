@@ -126,6 +126,21 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         initializeOptions();
     }
 
+    public void deleteOptionList(OptionList optionList) {
+        if (owner.isAdmin() && !optionList.isUsed()) {
+            return;
+        }
+        if (askConfirmation("Are you sure you want to delete this option list?", "Delete")) {
+            return;
+        }
+        for (OptionValue value : optionList.getOptionValues()) {
+            value.delete();
+        }
+        optionList.delete();
+
+        view.reloadData(); // refresh de l'interface
+    }
+
     public void deleteOptionValue(OptionValue value) {
         tempOptions.remove(value);
         reindexTempOptions();

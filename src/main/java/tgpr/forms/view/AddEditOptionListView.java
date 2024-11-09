@@ -136,7 +136,7 @@ public class AddEditOptionListView extends DialogWindow {
         if (optionList != null) {
             if (normal) {
                 new Button("Reorder", this::reorder).addTo(btnContainer);
-                //new Button("Delete", this::deleteValue).addTo(btnContainer);
+                new Button("Delete", this::deleteOptionList).addTo(btnContainer);
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
                 new Button("Save", this::save).addTo(btnContainer);
                 new Button("Close", this::close).addTo(btnContainer);
@@ -200,7 +200,7 @@ public class AddEditOptionListView extends DialogWindow {
     private void reorder() {
         normal = false;
         affichageDesButtons(normal);}
-
+    private void deleteOptionList() {controller.deleteOptionList(optionList);}
     private void duplicate() {controller.duplicate();}
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
