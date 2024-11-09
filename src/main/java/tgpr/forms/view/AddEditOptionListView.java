@@ -87,7 +87,7 @@ public class AddEditOptionListView extends DialogWindow {
                 .setLayoutManager(new GridLayout(2).setLeftMarginSize(1));
         new Label("System: ").addTo(checkBoxPanel);
         checkBoxSystem = new CheckBox().addTo(checkBoxPanel);
-        checkBoxPanel.setVisible(!owner.isAdmin());
+        checkBoxPanel.setVisible(owner.isAdmin());
         new EmptySpace().addTo(checkBoxPanel);
         return checkBoxPanel;
     }
@@ -149,7 +149,7 @@ public class AddEditOptionListView extends DialogWindow {
             }
         } else {
             new Button("Create", this::createOptionList).addTo(btnContainer);
-            //new Button("Close", this::closeAll).addTo(btnContainer);
+            new Button("Close", this::closeAll).addTo(btnContainer);
         }
         root.invalidate();
     }
@@ -212,7 +212,7 @@ public class AddEditOptionListView extends DialogWindow {
     private void cancelOrder() {controller.cancelOrder();}
     public void createOptionList() {controller.createOptionList(txtName.getText(), txtAddOption.getText());}
     private void save() {controller.save(optionList);}
-    //    private void closeAll() {controller.closeAll();}
+    private void closeAll() {controller.closeAll();}
 
     private void validate() {
         var errors = controller.validate(txtName.getText());

@@ -19,6 +19,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     List<OptionValue> optionsToDelete = new ArrayList<>();
     List<OptionValue> originalOptionList;
     private List<OptionValue> tempOptions = new ArrayList<>();
+    private boolean isModified = false;
 
 
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
@@ -75,7 +76,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         firstOptionValue.setLabel(label);
         optionList.addValue(firstOptionValue);
         optionList.save();
-
+        onOptionListModified(); // est-ce nécessaire ici?
         return optionList;
     }
 
@@ -116,6 +117,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         //optionList.addValue(newOptionValue);
         //newOptionValue.save();
         view.reload(tempOptions);
+        onOptionListModified();// est-ce nécessaire ici?
     }
     public void saveAllOptionValues() {
         //optionList.clearValuesInDatabase();
@@ -145,6 +147,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         tempOptions.remove(value);
         reindexTempOptions();
         view.reload(tempOptions);
+        onOptionListModified();// est-ce nécessaire ici?
     }
 
     public void reindexTempOptions() {
@@ -237,4 +240,21 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
 
+    public void onOptionListModified() {
+        isModified = true;
+    }
+
+    public void closeAll() {
+        if (isModified) {
+            askConfirmation("Are you sure you want to cancel?", "Cancel");
+            discardChanges();
+            view.close();
+        }
+    }
+
+    private void discardChanges() {
+        List<OptionValue> freshValues = optionList.getOptionValues();
+        optionList.setValues(freshValues);
+        isModified = false;
+    }
 }
