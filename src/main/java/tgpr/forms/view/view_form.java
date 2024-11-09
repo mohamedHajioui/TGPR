@@ -55,15 +55,6 @@ public class view_form extends DialogWindow{
     private boolean normal;
     private ObjectTable<Question> table;
 
-    private final Button nq_button = new Button("New Question");
-    private final Button ef_button = new Button("Edit Form");
-    private final Button df_button = new Button("Delete Form");
-    private final Button s_button = new Button("Share");
-    private final Button r_button = new Button("Reorder");
-    private final Button a_button = new Button("Analyse");
-
-
-
 
     public view_form(formController controller,Form form,boolean normal) {
         super("View Form detail");
@@ -221,7 +212,7 @@ public class view_form extends DialogWindow{
 
         new Button("Clear Instances", this::clearInstances).addTo(panel);
         new Button("Analyse", this::Analyse).addTo(panel);
-        new Button("Close", this::close).addTo(panel);
+        new Button("Close", this::backToForms).addTo(panel);
         return panel;
     }
 

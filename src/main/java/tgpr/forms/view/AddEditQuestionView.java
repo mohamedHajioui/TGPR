@@ -7,6 +7,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import tgpr.forms.controller.AddEditQuestionController;
+import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
 
@@ -28,11 +29,13 @@ public class AddEditQuestionView extends DialogWindow {
     private final Button btnCancel;
     private Button btnDelete;
     private final Label errOptionList;
+    private Form form;
 
-    public AddEditQuestionView(AddEditQuestionController controller, Question question) {
+    public AddEditQuestionView(AddEditQuestionController controller, Question question,Form form) {
         super((question == null ? "Add " : "Edit ") + "Question");
         this.controller = controller;
         this.question = question;
+        this.form = form;
         setHints(List.of(Hint.CENTERED));
         //permet de fermer avec Echap
         setCloseWindowWithEscape(true);
@@ -132,6 +135,7 @@ public class AddEditQuestionView extends DialogWindow {
                     cklRequired.isChecked()
             );
         }
+        close();
     }
 
 
@@ -155,6 +159,9 @@ public class AddEditQuestionView extends DialogWindow {
 
         } else if (txtTitle.getText().length() < 3) {
             errTitle.setText("min 3 caracters");
+        }
+        else if(controller.sameTitle(txtTitle.getText(),form)){
+            errTitle.setText("Title already exists");
         }
         else {
             errTitle.setText("");
