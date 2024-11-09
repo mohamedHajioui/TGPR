@@ -15,8 +15,8 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         else {
             User owner = User.getByKey(1);
-            OptionList optionList = OptionList.getByKey(9);
-            Controller.navigateTo(new AddEditOptionListController(owner,null, null));
+            OptionList optionList = OptionList.getByKey(1);
+            Controller.navigateTo(new AddEditOptionListController(owner,optionList, null));
             //Controller.navigateTo(new LoginController());
         }
     }

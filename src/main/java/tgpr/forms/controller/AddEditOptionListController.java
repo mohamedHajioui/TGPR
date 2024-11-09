@@ -16,7 +16,11 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private User owner;
     private OptionValue optionValue;
     private List<OptionValue> options;
-    //private List<OptionValue> optionValues = new ArrayList<>();
+    List<OptionValue> optionsToDelete = new ArrayList<>();
+    List<OptionValue> originalOptionList;
+    private List<OptionValue> tempOptions = new ArrayList<>();
+
+
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
         this.optionList = optionList;
@@ -25,6 +29,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public AddEditOptionListController() {
+        this.optionList = new OptionList();
 //        view = new AddEditOptionListView(this, owner, optionList);
     }
 
@@ -39,6 +44,16 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return options;
     }
 
+    public ErrorList validate(String optionListName) {
+        var errors = new ErrorList();
+
+        var nameError = OptionListValidator.validateOptionListName(optionListName, owner, optionList);
+        if (nameError != null) {
+            errors.add(nameError, Form.Fields.Name);
+        }
+        return errors;
+    }
+
     public void save(String labelOption) {
         var errors = validate(optionList.getName());
         if (errors.isEmpty()) {
@@ -50,93 +65,146 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             showErrors(errors);
         }
     }
-    public ErrorList validate(String optionListName) {
-        var errors = new ErrorList();
 
-        var nameError = OptionListValidator.validateOptionListName(optionListName, owner, optionList);
-        if (nameError != null) {
-            errors.add(nameError, Form.Fields.Name);
-        }
-        return errors;
-    }
-
-    public boolean canCreateOptionList() {
-        return options != null && !options.isEmpty();
-    }
-
-    public OptionList createOptionList(String name, OptionValue optionValue) {
-        optionList = new OptionList(name);
+    public OptionList createOptionList(String name, String label) {
+        optionList = new OptionList();
+        optionList.setName(name);
         optionList = optionList.save();
-        optionList.addValue(optionValue);
+        OptionValue firstOptionValue = new OptionValue();
+        firstOptionValue.setIdx(1);
+        firstOptionValue.setLabel(label);
+        optionList.addValue(firstOptionValue);
         optionList.save();
+
         return optionList;
     }
 
-    public void saveOptionList(OptionList optionList) {
+    public void addToDeleteList(OptionValue option) {
+        optionsToDelete.add(option);
+    }
+
+    public void save(OptionList optionList) {
+        for (OptionValue option : optionsToDelete) {
+            option.delete();
+        }
+        optionsToDelete.clear();
+        int index = 1;
+        for (OptionValue option : options) {
+            option.setIdx(index++);
+            option.save();
+        }
         optionList.save();
-        view.close();
+        view.reloadData();
+        view.close(); //à mettre ou pas???
+    }
+    public void initializeOptions() {
+        tempOptions = new ArrayList<>(optionList.getOptionValues());
+        view.reload(tempOptions);
     }
 
     public void addOptionValue(String label) {
         if (optionList == null) {
             view.createOptionList();
         }
-        List<OptionValue> currentOptions = optionList.getOptionValues();
-        int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.getLast().getIdx() + 1;
+//        List<OptionValue> currentOptions = optionList.getOptionValues();
+//        int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.getLast().getIdx() + 1;
+        int newIdx = tempOptions.isEmpty() ? 1 : tempOptions.getLast().getIdx() + 1;
         OptionValue newOptionValue = new OptionValue(optionList, newIdx, label);
-//        newOptionValue.setIdx(newIdx);
-//        newOptionValue.setLabel(label);
-        optionList.addValue(newOptionValue);
-        newOptionValue.save();
-        view.reloadData();
+        tempOptions.add(newOptionValue);
+        //optionList.addValue(newOptionValue);
+        //newOptionValue.save();
+        view.reload(tempOptions);
+    }
+    public void saveAllOptionValues() {
+        //optionList.clearValuesInDatabase();
+        for (OptionValue option : tempOptions) {
+            optionList.addValue(option);
+        }
+        tempOptions.clear();
+        initializeOptions();
     }
 
-    public void optionValueDelete(OptionValue optionValue) {
-        if (optionValue != null) {
-            optionValue.delete();
-            options.remove(optionValue);
-            optionList.reorderValues(options);
-            view.reloadData();
+    public void deleteOptionValue(OptionValue value) {
+        tempOptions.remove(value);
+        reindexTempOptions();
+        view.reload(tempOptions);
+    }
+
+    public void reindexTempOptions() {
+        for (int i = 0; i < tempOptions.size(); i++) {
+            tempOptions.get(i).setIdx(i + 1);
         }
     }
-
     public void reorder() {
         view.updateButtonDisplay(false);
         optionList.reorderValues(optionList.getOptionValues());
-    }
-
-    public void duplicate() {
-        optionList.duplicate(owner);
-        //navigateTo(manageOptionLists);
-        //Une fois la copie créée, on revient à la vue de gestion des listes d'options
-        // (voir manage_option_lists).
     }
 
     public void alphabetically() {
         if (optionList != null) {
             optionList.getOptionValues().sort(Comparator.comparing(OptionValue::getLabel));
             optionList.reorderValues(optionList.getOptionValues());
+            reindexInMemory(optionList.getOptionValues());
             view.reloadData();
+        }
+    }
+
+    public void reindexInMemory(List<OptionValue> values) {
+        int i = 1;
+        for (var value : values) {
+            value.setIdx(i++);
         }
     }
     public void confirmOrder() {
-        if (optionList != null && options != null && !options.isEmpty()) {
-            optionList.reorderValues(options);
-            optionList.save();
-            view.reloadData();
+        if (options != null && !options.isEmpty()){
+
         }
         view.updateButtonDisplay(true);
     }
-
+    public void duplicate() {
+        optionList.duplicate(owner);
+        //navigateTo(manageOptionLists);
+        //Une fois la copie créée, on revient à la vue de gestion des listes d'options
+        // (voir manage_option_lists).
+    }
     public void cancelOrder() {
-        List<OptionValue> originalOptions = optionList.getOptionValues();
-        if (originalOptions != null && !originalOptions.isEmpty()) {
-            options.clear();
-            options.addAll(originalOptions);
-            optionList.reorderValues(options);
+        if (optionList != null && optionList.getOptionValues() != null) {
+            optionList.setValues(originalOptionList);
+            reindexInMemory(optionList.getOptionValues());
             view.reloadData();
         }
         view.updateButtonDisplay(true);
     }
 
+    /*public void deleteOptionValue(OptionValue option) {
+        options.remove(option);
+        reindexInMemory(options);
+        view.reloadData();
+    }
+     */
+
+    public void saveOptionList() {
+        for (OptionValue option : options) {
+            option.save();
+        }
+        optionList.save();
+        view.reloadData();
+    }
+/*
+    public void closeWindow() {
+        if (changesPending()) {
+            boolean saveChanges = view.confirmSaveChanges();
+            if (saveChanges) {
+                saveOptionList();
+            }
+        }
+        view.close();
+    }
+
+
+ */
+    private boolean changesPending() {
+        // Implémente la logique pour vérifier s'il y a des changements en cours
+        return true; // Exemple simplifié
+    }
 }

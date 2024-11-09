@@ -30,6 +30,7 @@ public class AddEditOptionListView extends DialogWindow {
     private final Panel namePanel;
     private TextBox txtName;
     private Label errName;
+    private CheckBox chkSystem;
     private final ObjectTable<OptionValue> table;
     private final Panel addOptionPanel;
     private Label errAddOption;
@@ -39,7 +40,7 @@ public class AddEditOptionListView extends DialogWindow {
     private Panel btnContainer;
     //private Button btnCreate;
     private List<OptionValue> options = new ArrayList<>();
-
+    private List<OptionValue> optionsToDelete = new ArrayList<>();
     public AddEditOptionListView(AddEditOptionListController controller, User owner, OptionList optionList) {
         super((optionList == null ? "Create" : "Update") + " Option List");
 
@@ -54,6 +55,7 @@ public class AddEditOptionListView extends DialogWindow {
         setComponent(root);
 
         namePanel = getNamePanel();
+        chkSystem = getCheckBoxSystem();
         table = getTable();
         addOptionPanel = getAddOptionPanel();
         new EmptySpace().addTo(root);
@@ -88,7 +90,7 @@ public class AddEditOptionListView extends DialogWindow {
         table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
         if(!normal){
-            reorder();
+            //reorder();
         }
         addKeyboardListener(table,KeyType.Backspace,this::deleteSelectedOption);
         return table;
@@ -127,7 +129,7 @@ public class AddEditOptionListView extends DialogWindow {
                 new Button("Reorder", this::reorder).addTo(btnContainer);
                 //new Button("Delete", this::deleteValue).addTo(btnContainer);
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
-                new Button("Save", this::saveOptionList).addTo(btnContainer);
+                new Button("Save", this::save).addTo(btnContainer);
                 new Button("Close", this::close).addTo(btnContainer);
             } else {
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
@@ -136,7 +138,7 @@ public class AddEditOptionListView extends DialogWindow {
             }
         } else {
             new Button("Create", this::createOptionList).addTo(btnContainer);
-            new Button("Close", this::close).addTo(btnContainer);
+            //new Button("Close", this::closeAll).addTo(btnContainer);
         }
         root.invalidate();
     }
@@ -161,35 +163,43 @@ public class AddEditOptionListView extends DialogWindow {
     }
     private void swap(int prec, int current){
         System.out.println("swap");
-        OptionValue tmp = table.getItem(current);
-        table.setItem(current, table.getItem(prec));
-        table.setItem(prec, tmp);
+        OptionValue item1 = table.getItem(prec);
+        OptionValue item2 = table.getItem(current);
+        String tmpLabel = item1.getLabel();
+        item1.setLabel(item2.getLabel());
+        item2.setLabel(tmpLabel);
         table.refresh();
     }
     private boolean deleteSelectedOption() {
         OptionValue selectedOption = table.getSelected();
         if (selectedOption != null) {
-            options.remove(selectedOption);
-            reindexOptions();  // changer la table en optionList
+            controller.addToDeleteList(selectedOption);
+            //options.remove(selectedOption);
+            //reorder();
             //table.clear();
-            table.add(options);
+            //table.add(options);
         }
         return true;
     }
+
     private void reindexOptions() {
         for (int i = 0; i < options.size(); i++) {
             options.get(i).setIdx(i + 1);
         }
     }
+
     private void reorder() {
         normal = false;
         affichageDesButtons(normal);}
+
     private void duplicate() {controller.duplicate();}
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
     private void cancelOrder() {controller.cancelOrder();}
-    public void createOptionList() {controller.createOptionList(txtName.getText(), optionValue);}
-    private void saveOptionList() {controller.saveOptionList(optionList);}
+    public void createOptionList() {controller.createOptionList(txtName.getText(), txtAddOption.getText());}
+    private void save() {controller.save(optionList);}
+    //    private void closeAll() {controller.closeAll();}
+
     private void validate() {
         var errors = controller.validate(txtName.getText());
         boolean hasOptions = !options.isEmpty();
@@ -203,19 +213,24 @@ public class AddEditOptionListView extends DialogWindow {
         //btnCreate.setEnabled(errors.isEmpty() && hasOptions);
     }
 
-    public void reloadData() {
-        options.clear();
-        options.addAll(optionList.getOptionValues());
-        options.sort(Comparator.comparingInt(OptionValue::getIdx));
-        table.clear();
-        table.add(options);
+    public void reload(List<OptionValue> options) {
+        table.getItems().clear();
+        table.getItems().addAll(options);
     }
-
-    public void createNewOptionList() {
-        OptionList newOptionList = new OptionList();
-        newOptionList.save();
-        this.optionList = newOptionList;
-        reloadData();
+    public void reloadData() {
+        if (optionList != null && options != null) {
+            for (OptionValue option : options) {
+                option.save();
+            }
+            options.clear();
+            List<OptionValue> newOptions = optionList.getOptionValues();
+            if (newOptions != null) {
+                options.addAll(newOptions);
+                options.sort(Comparator.comparingInt(OptionValue::getIdx));
+            }
+            table.clear();
+            table.add(options);
+        }
     }
 
     private void addOptionValue() {
