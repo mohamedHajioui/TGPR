@@ -3,23 +3,34 @@ package tgpr.forms.view;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.input.*;
 import tgpr.forms.controller.ViewInstancesController;
+import tgpr.forms.model.Form;
+import tgpr.forms.model.Instance;
+import tgpr.forms.model.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+
+
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
+
 
 public class ViewInstancesView extends DialogWindow {
     private ViewInstancesController controller;
     private Panel mainPanel;
     private Table<String> instancesTable;
+    private int idForm = 15;
 
     public ViewInstancesView(ViewInstancesController controller) {
         super("Titre par defaut");
         this.controller = controller;
         ListInstancesSubmitted();
+        addDeleteKeyListener(); // Add Delete key listener
     }
 
     private void setViewTitle(String title) {
@@ -27,116 +38,131 @@ public class ViewInstancesView extends DialogWindow {
     }
 
     private void ListInstancesSubmitted() {
-        setViewTitle("List of Submitted Instances"); // Title for RequestConfirmation
+        Form dataForm = Form.getByKey(idForm);
+        setViewTitle("List of Submitted Instances");
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(60, 20)); // Set preferred size for the panel
+        mainPanel.setPreferredSize(new TerminalSize(60, 20));
 
         // Create and add main labels (Title, Description, and Date)
-        Label titleLabel = new Label("Title: ");
-        Label descriptionLabel = new Label("Description: ");
+        Label titleLabel = new Label("Title: " + dataForm.getTitle());
+        Label descriptionLabel = new Label("Description: " + dataForm.getDescription());
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
         // Create table with columns "ID", "User Name", "Date"
         instancesTable = new Table<>("ID", "User Name", "Date");
-        instancesTable.setPreferredSize(new TerminalSize(50, 10)); // Set preferred size for the table
+        instancesTable.setPreferredSize(new TerminalSize(50, 10));
 
-        // Example data (you can replace this with real data from the controller)
-        instancesTable.getTableModel().addRow("1", "Alice", LocalDateTime.now().toString());
-        instancesTable.getTableModel().addRow("2", "Bob", LocalDateTime.now().minusDays(1).toString());
-        instancesTable.getTableModel().addRow("3", "Charlie", LocalDateTime.now().minusDays(2).toString());
+        Form form = new Form();
+        form.setId(idForm);
+        List<Instance> completedInstances = form.getCompletedInstances();
+        instancesTable.getTableModel().clear();
 
-        mainPanel.addComponent(instancesTable); // Add the table to the main panel
+        for (Instance instance : completedInstances) {
+            String id = String.valueOf(instance.getId());
+            User user = User.getByKey(instance.getUserId());
+            String userName = user.getName();
+            String completedDate = instance.getCompleted().toString();
 
-        // Add empty space after the table
+            instancesTable.getTableModel().addRow(id, userName, completedDate);
+        }
+        mainPanel.addComponent(instancesTable);
+
         mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-        // Create button panel and add buttons
         Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("Delete Selected", this::ButtonDeleteSelected));
+        buttonPanel.addComponent(new Button("Delete Selected", this::confirmDeleteSelected));
         buttonPanel.addComponent(new Button("Delete All", this::ButtonDeleteAll));
         buttonPanel.addComponent(new Button("Close", this::close));
+        Button openButton = new Button("Open");
+
+        int selectedRow = instancesTable.getSelectedRow();
+        User user;
+        if (selectedRow >= 0) {
+            String id = instancesTable.getTableModel().getCell(0, selectedRow);
+
+            Instance instance = Instance.getByKey(Integer.parseInt(id));
+            user = User.getByKey(instance.getUserId());
+        } else {
+            user = null;
+        }
+
+
+        buttonPanel.addComponent(openButton);
         buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         mainPanel.addComponent(buttonPanel);
 
-        // Add main panel to the container
         Panel container = new Panel(new LinearLayout(Direction.HORIZONTAL));
         container.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Empty space before
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1)));
         container.addComponent(mainPanel);
-        container.addComponent(new EmptySpace(new TerminalSize(0, 1))); // Empty space after
+        container.addComponent(new EmptySpace(new TerminalSize(0, 1)));
 
-        // Set the container panel as the main component of the window
         setComponent(container);
         setHints(List.of(Hint.CENTERED));
-
     }
 
 
+    private void addDeleteKeyListener() {
+        this.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Delete) {
+                    confirmDeleteSelected();  // Trigger delete action with confirmation
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
+    }
 
-    private void ButtonDeleteSelected() {
+    private void confirmDeleteSelected() {
         if (instancesTable.getSelectedRow() >= 0) {
-            String id = instancesTable.getTableModel().getCell(0, instancesTable.getSelectedRow());
-            // Add logic to delete the selected instance by ID
+            MessageDialogButton result = MessageDialog.showMessageDialog(
+                    getTextGUI(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete the selected instance?",
+                    MessageDialogButton.Yes, MessageDialogButton.No
+            );
+
+            if (result == MessageDialogButton.Yes) {
+                deleteSelectedInstance();
+            }
+        }
+    }
+
+    private void deleteSelectedInstance() {
+        int selectedRow = instancesTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String id = instancesTable.getTableModel().getCell(0, selectedRow);
             System.out.println("Delete instance with ID: " + id);
-            // Refresh or update table if needed
+            Instance instanceDelete = new Instance();
+            instanceDelete.setId(Integer.parseInt(id));
+            instanceDelete.delete();
+
+            instancesTable.getTableModel().removeRow(selectedRow); // Remove row from the table
         }
     }
 
     private void ButtonDeleteAll() {
-        ConfirmationDeleteAll();
+        // Show confirmation dialog
+        MessageDialogButton result = MessageDialog.showMessageDialog(
+                getTextGUI(),
+                "Confirm Delete All",
+                "Are you sure you want to delete all submitted instances?\nThis action cannot be undone.",
+                MessageDialogButton.Yes, MessageDialogButton.No
+        );
+
+        // Proceed with deletion if the user confirms
+        if (result == MessageDialogButton.Yes) {
+            Form form = new Form();
+            form.setId(idForm);
+            form.deleteAllSubmittedInstances();  // Delete all instances
+            instancesTable.getTableModel().clear();  // Clear the table
+        }
+        // If "No" is selected, the dialog simply closes and no action is taken
     }
 
-    private void ConfirmationDeleteSelected() {
-        setViewTitle("Delete Instance");
-        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(45, 5)); // Set preferred size for the panel
 
-        Label textLabel = new Label("Are you sure you want to delete this instance?");
-        mainPanel.addComponent(textLabel);
 
-        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
-
-        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("Yes", this::ButtonConfirmYes));
-        buttonPanel.addComponent(new Button("No", this::ButtonConfirmNo));
-
-        mainPanel.addComponent(buttonPanel);
-        setComponent(mainPanel);
-    }
-
-    private void ButtonConfirmYes() {
-        // Logic to confirm delete
-    }
-
-    private void ButtonConfirmNo() {
-        close();
-    }
-
-    private void ConfirmationDeleteAll() {
-        setViewTitle("Delete All Instances");
-        mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
-        mainPanel.setPreferredSize(new TerminalSize(90, 4));
-
-        Label textLabel = new Label("Are you sure you want to delete all the submitted instances?\nNote: This will not delete instances that are currently being edited (not submitted).");
-        mainPanel.addComponent(textLabel);
-
-        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
-
-        Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(new Button("Yes", this::ButtonDeleteAllYes));
-        buttonPanel.addComponent(new Button("No", this::ButtonDeleteAllNo));
-
-        mainPanel.addComponent(buttonPanel);
-        setComponent(mainPanel);
-    }
-
-    private void ButtonDeleteAllYes() {
-        // Logic to delete all instances
-    }
-
-    private void ButtonDeleteAllNo() {
-        close();
-    }
 }
