@@ -4,6 +4,8 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.input.KeyType;
+import com.googlecode.lanterna.input.*;
 import tgpr.forms.controller.ViewInstancesController;
 
 import java.time.LocalDateTime;
@@ -68,7 +70,10 @@ public class ViewInstancesView extends DialogWindow {
         // Set the container panel as the main component of the window
         setComponent(container);
         setHints(List.of(Hint.CENTERED));
+
     }
+
+
 
     private void ButtonDeleteSelected() {
         if (instancesTable.getSelectedRow() >= 0) {
