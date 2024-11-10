@@ -1180,6 +1180,11 @@ public class EditInstanceView extends DialogWindow {
         return filteredAnswers;
     }
 
+
+
+
+
+
     private void createOrUpdateButtonsViewSubmission(List<Question> questions) {
         // Réinitialiser le panneau de boutons
         buttonPanel.removeAllComponents();
