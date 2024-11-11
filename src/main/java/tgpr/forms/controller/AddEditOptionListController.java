@@ -112,9 +112,9 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             showError("Option already exists in the list");
             return;
         }
-        int newIndex = options.size() + 1;
+        int newIndex = tempOptions.size() + 1;
         OptionValue newOptionValue = new OptionValue(optionList, newIndex, label);
-        options.add(newOptionValue);
+        tempOptions.add(newOptionValue);
         System.out.println("Options après ajout :");
         options.forEach(opt -> System.out.println("Label: " + opt.getLabel() + ", Index: " + opt.getIdx()));
         isModified = true;
@@ -129,13 +129,14 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void save() {
-        for (int i = 0; i < options.size(); i++) {
-            OptionValue option = options.get(i);
-            option.setIdx(i + 1);
-        }
-        for (OptionValue option : options) {
-            option.save();
-        }
+        options.clear();
+        options.addAll(tempOptions);
+        reindexOptions();
+        saveOptionValue();
+        saveOptionList();
+        isModified = false;
+    }
+    private void saveOptionList() {
         optionList.save();
     }
     public void deleteOptionList(OptionList optionList) {   // A TESTER !!!
@@ -237,7 +238,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     private void discardChanges() {
-        options = optionList.getOptionValues();
+        tempOptions = new ArrayList<>(options);
         reindexOptions();
         isModified = false;
         view.reloadData();
