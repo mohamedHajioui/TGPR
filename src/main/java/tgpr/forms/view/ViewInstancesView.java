@@ -69,13 +69,13 @@ public class ViewInstancesView extends DialogWindow {
         }
         mainPanel.addComponent(instancesTable);
 
-        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 1)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+        mainPanel.addComponent(new EmptySpace(new TerminalSize(0, 6)), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
         Panel buttonPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         buttonPanel.addComponent(new Button("Delete Selected", this::confirmDeleteSelected));
         buttonPanel.addComponent(new Button("Delete All", this::ButtonDeleteAll));
         buttonPanel.addComponent(new Button("Close", this::close));
-        Button openButton = new Button("Open");
+
 
         int selectedRow = instancesTable.getSelectedRow();
         User user;
@@ -89,7 +89,7 @@ public class ViewInstancesView extends DialogWindow {
         }
 
 
-        buttonPanel.addComponent(openButton);
+
         buttonPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         mainPanel.addComponent(buttonPanel);
 
@@ -121,7 +121,7 @@ public class ViewInstancesView extends DialogWindow {
             MessageDialogButton result = MessageDialog.showMessageDialog(
                     getTextGUI(),
                     "Confirm Delete",
-                    "Are you sure you want to delete the selected instance?",
+                    "Are you sure you want to delete this instance?",
                     MessageDialogButton.Yes, MessageDialogButton.No
             );
 
@@ -147,8 +147,8 @@ public class ViewInstancesView extends DialogWindow {
         // Show confirmation dialog
         MessageDialogButton result = MessageDialog.showMessageDialog(
                 getTextGUI(),
-                "Confirm Delete All",
-                "Are you sure you want to delete all submitted instances?\nThis action cannot be undone.",
+                "Delete All instances",
+                "Are you sure you want to delete all submitted instances?\nNote : This will not delete instances that are currently being edited (not submitted).",
                 MessageDialogButton.Yes, MessageDialogButton.No
         );
 
@@ -161,6 +161,26 @@ public class ViewInstancesView extends DialogWindow {
         }
         // If "No" is selected, the dialog simply closes and no action is taken
     }
+
+    private void BtnDeleteAll() {
+        // Show confirmation dialog
+        MessageDialogButton result = MessageDialog.showMessageDialog(
+                getTextGUI(),
+                "Delete All instances",
+                "Are you sure you want to delete all instances?\nNote : This will also delete instances that are currently being edited (not submitted).",
+                MessageDialogButton.Yes, MessageDialogButton.No
+        );
+
+        // Proceed with deletion if the user confirms
+        if (result == MessageDialogButton.Yes) {
+            Form form = new Form();
+            form.setId(idForm);
+            form.deleteAllInstances();  // Delete all instances
+            instancesTable.getTableModel().clear();  // Clear the table
+        }
+        // If "No" is selected, the dialog simply closes and no action is taken
+    }
+
 
 
 
