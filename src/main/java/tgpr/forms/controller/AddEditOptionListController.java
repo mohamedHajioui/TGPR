@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static tgpr.forms.model.OptionList.getAll;
+
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
     private OptionList optionList;
@@ -26,12 +28,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         this.owner = owner;
         this.optionList = optionList;
         this.options = (options != null) ? options : new ArrayList<>();
-        view = new AddEditOptionListView(this, owner, optionList);
-    }
-
-    public AddEditOptionListController() {
-        this.optionList = new OptionList();
-//        view = new AddEditOptionListView(this, owner, optionList);
+        this.view = new AddEditOptionListView(this, owner, optionList);
+        loadOptions();
     }
 
     @Override
@@ -55,80 +53,57 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return errors;
     }
 
-    public void save(String labelOption) {
-        var errors = validate(optionList.getName());
-        if (errors.isEmpty()) {
-            List<OptionValue> existingOptions = optionList.getOptionValues();
-            int idx = existingOptions.isEmpty() ? 1 : existingOptions.size() + 1;
-            optionValue = new OptionValue(optionList, idx, labelOption);
-            optionValue.save();
-        } else {
-            showErrors(errors);
+    public static int getNextAvailableId() {
+        List<OptionList> optionLists = getAll();
+        if (optionLists.isEmpty()) {
+            return 1;
         }
+        int nextId = 1;
+        for (OptionList optionList : optionLists) {
+            if (optionList.getId() != nextId) {
+                return nextId;
+            }
+            nextId++;
+        }
+        return nextId;
     }
 
-    public OptionList createOptionList(String name, String label) {
-        optionList = new OptionList();
-        optionList.setName(name);
-        optionList = optionList.save();
-        OptionValue firstOptionValue = new OptionValue();
-        firstOptionValue.setIdx(1);
-        firstOptionValue.setLabel(label);
-        optionList.addValue(firstOptionValue);
-        optionList.save();
-        onOptionListModified(); // est-ce nécessaire ici?
-        return optionList;
-    }
-
-    public void addToDeleteList(OptionValue option) {
-        optionsToDelete.add(option);
-    }
-
-    public void save(OptionList optionList) {
-        optionList.save();
-/*        for (OptionValue option : optionsToDelete) {
-            option.delete();
-        }
-        optionsToDelete.clear();
-        int index = 1;
-        for (OptionValue option : options) {
-            option.setIdx(index++);
-            option.save();
-        }
-        optionList.save();
+    public OptionList createNewOptionList(String name) {  // méthode pour le bouton new List dans Manage Option List
+        OptionList newOptionList = new OptionList(name);
+        int nextId = getNextAvailableId();
+        newOptionList.setId(nextId);
+        newOptionList.setOwnerId(owner.getId());
+        this.optionList = newOptionList;
         view.reloadData();
-        view.close(); //à mettre ou pas???
-*/
-    }
-    public void initializeOptions() {
-        tempOptions = new ArrayList<>(optionList.getOptionValues());
-        view.reload(tempOptions);
+        return newOptionList;
     }
 
     public void addOptionValue(String label) {
-        if (optionList == null) {
-            view.createOptionList();
+        OptionValue newOptionValue = new OptionValue(optionList, options.size() + 1, label);
+        if (optionList.hasValue(newOptionValue)) {
+            showError("Option already exists in the list");
+            return; // je préfère désactiver le bouton add dans ce cas !!!
         }
-//        List<OptionValue> currentOptions = optionList.getOptionValues();
-//        int newIdx = currentOptions.isEmpty() ? 1 : currentOptions.getLast().getIdx() + 1;
-        int newIdx = tempOptions.isEmpty() ? 1 : tempOptions.getLast().getIdx() + 1;
-        OptionValue newOptionValue = new OptionValue(optionList, newIdx, label);
-        tempOptions.add(newOptionValue);
-        //optionList.addValue(newOptionValue);
-        //newOptionValue.save();
-        view.reload(tempOptions);
-        onOptionListModified();// est-ce nécessaire ici?
+        newOptionValue.save();
+        options.add(newOptionValue);
+        view.reloadData();
+        isModified = true;
     }
-    public void saveAllOptionValues() {
-        //optionList.clearValuesInDatabase();
-        for (OptionValue option : tempOptions) {
-            optionList.addValue(option);
-        }
-        tempOptions.clear();
-        initializeOptions();
+    public boolean enableCreateButton() {
+        return !optionList.getOptionValues().isEmpty();
     }
 
-    public void deleteOptionList(OptionList optionList) {
+    public void save() {
+        for (int i = 0; i < options.size(); i++) {
+            OptionValue option = options.get(i);
+            option.setIdx(i + 1);
+        }
+        for (OptionValue option : options) {
+            option.save();
+        }
+        optionList.save();
+    }
+    public void deleteOptionList(OptionList optionList) {   // A TESTER !!!
         if (!askConfirmation("Are you sure you want to delete this option list?", "Delete")) {
             return;
         }
@@ -138,35 +113,45 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.delete();
         view.close();
     }
+    /*
+    public void deleteOptionList(OptionList optionList) {
+        if (!canDeleteOptionList(optionList)) {
+            view.showError("You cannot delete this option list because it's in use or you lack permissions.");
+            return;
+        }
+        boolean confirmDelete = askConfirmation("Are you sure you want to delete this option list?", "Delete");
+        if (confirmDelete) {
+            optionList.deleteAllValues; // Supprime toutes les valeurs associées
+            optionList.delete(); // Supprime la liste
+            view.close(); // Ferme la vue après suppression
+        }
+    }
+     */
 
     public boolean canDeleteOptionList(OptionList optionList) {
-        return owner.isAdmin() && !optionList.isUsed();
+        return owner.isAdmin() && !optionList.isUsed() && !optionList.isSystem();
     }
 
-    public void deleteOptionValue(OptionValue value) {
-        tempOptions.remove(value);
-        reindexTempOptions();
-        view.reload(tempOptions);
-        onOptionListModified();// est-ce nécessaire ici?
-    }
-
-    public void reindexTempOptions() {
-        for (int i = 0; i < tempOptions.size(); i++) {
-            tempOptions.get(i).setIdx(i + 1);
+    public void reindexOptions() {
+        for (int i = 0; i < options.size(); i++) {
+            OptionValue option = options.get(i);
+            option.setIdx(i + 1);
+            option.save();
         }
-    }
+        view.reloadData();
+/*        List<OptionValue> optionValues = options;
+        for (int i = 0; i < optionValues.size(); i++) {
+            optionValues.get(i).setIdx(i + 1);
+ */ }
+
     public void reorder() {
         view.updateButtonDisplay(false);
-        optionList.reorderValues(optionList.getOptionValues());
+        isModified = true;
     }
-
     public void alphabetically() {
-        if (optionList != null) {
-            optionList.getOptionValues().sort(Comparator.comparing(OptionValue::getLabel));
-            optionList.reorderValues(optionList.getOptionValues());
-            reindexInMemory(optionList.getOptionValues());
-            view.reloadData();
-        }
+        options.sort(Comparator.comparing(OptionValue::getLabel));
+        reindexOptions();
+        view.reloadData();
     }
 
     public void reindexInMemory(List<OptionValue> values) {
@@ -176,9 +161,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
     public void confirmOrder() {
-        if (options != null && !options.isEmpty()){
-
-        }
+        optionList.reorderValues(options);
+        isModified = false;
         view.updateButtonDisplay(true);
     }
     public void duplicate() {
@@ -186,56 +170,21 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         //navigateTo(manageOptionLists);
         //Une fois la copie créée, on revient à la vue de gestion des listes d'options
         // (voir manage_option_lists).
+        /*
+        OptionList duplicateList = optionList.duplicate(owner);
+        navigateTo(ManageOptionListsView.class);
+         */
     }
     public void cancelOrder() {
-        if (optionList != null && optionList.getOptionValues() != null) {
-            optionList.setValues(originalOptionList);
-            reindexInMemory(optionList.getOptionValues());
-            view.reloadData();
-        }
+        options = new ArrayList<>(originalOptionList);
+        view.reloadData();
         view.updateButtonDisplay(true);
-    }
-
-    /*public void deleteOptionValue(OptionValue option) {
-        options.remove(option);
-        reindexInMemory(options);
-        view.reloadData();
-    }
-     */
-
-    public void saveOptionList() {
-        for (OptionValue option : options) {
-            option.save();
-        }
-        optionList.save();
-        view.reloadData();
-    }
-/*
-    public void closeWindow() {
-        if (changesPending()) {
-            boolean saveChanges = view.confirmSaveChanges();
-            if (saveChanges) {
-                saveOptionList();
-            }
-        }
-        view.close();
-    }
-
-
- */
-    private boolean changesPending() {
-        return true;
     }
 
     public void handleToggleSystem(boolean isSystem) {
         if (optionList != null) {
-            if (isSystem) {
-                optionList.setOwnerId(null);
-            } else {
-                optionList.setOwnerId(owner.getId());
-            }
+            optionList.setOwnerId(isSystem ? null : owner.getId());
             optionList.save();
-
             view.reloadData();
         }
     }
@@ -247,14 +196,26 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public void closeAll() {
         if (isModified) {
             askConfirmation("Are you sure you want to cancel?", "Cancel");
-            discardChanges();
-            view.close();
+            discardChanges();  // est-ce vraiment nécessaire?
         }
+        view.close();
     }
 
     private void discardChanges() {
-        List<OptionValue> freshValues = optionList.getOptionValues();
-        optionList.setValues(freshValues);
+        options = optionList.getOptionValues();
+        reindexOptions();
         isModified = false;
+        view.reloadData();
+    }
+
+    public void addToDeleteList(OptionValue option) {
+        optionsToDelete.add(option);
+    }
+
+    public void loadOptions() {
+        options.clear();
+        options.addAll(optionList.getOptionValues());
+        options.sort(Comparator.comparingInt(OptionValue::getIdx));
+        view.reloadData();
     }
 }
