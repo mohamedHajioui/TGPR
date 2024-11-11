@@ -24,11 +24,13 @@ public class ViewInstancesView extends DialogWindow {
     private ViewInstancesController controller;
     private Panel mainPanel;
     private Table<String> instancesTable;
-    private int idForm = 15;
+    private int currentForm ;
 
-    public ViewInstancesView(ViewInstancesController controller) {
+    public ViewInstancesView(ViewInstancesController controller, int currentForm) {
+
         super("Titre par defaut");
         this.controller = controller;
+        this.currentForm = currentForm;
         ListInstancesSubmitted();
         addDeleteKeyListener(); // Add Delete key listener
     }
@@ -38,7 +40,7 @@ public class ViewInstancesView extends DialogWindow {
     }
 
     private void ListInstancesSubmitted() {
-        Form dataForm = Form.getByKey(idForm);
+        Form dataForm = Form.getByKey(currentForm);
         setViewTitle("List of Submitted Instances");
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(60, 20));
@@ -55,7 +57,7 @@ public class ViewInstancesView extends DialogWindow {
         instancesTable.setPreferredSize(new TerminalSize(50, 10));
 
         Form form = new Form();
-        form.setId(idForm);
+        form.setId(currentForm);
         List<Instance> completedInstances = form.getCompletedInstances();
         instancesTable.getTableModel().clear();
 
@@ -155,7 +157,7 @@ public class ViewInstancesView extends DialogWindow {
         // Proceed with deletion if the user confirms
         if (result == MessageDialogButton.Yes) {
             Form form = new Form();
-            form.setId(idForm);
+            form.setId(currentForm);
             form.deleteAllSubmittedInstances();  // Delete all instances
             instancesTable.getTableModel().clear();  // Clear the table
         }
@@ -174,7 +176,7 @@ public class ViewInstancesView extends DialogWindow {
         // Proceed with deletion if the user confirms
         if (result == MessageDialogButton.Yes) {
             Form form = new Form();
-            form.setId(idForm);
+            form.setId(currentForm);
             form.deleteAllInstances();  // Delete all instances
             instancesTable.getTableModel().clear();  // Clear the table
         }

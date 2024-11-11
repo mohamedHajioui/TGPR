@@ -5,6 +5,7 @@ import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionValue;
 import tgpr.forms.model.Question;
 import tgpr.forms.view.AnalyseView;
+import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
 
 import java.util.List;
@@ -63,6 +64,7 @@ public class AnalyseController extends Controller<AnalyseView> {
     }
 
     public void viewInstance(){
-        navigateTo(new TestController());
+        
+        navigateTo(new ViewInstancesController(currentForm));
     }
 }

@@ -744,7 +744,7 @@ public class EditInstanceView extends DialogWindow {
 
         if ( Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
-                displayCurrentInputValue(questions);
+                displayCurrentInputValue(questions );
                 displayAnswerList(); // Display the answer list
                 close(); // Close the application
             });
