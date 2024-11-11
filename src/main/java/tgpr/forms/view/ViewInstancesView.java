@@ -104,4 +104,16 @@ public class ViewInstancesView extends DialogWindow {
     }
 
 
+    private void addDeleteKeyListener() {
+        this.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Delete) {
+                    confirmDeleteSelected();  // Trigger delete action with confirmation
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
+    }
+
 }
