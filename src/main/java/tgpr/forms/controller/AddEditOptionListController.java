@@ -29,7 +29,10 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         this.optionList = optionList;
         this.options = (options != null) ? options : new ArrayList<>();
         this.view = new AddEditOptionListView(this, owner, optionList);
-        loadOptions();
+
+        if (this.optionList != null) {
+            loadOptions();
+        }
     }
 
     @Override
@@ -78,6 +81,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return newOptionList;
     }
 
+    public void createAndSaveOptionList(String name) {
+        OptionList newOptionList = new OptionList(name);
+        newOptionList.setOwnerId(owner.getId());
+        newOptionList.save();
+    }
+
     public void addOptionValue(String label) {
         OptionValue newOptionValue = new OptionValue(optionList, options.size() + 1, label);
         if (optionList.hasValue(newOptionValue)) {
@@ -89,7 +98,25 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         view.reloadData();
         isModified = true;
     }
-    public boolean enableCreateButton() {
+
+    public void addOptionInMemory(String label) {
+        if (isOptionDuplicate(label)) {
+            showError("Option already exists in the list");
+            return;
+        }
+        int newIndex = options.size() + 1;
+        OptionValue newOptionValue = new OptionValue(optionList, newIndex, label);
+        options.add(newOptionValue);
+        System.out.println("Options après ajout :");
+        options.forEach(opt -> System.out.println("Label: " + opt.getLabel() + ", Index: " + opt.getIdx()));
+        isModified = true;
+        view.reloadData();
+        view.updateCreateButtonState();
+    }
+    public boolean isOptionDuplicate(String label) {
+        return options.stream().anyMatch(option -> option.getLabel().equals(label));
+    }
+        public boolean enableCreateButton() {
         return !optionList.getOptionValues().isEmpty();
     }
 
@@ -215,7 +242,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public void loadOptions() {
         options.clear();
         options.addAll(optionList.getOptionValues());
-        options.sort(Comparator.comparingInt(OptionValue::getIdx));
+        boolean needIndexAssignment = options.stream().allMatch(option -> option.getIdx() == 0);
+        if (needIndexAssignment) {
+            for (int i = 0; i < options.size(); i++) {
+                options.get(i).setIdx(i + 1);
+            }
+        }
         view.reloadData();
     }
 }

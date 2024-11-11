@@ -65,6 +65,10 @@ public class AddEditOptionListView extends DialogWindow {
         new EmptySpace().addTo(root);
         affichageDesButtons(normal);
 
+        txtName.setText(optionList != null ? optionList.getName() : "");
+        updateAddButtonState();
+        updateCreateButtonState();
+        errAddOption.setVisible(options.isEmpty());
     }
     private Panel getNamePanel() {
         final Panel namePanel = new Panel().addTo(root);
@@ -95,7 +99,7 @@ public class AddEditOptionListView extends DialogWindow {
     private ObjectTable<OptionValue> getTable() {
         final ObjectTable<OptionValue> table;
         table = new ObjectTable<>(
-                new ColumnSpec<>("Index", optionValue -> options.indexOf(optionValue) + 1),
+                new ColumnSpec<>("Index", OptionValue::getIdx),
                 new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
         ).addTo(root);
         table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
@@ -105,6 +109,7 @@ public class AddEditOptionListView extends DialogWindow {
             reorder();
         }
         addKeyboardListener(table,KeyType.Backspace,this::deleteSelectedOption);
+        addKeyboardListener(table,KeyType.Delete,this::deleteSelectedOption);
         return table;
     }
 
@@ -118,14 +123,15 @@ public class AddEditOptionListView extends DialogWindow {
 
         txtAddOption = new TextBox(new TerminalSize(35, 1))
                 .setTextChangeListener((txt, byUser) -> {
-                    btnAddOption.setEnabled(!txt.isEmpty());
-                    errAddOption.setVisible(options.isEmpty());
+                    updateAddButtonState();
                 });
         btnAddOption = new Button("Add", () -> {
-            String label = txtAddOption.getText();
+            String label = txtAddOption.getText().trim();
             if (!label.isEmpty()) {
-                controller.addOptionValue(label);
+                controller.addOptionInMemory(label);
                 txtAddOption.setText("");
+                errAddOption.setVisible(false);
+                updateCreateButtonState();
             }
         });
         addOptionPanel.addComponent(errAddOption);
@@ -133,6 +139,16 @@ public class AddEditOptionListView extends DialogWindow {
         addOptionPanel.addComponent(txtAddOption);
         addOptionPanel.addComponent(btnAddOption);
         return addOptionPanel;
+    }
+    private void updateAddButtonState() {
+        String text = txtAddOption.getText().trim();
+        btnAddOption.setEnabled(!text.isEmpty() && !controller.isOptionDuplicate(text));
+    }
+
+    public void updateCreateButtonState() {
+        if (btnCreate != null) {
+            btnCreate.setEnabled(!controller.getOptions().isEmpty());
+        }
     }
 
     private void affichageDesButtons(boolean normal){
@@ -155,16 +171,25 @@ public class AddEditOptionListView extends DialogWindow {
                 new Button("Cancel", this::cancelOrder).addTo(btnContainer);
             }
         } else {
-            //new Button("Create", this::createOptionList).addTo(btnContainer);
+            btnCreate = new Button("Create", this::createOptionList).addTo(btnContainer);
+            btnCreate.setEnabled(false);
             new Button("Close", this::closeAll).addTo(btnContainer);
         }
         root.invalidate();
     }
 
+    private void createOptionList() {
+        String name = txtName.getText().trim();
+        if (!name.isEmpty()) {
+            controller.createAndSaveOptionList(name);
+            close();
+        } else {
+            errName.setText("name required");
+        }
+    }
     public void updateButtonDisplay(boolean normal) {
         affichageDesButtons(normal);
     }
-
     private void choice(){
         if (!normal){
             //on change juste l'etat de moving pour dire si on bouge ou paS
@@ -199,6 +224,7 @@ public class AddEditOptionListView extends DialogWindow {
         }
         return true;
     }
+
     public boolean deleteSelectedOption(OptionValue option) {
         option.delete();
         options.remove(option);
@@ -213,7 +239,6 @@ public class AddEditOptionListView extends DialogWindow {
             options.get(i).setIdx(i + 1);
         }
     }
-
     private void reorder() {
         normal = false;
         table.setSelectAction(this::choice);
@@ -226,27 +251,28 @@ public class AddEditOptionListView extends DialogWindow {
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
     private void cancelOrder() {controller.cancelOrder();}
-    //public void createOptionList() {controller.createOptionList();}
     private void save() {controller.save();}
-    private void closeAll() {controller.closeAll();}
 
+    private void closeAll() {controller.closeAll();}
     private void validate() {
         var errors = controller.validate(txtName.getText());
         boolean hasOptions = !options.isEmpty();
         if (!hasOptions) {
             errAddOption.setVisible(true);
-            //btnCreate.setEnabled(false);
         } else {
             errAddOption.setVisible(false);
         }
         errName.setText(errors.getFirstErrorMessage(Form.Fields.Name));
-        //btnCreate.setEnabled(errors.isEmpty() && hasOptions);
     }
+
     public void reloadData() {
         table.clear();
-        List<OptionValue> options = controller.getOptions();
+        List<OptionValue> currentOptions = controller.getOptions();
+        for (int i = 0; i < currentOptions.size(); i++) {
+            currentOptions.get(i).setIdx(i + 1);
+        }
         options.sort(Comparator.comparingInt(OptionValue::getIdx));
-        table.add(options);
+        table.add(currentOptions);
         root.invalidate();
 
     }
@@ -255,9 +281,5 @@ public class AddEditOptionListView extends DialogWindow {
         String label = txtAddOption.getText();
         controller.addOptionValue(label);
         txtAddOption.setText("");
-    }
-
-    public void updateCreateButtonState() {
-            btnCreate.setEnabled(!options.isEmpty());
     }
 }
