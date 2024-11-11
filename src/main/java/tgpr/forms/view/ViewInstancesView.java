@@ -81,7 +81,8 @@ public class ViewInstancesView extends DialogWindow {
 
         int selectedRow = instancesTable.getSelectedRow();
         User user;
-        if (selectedRow >= 0) {
+        if (selectedRow >= 0 && selectedRow < instancesTable.getTableModel().getRowCount()) {
+            // Safely access the selected row
             String id = instancesTable.getTableModel().getCell(0, selectedRow);
 
             Instance instance = Instance.getByKey(Integer.parseInt(id));
@@ -135,14 +136,18 @@ public class ViewInstancesView extends DialogWindow {
 
     private void deleteSelectedInstance() {
         int selectedRow = instancesTable.getSelectedRow();
-        if (selectedRow >= 0) {
+        // Vérifie de nouveau que la table contient des lignes et que l'index est valide
+        if (selectedRow >= 0 && selectedRow < instancesTable.getTableModel().getRowCount()) {
             String id = instancesTable.getTableModel().getCell(0, selectedRow);
             System.out.println("Delete instance with ID: " + id);
+
+            // Suppression de l'instance dans le modèle de données
             Instance instanceDelete = new Instance();
             instanceDelete.setId(Integer.parseInt(id));
             instanceDelete.delete();
 
-            instancesTable.getTableModel().removeRow(selectedRow); // Remove row from the table
+            // Supprime la ligne de la table
+            instancesTable.getTableModel().removeRow(selectedRow);
         }
     }
     private void ButtonDeleteAll() {

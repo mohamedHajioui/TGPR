@@ -12,12 +12,13 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
     private Form currentForm;
 
     public ViewInstancesController(Form currentForm) {
-        this.view = new ViewInstancesView(this);
+        this.currentForm = currentForm;
+        this.view = new ViewInstancesView(this, this.currentForm.getId());
     }
 
     public Form getCurrentForm() {
 
-        return this.currentForm;
+        return currentForm;
     }
 
     @Override
