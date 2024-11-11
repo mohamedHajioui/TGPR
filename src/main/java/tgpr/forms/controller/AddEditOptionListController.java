@@ -89,19 +89,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         this.optionList = newOptionList;
         saveOptionValue();
     }
-
-    public void addOptionValue(String label) {
-        OptionValue newOptionValue = new OptionValue(optionList, options.size() + 1, label);
-        if (optionList.hasValue(newOptionValue)) {
-            showError("Option already exists in the list");
-            return; // je préfère désactiver le bouton add dans ce cas !!!
-        }
-        newOptionValue.save();
-        options.add(newOptionValue);
-        view.reloadData();
-        isModified = true;
-    }
-
     public void saveOptionValue() {
         for (OptionValue optionValue : options) {
             optionValue.setOptionListId(optionList.getId());
@@ -161,20 +148,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.delete();
         view.close();
     }
-    /*
-    public void deleteOptionList(OptionList optionList) {
-        if (!canDeleteOptionList(optionList)) {
-            view.showError("You cannot delete this option list because it's in use or you lack permissions.");
-            return;
-        }
-        boolean confirmDelete = askConfirmation("Are you sure you want to delete this option list?", "Delete");
-        if (confirmDelete) {
-            optionList.deleteAllValues; // Supprime toutes les valeurs associées
-            optionList.delete(); // Supprime la liste
-            view.close(); // Ferme la vue après suppression
-        }
-    }
-     */
 
     public boolean canDeleteOptionList(OptionList optionList) {
         return owner.isAdmin() && !optionList.isUsed() && !optionList.isSystem();
@@ -211,7 +184,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
     public void duplicate() {
         optionList.duplicate(owner);
-        //navigateTo(manageOptionLists);
+        //navigateTo(manageOptionLists); OU view.close();
         //Une fois la copie créée, on revient à la vue de gestion des listes d'options
         // (voir manage_option_lists).
         /*
@@ -228,8 +201,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public void handleToggleSystem(boolean isSystem) {
         if (optionList != null) {
             optionList.setOwnerId(isSystem ? null : owner.getId());
-            optionList.save();
-            view.reloadData();
         }
     }
 
@@ -238,7 +209,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void closeAll() {
-        System.out.println("isModified: " + isModified);
         if (isModified) {
             boolean confirmDiscard = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmDiscard) {
@@ -250,9 +220,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
 
-    private void discardChanges() {
-//        tempOptions.clear();
-//        tempOptions.addAll(options);
+    public void discardChanges() {
         tempOptions = new ArrayList<>(options);
         reindexOptions();
         isModified = false;

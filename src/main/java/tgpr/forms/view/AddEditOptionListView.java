@@ -92,6 +92,8 @@ public class AddEditOptionListView extends DialogWindow {
                 .setLayoutManager(new GridLayout(2).setLeftMarginSize(1));
         new Label("System: ").addTo(checkBoxPanel);
         checkBoxSystem = new CheckBox().addTo(checkBoxPanel);
+        checkBoxSystem.setChecked(optionList != null && optionList.isSystem());
+        checkBoxSystem.addListener((newState) -> controller.handleToggleSystem(newState));
         checkBoxPanel.setVisible(owner.isAdmin());
         new EmptySpace().addTo(checkBoxPanel);
         return checkBoxPanel;
@@ -139,6 +141,12 @@ public class AddEditOptionListView extends DialogWindow {
         addOptionPanel.addComponent(new EmptySpace());
         addOptionPanel.addComponent(txtAddOption);
         addOptionPanel.addComponent(btnAddOption);
+
+        if (optionList.isSystem() && !owner.isAdmin()) {
+            addOptionPanel.setVisible(false);
+            return addOptionPanel;
+        }
+
         return addOptionPanel;
     }
     private void updateAddButtonState() {
@@ -154,17 +162,19 @@ public class AddEditOptionListView extends DialogWindow {
 
     private void affichageDesButtons(boolean normal){
         if (btnContainer == null) {
-            btnContainer = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-            btnContainer.addTo(root);
+            btnContainer = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+            root.addComponent(btnContainer);
         } else {
             btnContainer.removeAllComponents();
         }
         if (optionList != null) {
             if (normal) {
-                new Button("Reorder", this::reorder).addTo(btnContainer);
-                btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                if (owner.isAdmin() || !optionList.isSystem()) {
+                    new Button("Reorder", this::reorder).addTo(btnContainer);
+                    btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                    new Button("Save", this::save).addTo(btnContainer);
+                }
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
-                new Button("Save", this::save).addTo(btnContainer);
                 new Button("Close", this::closeAll).addTo(btnContainer);
             } else {
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
@@ -268,12 +278,6 @@ public class AddEditOptionListView extends DialogWindow {
         table.refresh();
         root.invalidate();
 
-    }
-
-    private void addOptionValue() {
-        String label = txtAddOption.getText();
-        controller.addOptionValue(label);
-        txtAddOption.setText("");
     }
 
     public void initialize() {
