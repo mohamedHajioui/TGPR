@@ -9,7 +9,7 @@ public class OptionListValidator {
     public static String validateOptionListName(String name, User owner, OptionList optionList) {
 
         if (name == null || name.isBlank()) {
-            return "Name required";
+            return "name required";
         }
         if (name.length() < 3) {
             return "min 3 characters required";
