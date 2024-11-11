@@ -165,7 +165,7 @@ public class AddEditOptionListView extends DialogWindow {
                 btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
                 new Button("Save", this::save).addTo(btnContainer);
-                new Button("Close", this::close).addTo(btnContainer);
+                new Button("Close", this::closeAll).addTo(btnContainer);
             } else {
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
                 new Button("Confirm order", this::confirmOrder).addTo(btnContainer);

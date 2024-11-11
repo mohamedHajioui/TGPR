@@ -138,17 +138,13 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
         reindexOptions();
 
+        optionList.deleteAllValues();
+
         for (OptionValue option : tempOptions) {
             option.setOptionListId(optionList.getId());
-
-            OptionValue existingOption = OptionValue.getByKey(option.getIdx(), option.getOptionListId());
-            if (existingOption == null) {
-                option.save();
-            } else {
-                existingOption.setLabel(option.getLabel());
-                existingOption.save();
-            }
+            option.save();
         }
+
         saveOptionList();
         isModified = false;
     }
@@ -242,11 +238,16 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void closeAll() {
+        System.out.println("isModified: " + isModified);
         if (isModified) {
-            askConfirmation("Are you sure you want to cancel?", "Cancel");
-            discardChanges();  // est-ce vraiment nécessaire?
+            boolean confirmDiscard = askConfirmation("Are you sure you want to cancel?", "Cancel");
+            if (confirmDiscard) {
+                discardChanges();
+                view.close();
+            }
+        } else {
+            view.close();
         }
-        view.close();
     }
 
     private void discardChanges() {
@@ -260,6 +261,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     public void addToDeleteList(OptionValue option) {
         optionsToDelete.add(option);
+        isModified = true;
     }
 
     public List<OptionValue> loadOptions(OptionList optionList) {
