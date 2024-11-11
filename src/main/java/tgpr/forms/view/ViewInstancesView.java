@@ -131,4 +131,40 @@ public class ViewInstancesView extends DialogWindow {
         }
     }
 
+    private void deleteSelectedInstance() {
+        int selectedRow = instancesTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String id = instancesTable.getTableModel().getCell(0, selectedRow);
+            System.out.println("Delete instance with ID: " + id);
+            Instance instanceDelete = new Instance();
+            instanceDelete.setId(Integer.parseInt(id));
+            instanceDelete.delete();
+
+            instancesTable.getTableModel().removeRow(selectedRow); // Remove row from the table
+        }
+    }
+    private void ButtonDeleteAll() {
+        // Show confirmation dialog
+        MessageDialogButton result = MessageDialog.showMessageDialog(
+                getTextGUI(),
+                "Confirm Delete All",
+                "Are you sure you want to delete all submitted instances?\nThis action cannot be undone.",
+                MessageDialogButton.Yes, MessageDialogButton.No
+        );
+
+        // Proceed with deletion if the user confirms
+        if (result == MessageDialogButton.Yes) {
+            Form form = new Form();
+            form.setId(idForm);
+            form.deleteAllSubmittedInstances();  // Delete all instances
+            instancesTable.getTableModel().clear();  // Clear the table
+        }
+        // If "No" is selected, the dialog simply closes and no action is taken
+    }
+
+
+
+
+
+
 }
