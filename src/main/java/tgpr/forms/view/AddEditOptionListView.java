@@ -28,6 +28,7 @@ public class AddEditOptionListView extends DialogWindow {
     private OptionValue optionValue;
     private final Panel root;
     private final Panel namePanel;
+    private Label nameLabel;
     private TextBox txtName;
     private Label errName;
     private Panel systemCheckBox;
@@ -39,7 +40,7 @@ public class AddEditOptionListView extends DialogWindow {
     private Button btnAddOption;
     //private final Panel btnPanel;
     private Panel btnContainer;
-    //private Button btnCreate;
+    private Button btnCreate;
     private Button btnDelete;
     private List<OptionValue> options = new ArrayList<>();
     private List<OptionValue> optionsToDelete = new ArrayList<>();
@@ -64,21 +65,21 @@ public class AddEditOptionListView extends DialogWindow {
         new EmptySpace().addTo(root);
         affichageDesButtons(normal);
 
-        if (optionList != null) {
-            txtName.setText(optionList.getName());
-            reloadData();
-        }
     }
     private Panel getNamePanel() {
-        final Panel namePanel;
-        namePanel = new Panel().addTo(root)
-                .setLayoutManager(new GridLayout(2).setTopMarginSize(1).setLeftMarginSize(1).setRightMarginSize(2).setHorizontalSpacing(2));
-        new Label("Name: ").addTo(namePanel);
-        txtName = new TextBox(new TerminalSize(37, 1)).addTo(namePanel)
-                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,-_]{0,25}"))
+        final Panel namePanel = new Panel().addTo(root);
+        namePanel.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
+        nameLabel = new Label("Name: ");
+        txtName = new TextBox(new TerminalSize(37, 1))
+                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,()-_]{0,25}"))
                 .setTextChangeListener((txt, byUser) -> validate());
-        new EmptySpace().addTo(namePanel);
-        errName = new Label("name required").addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
+        errName = new Label("").setForegroundColor(TextColor.ANSI.RED);
+
+        namePanel.addComponent(nameLabel);
+        namePanel.addComponent(txtName);
+        namePanel.addComponent(new EmptySpace());
+        namePanel.addComponent(errName);
+
         return namePanel;
     }
 
@@ -98,7 +99,7 @@ public class AddEditOptionListView extends DialogWindow {
                 new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
         ).addTo(root);
         table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
-        table.setSelectAction(this::choice);
+        //table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
         if(!normal){
             reorder();
@@ -108,23 +109,29 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     private Panel getAddOptionPanel() {
-        final Panel addOptionPanel;
+        final Panel addOptionPanel = new Panel().addTo(root);
+        addOptionPanel.setLayoutManager(new GridLayout(2).setLeftMarginSize(1).setRightMarginSize(1));
+
         errAddOption = new Label("at least one value required")
-                .addTo(root)
-                .setForegroundColor(TextColor.ANSI.RED);
-        errAddOption.setVisible(false);
+                .setForegroundColor(TextColor.ANSI.RED)
+                .setVisible(options.isEmpty());
 
-        addOptionPanel = new Panel().addTo(root)
-                .setLayoutManager(new GridLayout(2).setLeftMarginSize(1).setRightMarginSize(1));
-
-        txtAddOption = new TextBox(new TerminalSize(35, 1)).addTo(addOptionPanel)
+        txtAddOption = new TextBox(new TerminalSize(35, 1))
                 .setTextChangeListener((txt, byUser) -> {
                     btnAddOption.setEnabled(!txt.isEmpty());
                     errAddOption.setVisible(options.isEmpty());
                 });
-        btnAddOption = new Button("Add", this::addOptionValue).addTo(addOptionPanel);
-        btnAddOption.setEnabled(!options.isEmpty());
-        //btnCreate.setEnabled(controller.canCreateOptionList());
+        btnAddOption = new Button("Add", () -> {
+            String label = txtAddOption.getText();
+            if (!label.isEmpty()) {
+                controller.addOptionValue(label);
+                txtAddOption.setText("");
+            }
+        });
+        addOptionPanel.addComponent(errAddOption);
+        addOptionPanel.addComponent(new EmptySpace());
+        addOptionPanel.addComponent(txtAddOption);
+        addOptionPanel.addComponent(btnAddOption);
         return addOptionPanel;
     }
 
@@ -148,7 +155,7 @@ public class AddEditOptionListView extends DialogWindow {
                 new Button("Cancel", this::cancelOrder).addTo(btnContainer);
             }
         } else {
-            new Button("Create", this::createOptionList).addTo(btnContainer);
+            //new Button("Create", this::createOptionList).addTo(btnContainer);
             new Button("Close", this::closeAll).addTo(btnContainer);
         }
         root.invalidate();
@@ -185,11 +192,19 @@ public class AddEditOptionListView extends DialogWindow {
         OptionValue selectedOption = table.getSelected();
         if (selectedOption != null) {
             controller.addToDeleteList(selectedOption);
-            //options.remove(selectedOption);
-            //reorder();
-            //table.clear();
-            //table.add(options);
+            options.remove(selectedOption);
+            reindexOptions();
+            table.clear();
+            table.add(options);
         }
+        return true;
+    }
+    public boolean deleteSelectedOption(OptionValue option) {
+        option.delete();
+        options.remove(option);
+        reindexOptions();
+        reloadData();
+        //isModified = true;
         return true;
     }
 
@@ -201,6 +216,7 @@ public class AddEditOptionListView extends DialogWindow {
 
     private void reorder() {
         normal = false;
+        table.setSelectAction(this::choice);
         affichageDesButtons(normal);}
     private void deleteOptionList() {
         boolean canDelete = controller.canDeleteOptionList(optionList);
@@ -210,8 +226,8 @@ public class AddEditOptionListView extends DialogWindow {
     private void alphabetically() {controller.alphabetically();}
     private void confirmOrder() {controller.confirmOrder();}
     private void cancelOrder() {controller.cancelOrder();}
-    public void createOptionList() {controller.createOptionList(txtName.getText(), txtAddOption.getText());}
-    private void save() {controller.save(optionList);}
+    //public void createOptionList() {controller.createOptionList();}
+    private void save() {controller.save();}
     private void closeAll() {controller.closeAll();}
 
     private void validate() {
@@ -226,25 +242,13 @@ public class AddEditOptionListView extends DialogWindow {
         errName.setText(errors.getFirstErrorMessage(Form.Fields.Name));
         //btnCreate.setEnabled(errors.isEmpty() && hasOptions);
     }
-
-    public void reload(List<OptionValue> options) {
-        table.getItems().clear();
-        table.getItems().addAll(options);
-    }
     public void reloadData() {
-        if (optionList != null && options != null) {
-            for (OptionValue option : options) {
-                option.save();
-            }
-            options.clear();
-            List<OptionValue> newOptions = optionList.getOptionValues();
-            if (newOptions != null) {
-                options.addAll(newOptions);
-                options.sort(Comparator.comparingInt(OptionValue::getIdx));
-            }
-            table.clear();
-            table.add(options);
-        }
+        table.clear();
+        List<OptionValue> options = controller.getOptions();
+        options.sort(Comparator.comparingInt(OptionValue::getIdx));
+        table.add(options);
+        root.invalidate();
+
     }
 
     private void addOptionValue() {
@@ -252,32 +256,8 @@ public class AddEditOptionListView extends DialogWindow {
         controller.addOptionValue(label);
         txtAddOption.setText("");
     }
-/*
-15. Si l'utilisateur courant est un admin, il peut éditer toutes les listes d'options,
-y compris les listes "Système".
 
-public void editOptionList(OptionList optionList) {
-    User currentUser = getCurrentUser(); // Méthode pour récupérer l'utilisateur courant
-
-    // Vérifie si la liste est une liste système et si l'utilisateur n'est pas admin
-    if (optionList.isSystem() && !currentUser.isAdmin()) {
-        throw new SecurityException("Vous n'avez pas l'autorisation de modifier cette liste.");
+    public void updateCreateButtonState() {
+            btnCreate.setEnabled(!options.isEmpty());
     }
-
-    }
-if (!currentUser.isAdmin()) {
-    systemCheckbox.setDisable(true); // Désactiver la checkbox pour les non-admins
-}
-
-    public void initializeView(OptionList optionList) {
-        this.optionList = optionList;
-
-        systemCheckBox.setChecked(optionList.isSystem());
-    systemCheckBox.addListener(e -> onSystemCheckBoxChanged());
-    }
-
-    public void onSystemCheckBoxChanged() {
-        controller.handleToggleSystem(systemCheckBox.isChecked());
-    }
-*/
 }
