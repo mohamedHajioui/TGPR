@@ -102,6 +102,7 @@ public class AddEditOptionListView extends DialogWindow {
                 new ColumnSpec<>("Index", OptionValue::getIdx),
                 new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
         ).addTo(root);
+        System.out.println("Table created and added to root");
         table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
         //table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
@@ -119,7 +120,7 @@ public class AddEditOptionListView extends DialogWindow {
 
         errAddOption = new Label("at least one value required")
                 .setForegroundColor(TextColor.ANSI.RED)
-                .setVisible(options.isEmpty());
+                .setVisible(controller.getTempOptions().isEmpty());
 
         txtAddOption = new TextBox(new TerminalSize(35, 1))
                 .setTextChangeListener((txt, byUser) -> {
@@ -216,21 +217,12 @@ public class AddEditOptionListView extends DialogWindow {
     private boolean deleteSelectedOption() {
         OptionValue selectedOption = table.getSelected();
         if (selectedOption != null) {
-            int selectedIdx = selectedOption.getIdx();
-            OptionValue optionToRemove = null;
-            for (OptionValue option : options) {
-                if (option.getIdx() == selectedIdx) {
-                    optionToRemove = option;
-                    break;
-                }
-            }
-            if (optionToRemove != null) {
-                options.remove(optionToRemove);
-                reindexOptions();
-                table.clear();
-                table.add(options);
-                table.refresh();
-            }
+            controller.addToDeleteList(selectedOption);
+            controller.getTempOptions().remove(selectedOption);
+            controller.reindexInMemory(controller.getTempOptions());
+            table.clear();
+            table.add(controller.getTempOptions());
+            table.refresh();
         }
         return true;
     }
@@ -267,12 +259,13 @@ public class AddEditOptionListView extends DialogWindow {
 
     public void reloadData() {
         table.clear();
-        List<OptionValue> currentOptions = controller.getOptions();
-        for (int i = 0; i < currentOptions.size(); i++) {
-            currentOptions.get(i).setIdx(i + 1);
-        }
-        options.sort(Comparator.comparingInt(OptionValue::getIdx));
+        List<OptionValue> currentOptions = controller.getTempOptions();
+        //for (int i = 0; i < currentOptions.size(); i++) {
+        //    currentOptions.get(i).setIdx(i + 1);
+        //}
+//        currentOptions.sort(Comparator.comparingInt(OptionValue::getIdx));
         table.add(currentOptions);
+        table.refresh();
         root.invalidate();
 
     }
@@ -284,8 +277,9 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void initialize() {
-        options = controller.loadOptions(optionList);
-        table.add(options);
-        System.out.println("Options at initialization: " + options);
+        List<OptionValue> tempOptions = controller.getTempOptions();
+        table.clear();
+        table.add(tempOptions);
+        table.refresh();
     }
 }

@@ -27,7 +27,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
         this.owner = owner;
         this.optionList = optionList;
-        this.options = (options != null) ? options : new ArrayList<>();
+        this.options = (options != null) ? options : (optionList != null ? optionList.getOptionValues() : new ArrayList<>());
+        this.tempOptions = new ArrayList<>(this.options);
         this.view = new AddEditOptionListView(this, owner, optionList);
 
         if (this.optionList != null) {
@@ -115,11 +116,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         int newIndex = tempOptions.size() + 1;
         OptionValue newOptionValue = new OptionValue(optionList, newIndex, label);
         tempOptions.add(newOptionValue);
-        System.out.println("Options après ajout :");
-        options.forEach(opt -> System.out.println("Label: " + opt.getLabel() + ", Index: " + opt.getIdx()));
         isModified = true;
         view.reloadData();
         view.updateCreateButtonState();
+    }
+    public List<OptionValue> getTempOptions() {
+        return tempOptions;
     }
     public boolean isOptionDuplicate(String label) {
         return options.stream().anyMatch(option -> option.getLabel().equals(label));
@@ -129,10 +131,24 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void save() {
-        options.clear();
-        options.addAll(tempOptions);
+        for (OptionValue optionValue : optionsToDelete) {
+            optionValue.delete();
+        }
+        optionsToDelete.clear();
+
         reindexOptions();
-        saveOptionValue();
+
+        for (OptionValue option : tempOptions) {
+            option.setOptionListId(optionList.getId());
+
+            OptionValue existingOption = OptionValue.getByKey(option.getIdx(), option.getOptionListId());
+            if (existingOption == null) {
+                option.save();
+            } else {
+                existingOption.setLabel(option.getLabel());
+                existingOption.save();
+            }
+        }
         saveOptionList();
         isModified = false;
     }
@@ -169,16 +185,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void reindexOptions() {
-        for (int i = 0; i < options.size(); i++) {
-            OptionValue option = options.get(i);
+        for (int i = 0; i < tempOptions.size(); i++) {
+            OptionValue option = tempOptions.get(i);
             option.setIdx(i + 1);
-            option.save();
         }
         view.reloadData();
-/*        List<OptionValue> optionValues = options;
-        for (int i = 0; i < optionValues.size(); i++) {
-            optionValues.get(i).setIdx(i + 1);
- */ }
+    }
 
     public void reorder() {
         view.updateButtonDisplay(false);
@@ -238,6 +250,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     private void discardChanges() {
+//        tempOptions.clear();
+//        tempOptions.addAll(options);
         tempOptions = new ArrayList<>(options);
         reindexOptions();
         isModified = false;
