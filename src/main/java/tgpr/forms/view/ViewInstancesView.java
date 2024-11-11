@@ -116,4 +116,19 @@ public class ViewInstancesView extends DialogWindow {
         });
     }
 
+    private void confirmDeleteSelected() {
+        if (instancesTable.getSelectedRow() >= 0) {
+            MessageDialogButton result = MessageDialog.showMessageDialog(
+                    getTextGUI(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete the selected instance?",
+                    MessageDialogButton.Yes, MessageDialogButton.No
+            );
+
+            if (result == MessageDialogButton.Yes) {
+                deleteSelectedInstance();
+            }
+        }
+    }
+
 }
