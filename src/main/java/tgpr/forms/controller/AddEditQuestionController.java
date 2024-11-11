@@ -3,6 +3,7 @@ package tgpr.forms.controller;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
+import tgpr.forms.model.User;
 import tgpr.forms.view.AddEditQuestionView;
 import tgpr.framework.Controller;
 
@@ -12,21 +13,32 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     private final Question question;
     private final Form form;
     private int formId;
+    private final User user;
 
-    public AddEditQuestionController(Question question,Form form) {
+    public AddEditQuestionController(Question question,Form form,User user) {
         this.question = question; // Question à modifier ou null pour une nouvelle question
         this.form = form;
         this.formId = form.getId();
+        this.user = user;
     }
 
     @Override
     public AddEditQuestionView getView() {
-        return new AddEditQuestionView(this, question);
+        return new AddEditQuestionView(this, question,form);
     }
 
     public int getNextIdxForForm() {
         int lastIdx = form.getQuestions().size();
         return lastIdx + 1;
+    }
+    public boolean sameTitle(String title, Form form) {
+        for (Question existingQuestion : form.getQuestions()) {
+            if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
+                System.out.println("Titre en doublon");
+                return true;
+            }
+        }
+        return false;
     }
     public void createQuestion(String title, String description, Question.Type type, OptionList optionList, boolean required) {
 
@@ -64,13 +76,15 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
         // Save the updated question in the database
         question.save();
+        System.out.println("pre");
         getView().close();
+        System.out.println("post");
     }
 
     public void deleteQuestion(Question question) {
         if(askConfirmation("are you sure you want to delete question","Delete question"))
             question.delete();
-        getView().close();
+        navigateTo(new formController(form,user));
     }
     public List<OptionList> getOptionLists() {
         return OptionList.getAll();

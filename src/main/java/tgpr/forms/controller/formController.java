@@ -14,13 +14,18 @@ import java.util.List;
 public class formController extends Controller<view_form> {
 
     private final view_form view;
-    private  Form form;
+    private Form form;
+    private User logedUser;
     private boolean normal = true;
 
-    public formController(Form form) {
+    public formController(Form form,User logedUser) {
         this.form = form;
+        this.logedUser = logedUser;
         view = new view_form(this,form,normal);
     }
+
+    public view_form getView() {return view;}
+
 
     public void makePublic(){
         if (askConfirmation("Are you sure you want to delete all instances?"+"\n Note: This will delete instances currently being edited (not submited).", "Delete All Instances")){
@@ -30,11 +35,13 @@ public class formController extends Controller<view_form> {
     }
 
     public void versAnalyse(){
-        Controller.navigateTo(new TestController());
+        Controller.navigateTo(new AnalyseController(form));
     }
 
+
+
     public void versShare(){
-        Controller.navigateTo(new TestController());
+        Controller.navigateTo(new ManageSharesController(form,logedUser));
     }
 
     public void versEditForm(){
@@ -43,16 +50,15 @@ public class formController extends Controller<view_form> {
     }
 
     public void versNouvelleQuestion(){
-        Controller.navigateTo(new AddEditQuestionController(null,form));
+        Controller.navigateTo(new AddEditQuestionController(null,form,logedUser));
         form.save();
     }
 
     public void versEditQuestion(Question question){
-        Controller.navigateTo(new AddEditQuestionController(question,form));
+        Controller.navigateTo(new AddEditQuestionController(question,form,logedUser));
         form.save();
     }
 
-    public view_form getView() {return view;}
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
@@ -62,6 +68,11 @@ public class formController extends Controller<view_form> {
             form = null;
             Controller.navigateTo(new ViewFormsController(owner));
         }
+    }
+
+    public void versViewForms(){
+        view.close();
+        Controller.navigateTo(new ViewFormsController(logedUser));
     }
 
 

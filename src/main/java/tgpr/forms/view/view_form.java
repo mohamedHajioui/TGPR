@@ -1,5 +1,6 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
@@ -54,15 +55,6 @@ public class view_form extends DialogWindow{
     private boolean normal;
     private ObjectTable<Question> table;
 
-    private final Button nq_button = new Button("New Question");
-    private final Button ef_button = new Button("Edit Form");
-    private final Button df_button = new Button("Delete Form");
-    private final Button s_button = new Button("Share");
-    private final Button r_button = new Button("Reorder");
-    private final Button a_button = new Button("Analyse");
-
-
-
 
     public view_form(formController controller,Form form,boolean normal) {
         super("View Form detail");
@@ -81,6 +73,7 @@ public class view_form extends DialogWindow{
         setHints(List.of(Hint.CENTERED,Hint.MODAL));
         setCloseWindowWithEscape(true);
         Panel root = Panel.verticalPanel();
+        root.setPreferredSize(new TerminalSize(100, 16));
         setComponent(root);
 
         upperDisciption().addTo(root);
@@ -177,10 +170,14 @@ public class view_form extends DialogWindow{
         new Button("Share",this::shares).addTo(panel);
         new Button("Reorder",this::reOrder).addTo(panel);
         new Button("Analyse",this::Analyse).addTo(panel);
-        new Button("Cancel", this::close).addTo(panel);
+        new Button("Cancel", this::backToForms).addTo(panel);
 
         return panel;
     }
+    private void backToForms(){
+        controller.versViewForms();
+    }
+
     private void Analyse(){
         controller.versAnalyse();
     }
@@ -214,8 +211,8 @@ public class view_form extends DialogWindow{
         }else new Button("Make Public", this::makePublic).addTo(panel);
 
         new Button("Clear Instances", this::clearInstances).addTo(panel);
-        new Button("Analyse").addTo(panel);
-        new Button("Close", this::close).addTo(panel);
+        new Button("Analyse", this::Analyse).addTo(panel);
+        new Button("Close", this::backToForms).addTo(panel);
         return panel;
     }
 
