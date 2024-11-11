@@ -216,24 +216,24 @@ public class AddEditOptionListView extends DialogWindow {
     private boolean deleteSelectedOption() {
         OptionValue selectedOption = table.getSelected();
         if (selectedOption != null) {
-            controller.addToDeleteList(selectedOption);
-            options.remove(selectedOption);
-            reindexOptions();
-            table.clear();
-            table.add(options);
+            int selectedIdx = selectedOption.getIdx();
+            OptionValue optionToRemove = null;
+            for (OptionValue option : options) {
+                if (option.getIdx() == selectedIdx) {
+                    optionToRemove = option;
+                    break;
+                }
+            }
+            if (optionToRemove != null) {
+                options.remove(optionToRemove);
+                reindexOptions();
+                table.clear();
+                table.add(options);
+                table.refresh();
+            }
         }
         return true;
     }
-
-    public boolean deleteSelectedOption(OptionValue option) {
-        option.delete();
-        options.remove(option);
-        reindexOptions();
-        reloadData();
-        //isModified = true;
-        return true;
-    }
-
     private void reindexOptions() {
         for (int i = 0; i < options.size(); i++) {
             options.get(i).setIdx(i + 1);
@@ -281,5 +281,11 @@ public class AddEditOptionListView extends DialogWindow {
         String label = txtAddOption.getText();
         controller.addOptionValue(label);
         txtAddOption.setText("");
+    }
+
+    public void initialize() {
+        options = controller.loadOptions(optionList);
+        table.add(options);
+        System.out.println("Options at initialization: " + options);
     }
 }

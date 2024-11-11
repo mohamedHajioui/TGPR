@@ -31,7 +31,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         this.view = new AddEditOptionListView(this, owner, optionList);
 
         if (this.optionList != null) {
-            loadOptions();
+            view.initialize();
         }
     }
 
@@ -247,15 +247,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionsToDelete.add(option);
     }
 
-    public void loadOptions() {
-        options.clear();
-        options.addAll(optionList.getOptionValues());
-        boolean needIndexAssignment = options.stream().allMatch(option -> option.getIdx() == 0);
-        if (needIndexAssignment) {
-            for (int i = 0; i < options.size(); i++) {
-                options.get(i).setIdx(i + 1);
-            }
-        }
-        view.reloadData();
+    public List<OptionValue> loadOptions(OptionList optionList) {
+        return optionList.getOptionValues();
     }
 }
