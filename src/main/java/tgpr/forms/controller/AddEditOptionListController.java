@@ -85,6 +85,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         OptionList newOptionList = new OptionList(name);
         newOptionList.setOwnerId(owner.getId());
         newOptionList.save();
+        this.optionList = newOptionList;
+        saveOptionValue();
     }
 
     public void addOptionValue(String label) {
@@ -99,6 +101,12 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         isModified = true;
     }
 
+    public void saveOptionValue() {
+        for (OptionValue optionValue : options) {
+            optionValue.setOptionListId(optionList.getId());
+            optionValue.save();
+        }
+    }
     public void addOptionInMemory(String label) {
         if (isOptionDuplicate(label)) {
             showError("Option already exists in the list");
