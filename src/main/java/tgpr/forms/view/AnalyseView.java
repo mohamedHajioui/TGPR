@@ -24,6 +24,8 @@ public class AnalyseView extends DialogWindow {
     private Table<String> answersTable;
     private Table<String> questionsTable;
 
+
+
     public AnalyseView(AnalyseController controller, Form currentForm) {
         super("Statistical Analysis of Submitted Instances");
         this.controller = controller;

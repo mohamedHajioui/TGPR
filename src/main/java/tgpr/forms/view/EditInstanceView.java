@@ -30,6 +30,7 @@ public class EditInstanceView extends DialogWindow {
     private User loggedUser;
     private int idForm;
 
+
     public EditInstanceView(EditInstanceController controller, User loggedUser, int idForm) {
         super("Open a form");
         this.controller = controller;

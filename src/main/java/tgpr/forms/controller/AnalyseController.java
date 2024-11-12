@@ -1,9 +1,6 @@
 package tgpr.forms.controller;
 
-import tgpr.forms.model.Answer;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.OptionValue;
-import tgpr.forms.model.Question;
+import tgpr.forms.model.*;
 import tgpr.forms.view.AnalyseView;
 import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
@@ -64,7 +61,7 @@ public class AnalyseController extends Controller<AnalyseView> {
     }
 
     public void viewInstance(){
-        
+
         navigateTo(new ViewInstancesController(currentForm));
     }
 }
