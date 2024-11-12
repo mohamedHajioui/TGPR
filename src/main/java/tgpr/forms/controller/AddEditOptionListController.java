@@ -19,7 +19,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private OptionValue optionValue;
     private List<OptionValue> options;
     List<OptionValue> optionsToDelete = new ArrayList<>();
-    List<OptionValue> originalOptionList;
+    List<OptionValue> originalOptionList = new ArrayList<>();
     private List<OptionValue> tempOptions = new ArrayList<>();
     private boolean isModified = false;
 
@@ -108,7 +108,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         view.updateCreateButtonState();
     }
     public List<OptionValue> getTempOptions() {
-        return tempOptions;
+        return tempOptions != null ? tempOptions : new ArrayList<>();
     }
     public boolean isOptionDuplicate(String label) {
         return options.stream().anyMatch(option -> option.getLabel().equals(label));
@@ -163,12 +163,16 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void reorder() {
+        originalOptionList = new ArrayList<>();
+        for (OptionValue option : tempOptions) {
+            originalOptionList.add(new OptionValue(option.getOptionList(), option.getIdx(), option.getLabel()));
+        }
         view.updateButtonDisplay(false);
         isModified = true;
     }
     public void alphabetically() {
-        options.sort(Comparator.comparing(OptionValue::getLabel));
-        reindexOptions();
+        tempOptions.sort(Comparator.comparing(OptionValue::getLabel));
+        reindexInMemory(tempOptions);
         view.reloadData();
     }
 
@@ -179,7 +183,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
     public void confirmOrder() {
-        optionList.reorderValues(options);
+        optionList.reorderValues(tempOptions);
         isModified = false;
         view.updateButtonDisplay(true);
     }
@@ -194,9 +198,11 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
          */
     }
     public void cancelOrder() {
-        options = new ArrayList<>(originalOptionList);
-        view.reloadData();
-        view.updateButtonDisplay(true);
+        if (originalOptionList != null) {
+            tempOptions = new ArrayList<>(originalOptionList);
+            view.reloadData();
+            view.updateButtonDisplay(true);
+        }
     }
 
     public void handleToggleSystem(boolean isSystem) {

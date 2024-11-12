@@ -246,7 +246,9 @@ public class AddEditOptionListView extends DialogWindow {
     private void reorder() {
         normal = false;
         table.setSelectAction(this::choice);
-        affichageDesButtons(normal);}
+        affichageDesButtons(normal);
+        controller.reorder();
+    }
     private void deleteOptionList() {
         boolean canDelete = controller.canDeleteOptionList(optionList);
         btnDelete.setVisible(canDelete);
@@ -272,11 +274,9 @@ public class AddEditOptionListView extends DialogWindow {
     public void reloadData() {
         table.clear();
         List<OptionValue> currentOptions = controller.getTempOptions();
-        //for (int i = 0; i < currentOptions.size(); i++) {
-        //    currentOptions.get(i).setIdx(i + 1);
-        //}
-//        currentOptions.sort(Comparator.comparingInt(OptionValue::getIdx));
-        table.add(currentOptions);
+        if (currentOptions != null && !currentOptions.isEmpty()) {
+            table.add(currentOptions);
+        }
         table.refresh();
         root.invalidate();
 
