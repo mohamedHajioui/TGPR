@@ -169,21 +169,21 @@ public class AddEditOptionListView extends DialogWindow {
         }
         if (optionList != null) {
             if (normal) {
-                if (owner.isAdmin() || !optionList.isSystem()) {
-                    new Button("Reorder", this::reorder).addTo(btnContainer);
-                    if (!optionList.isUsed()) {
+                if (owner.isAdmin() || !optionList.isSystem()) {    // si ADMIN ou PAS SYSTEM
+                    if (!optionList.isUsed()) {     // SI optionList PAS UTILISéE dans une question
+                        new Button("Reorder", this::reorder).addTo(btnContainer);
                         btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                        new Button("Save", this::save).addTo(btnContainer);
                     }
-                    new Button("Save", this::save).addTo(btnContainer);
-                }
+                }   // TOUJOURS dispo pour consultation
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
                 new Button("Close", this::closeAll).addTo(btnContainer);
-            } else {
+            } else {    // Mode REORDER
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
                 new Button("Confirm order", this::confirmOrder).addTo(btnContainer);
                 new Button("Cancel", this::cancelOrder).addTo(btnContainer);
             }
-        } else {
+        } else {    // Mode CREATE NEW LIST
             btnCreate = new Button("Create", this::createOptionList).addTo(btnContainer);
             btnCreate.setEnabled(false);
             new Button("Close", this::closeAll).addTo(btnContainer);
