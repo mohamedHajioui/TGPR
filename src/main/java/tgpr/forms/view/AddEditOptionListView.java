@@ -171,7 +171,9 @@ public class AddEditOptionListView extends DialogWindow {
             if (normal) {
                 if (owner.isAdmin() || !optionList.isSystem()) {
                     new Button("Reorder", this::reorder).addTo(btnContainer);
-                    btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                    if (!optionList.isUsed()) {
+                        btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);
+                    }
                     new Button("Save", this::save).addTo(btnContainer);
                 }
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);

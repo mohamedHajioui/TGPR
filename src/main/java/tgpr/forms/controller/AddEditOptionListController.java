@@ -150,7 +150,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public boolean canDeleteOptionList(OptionList optionList) {
-        return owner.isAdmin() && !optionList.isUsed() && !optionList.isSystem();
+        return (owner.isAdmin() || owner.getId() == optionList.getOwnerId())
+                && !optionList.isUsed() && !optionList.isSystem();
     }
 
     public void reindexOptions() {

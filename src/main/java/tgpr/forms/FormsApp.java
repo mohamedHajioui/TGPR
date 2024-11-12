@@ -14,8 +14,8 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            User owner = User.getByKey(5);
-            OptionList optionList = OptionList.getByKey(13);
+            User owner = User.getByKey(1);
+            OptionList optionList = OptionList.getByKey(17);
             Controller.navigateTo(new AddEditOptionListController(owner,optionList, null));
             //Controller.navigateTo(new LoginController());
         }
