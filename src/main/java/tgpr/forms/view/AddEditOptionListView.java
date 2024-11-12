@@ -66,9 +66,9 @@ public class AddEditOptionListView extends DialogWindow {
         affichageDesButtons(normal);
 
         txtName.setText(optionList != null ? optionList.getName() : "");
+        errAddOption.setVisible(options.isEmpty());
         updateAddButtonState();
         updateCreateButtonState();
-        errAddOption.setVisible(options.isEmpty());
     }
     private Panel getNamePanel() {
         final Panel namePanel = new Panel().addTo(root);
@@ -77,6 +77,7 @@ public class AddEditOptionListView extends DialogWindow {
         txtName = new TextBox(new TerminalSize(37, 1))
                 .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,()-_]{0,25}"))
                 .setTextChangeListener((txt, byUser) -> validate());
+        updateCreateButtonState();
         errName = new Label("").setForegroundColor(TextColor.ANSI.RED);
 
         namePanel.addComponent(nameLabel);
@@ -93,7 +94,7 @@ public class AddEditOptionListView extends DialogWindow {
         new Label("System: ").addTo(checkBoxPanel);
         checkBoxSystem = new CheckBox().addTo(checkBoxPanel);
         checkBoxSystem.setChecked(optionList != null && optionList.isSystem());
-        checkBoxSystem.addListener((newState) -> controller.handleToggleSystem(newState));
+        checkBoxSystem.addListener(controller::handleToggleSystem);
         checkBoxPanel.setVisible(owner.isAdmin());
         new EmptySpace().addTo(checkBoxPanel);
         return checkBoxPanel;
@@ -104,9 +105,7 @@ public class AddEditOptionListView extends DialogWindow {
                 new ColumnSpec<>("Index", OptionValue::getIdx),
                 new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
         ).addTo(root);
-        System.out.println("Table created and added to root");
         table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
-        //table.setSelectAction(this::choice);
         table.addSelectionChangeListener(this::change);
         if(!normal){
             reorder();
@@ -120,7 +119,7 @@ public class AddEditOptionListView extends DialogWindow {
         final Panel addOptionPanel = new Panel().addTo(root);
         addOptionPanel.setLayoutManager(new GridLayout(2).setLeftMarginSize(1).setRightMarginSize(1));
 
-        errAddOption = new Label("at least one value required")
+        errAddOption = new Label("at least one value required") //!!!
                 .setForegroundColor(TextColor.ANSI.RED)
                 .setVisible(controller.getTempOptions().isEmpty());
 
@@ -141,8 +140,8 @@ public class AddEditOptionListView extends DialogWindow {
         addOptionPanel.addComponent(new EmptySpace());
         addOptionPanel.addComponent(txtAddOption);
         addOptionPanel.addComponent(btnAddOption);
-
-        if (optionList.isSystem() && !owner.isAdmin()) {
+        // si liste SYSTEM        OU    liste USED       ET (user PAS admin   ou   user pas proprio de la liste)
+        if (optionList.isSystem() || optionList.isUsed() && (!owner.isAdmin() || owner.getId() != optionList.getOwnerId())) {
             addOptionPanel.setVisible(false);
             return addOptionPanel;
         }
@@ -156,7 +155,7 @@ public class AddEditOptionListView extends DialogWindow {
 
     public void updateCreateButtonState() {
         if (btnCreate != null) {
-            btnCreate.setEnabled(!controller.getOptions().isEmpty());
+            btnCreate.setEnabled(!controller.getTempOptions().isEmpty());
         }
     }
 
@@ -168,8 +167,8 @@ public class AddEditOptionListView extends DialogWindow {
             btnContainer.removeAllComponents();
         }
         if (optionList != null) {
-            if (normal) {
-                if (owner.isAdmin() || !optionList.isSystem()) {    // si ADMIN ou PAS SYSTEM
+            if (normal) {   // AUTORISATION DE MODIFICATION : ADMIN, LIST PAS SYSTEM
+                if (owner.isAdmin() || !optionList.isSystem()) {   //!!!!!
                     if (!optionList.isUsed()) {     // SI optionList PAS UTILISéE dans une question
                         new Button("Reorder", this::reorder).addTo(btnContainer);
                         btnDelete = new Button("Delete", this::deleteOptionList).addTo(btnContainer);

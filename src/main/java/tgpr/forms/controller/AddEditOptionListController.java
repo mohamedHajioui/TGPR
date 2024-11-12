@@ -90,7 +90,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         saveOptionValue();
     }
     public void saveOptionValue() {
-        for (OptionValue optionValue : options) {
+        for (OptionValue optionValue : tempOptions) {
             optionValue.setOptionListId(optionList.getId());
             optionValue.save();
         }
