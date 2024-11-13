@@ -42,7 +42,7 @@ public class ViewInstancesView extends DialogWindow {
 
         ListInstancesSubmitted();
         addDeleteKeyListener(); // Add Delete key listener
-        addEnterKeyListener();
+        //addEnterKeyListener();
 
         //addKeyboardListener(instancesTable,KeyType.Enter,this::addEnterKeyListener);
     }
@@ -264,6 +264,10 @@ public class ViewInstancesView extends DialogWindow {
     }
 
     private void ViewSubmission() {
+        if (currentUser == null) {
+            System.out.println("Current user is null. Cannot proceed with submission view.");
+            return; // Sortir de la méthode si l'utilisateur n'est pas initialisé
+        }
         setViewTitle("View Answers"); // Titre spécifique pour AnswerForm
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
@@ -431,14 +435,4 @@ public class ViewInstancesView extends DialogWindow {
         Button cancelButton = new Button("Cancel", this::close );
         ;
         buttonPanel.addComponent(cancelButton); // Ajouter le bouton "Cancel"
-    }
-
-
-
-
-
-
-
-
-
-}
+    }}

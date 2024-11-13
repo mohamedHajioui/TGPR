@@ -62,7 +62,7 @@ public class AnalyseController extends Controller<AnalyseView> {
         return question.getAnswers().size();
     }
 
-    public void viewInstance(){
+    public void viewInstance( ) {
 
         navigateTo(new ViewInstancesController(currentForm));
     }
