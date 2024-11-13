@@ -188,14 +188,11 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         view.updateButtonDisplay(true);
     }
     public void duplicate() {
-        optionList.duplicate(owner);
-        //navigateTo(manageOptionLists); OU view.close();
-        //Une fois la copie créée, on revient à la vue de gestion des listes d'options
-        // (voir manage_option_lists).
-        /*
         OptionList duplicateList = optionList.duplicate(owner);
-        navigateTo(ManageOptionListsView.class);
-         */
+        ManageOptionListsController manageController = new ManageOptionListsController(owner);
+        manageController.getOptionLists().add(duplicateList);
+        manageController.getView().reloadData();
+        view.close();
     }
     public void cancelOrder() {
         if (originalOptionList != null) {

@@ -55,7 +55,7 @@ public class ManageOptionListsView extends DialogWindow { ;
         table.setSelectAction(() -> handleEditList(table.getSelected()));
 
     }
-    private void reloadData() {
+    public void reloadData() {
         List<OptionList> optionLists = controller.getOptionLists();
         table.clear();
         table.add(optionLists);
