@@ -35,7 +35,7 @@ public class formController extends Controller<view_form> {
     }
 
     public void versAnalyse(){
-        Controller.navigateTo(new AnalyseController(form));
+        Controller.navigateTo(new AnalyseController(form, logedUser));
     }
 
 
@@ -73,6 +73,10 @@ public class formController extends Controller<view_form> {
     public void versViewForms(){
         view.close();
         Controller.navigateTo(new ViewFormsController(logedUser));
+    }
+
+    public void versViewInstance(){
+        Controller.navigateTo(new ViewInstancesController(form));
     }
 
 

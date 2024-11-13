@@ -1,10 +1,9 @@
 package tgpr.forms.controller;
-
-
-
-
 import tgpr.forms.model.Form;
 import tgpr.forms.model.User;
+import tgpr.forms.model.Form;
+import tgpr.forms.model.User;
+import tgpr.forms.view.EditInstanceView;
 import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
 

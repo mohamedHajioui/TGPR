@@ -30,6 +30,7 @@ public class EditInstanceView extends DialogWindow {
     private User loggedUser;
     private int idForm;
 
+
     public EditInstanceView(EditInstanceController controller, User loggedUser, int idForm) {
         super("Open a form");
         this.controller = controller;
@@ -744,7 +745,7 @@ public class EditInstanceView extends DialogWindow {
 
         if ( Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
-                displayCurrentInputValue(questions);
+                displayCurrentInputValue(questions );
                 displayAnswerList(); // Display the answer list
                 close(); // Close the application
             });

@@ -1,10 +1,8 @@
 package tgpr.forms.controller;
 
-import tgpr.forms.model.Answer;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.OptionValue;
-import tgpr.forms.model.Question;
+import tgpr.forms.model.*;
 import tgpr.forms.view.AnalyseView;
+import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
 
 import java.util.List;
@@ -14,10 +12,12 @@ import java.util.stream.Collectors;
 public class AnalyseController extends Controller<AnalyseView> {
     private final AnalyseView view;
     private Form currentForm;
+    private User currentUser;
 
 
-    public AnalyseController(Form currentFormForm) {
+    public AnalyseController(Form currentFormForm, User currentUser) {
         this.currentForm = currentFormForm;
+        this.currentUser = currentUser;
         this.view = new AnalyseView(this, currentForm);
     }
 

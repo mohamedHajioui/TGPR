@@ -1,12 +1,16 @@
 package tgpr.forms;
 
 
+import tgpr.forms.controller.AnalyseController;
 import tgpr.forms.controller.LoginController;
 
+import tgpr.forms.controller.ViewInstancesController;
+
+import tgpr.forms.controller.*;
+import tgpr.forms.model.*;
+import tgpr.forms.view.AddEditOptionListView;
 import tgpr.framework.Controller;
-import tgpr.forms.controller.formController;
 import tgpr.framework.Model;
-import tgpr.forms.model.User;
 import tgpr.forms.model.Form;
 
 public class FormsApp {
@@ -17,6 +21,8 @@ public class FormsApp {
             Controller.abort("Database is not available!");
         else {
             Controller.navigateTo(new LoginController());
+
+
         }
     }
 }
