@@ -12,10 +12,12 @@ import java.util.stream.Collectors;
 public class AnalyseController extends Controller<AnalyseView> {
     private final AnalyseView view;
     private Form currentForm;
+    private User currentUser;
 
 
-    public AnalyseController(Form currentFormForm) {
+    public AnalyseController(Form currentFormForm, User currentUser) {
         this.currentForm = currentFormForm;
+        this.currentUser = currentUser;
         this.view = new AnalyseView(this, currentForm);
     }
 

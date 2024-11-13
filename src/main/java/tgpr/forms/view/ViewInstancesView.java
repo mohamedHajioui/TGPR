@@ -30,17 +30,21 @@ public class ViewInstancesView extends DialogWindow {
     private Panel mainPanel;
     private Table<String> instancesTable;
     private int currentForm ;
+    private User currentUser;
 
-    public ViewInstancesView(ViewInstancesController controller, int currentForm) {
+    public ViewInstancesView(ViewInstancesController controller, int currentForm,User currentUser ) {
 
         super("Titre par defaut");
         this.controller = controller;
         this.currentForm = currentForm;
+        this.currentUser = currentUser;
 
 
         ListInstancesSubmitted();
         addDeleteKeyListener(); // Add Delete key listener
         addEnterKeyListener();
+
+        //addKeyboardListener(instancesTable,KeyType.Enter,this::addEnterKeyListener);
     }
 
 
@@ -123,6 +127,7 @@ public class ViewInstancesView extends DialogWindow {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
                 if (keyStroke.getKeyType() == KeyType.Delete) {
+                    System.out.println("delete pressed");
                     confirmDeleteSelected();  // Trigger delete action with confirmation
                     hasBeenHandled.set(true);
                 }
@@ -133,13 +138,17 @@ public class ViewInstancesView extends DialogWindow {
         this.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
-                if (keyStroke.getKeyType() == KeyType.Enter) {
-                    ViewSubmission();  // Trigger delete action with confirmation
+                if (keyStroke.getKeyType() == KeyType.Enter || (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '\n')) {
+                    System.out.println("Enter pressed!");
+                    ViewSubmission();
                     hasBeenHandled.set(true);
                 }
             }
         });
+
     }
+
+
 
     private void confirmDeleteSelected() {
         if (instancesTable.getSelectedRow() >= 0) {
@@ -152,7 +161,9 @@ public class ViewInstancesView extends DialogWindow {
 
             if (result == MessageDialogButton.Yes) {
                 deleteSelectedInstance();
-            }
+            }else
+                close();
+
         }
     }
 
@@ -187,7 +198,8 @@ public class ViewInstancesView extends DialogWindow {
             form.setId(currentForm);
             form.deleteAllSubmittedInstances();  // Delete all instances
             instancesTable.getTableModel().clear();  // Clear the table
-        }
+        }else
+            close();
         // If "No" is selected, the dialog simply closes and no action is taken
     }
 
@@ -206,7 +218,8 @@ public class ViewInstancesView extends DialogWindow {
             form.setId(currentForm);
             form.deleteAllInstances();  // Delete all instances
             instancesTable.getTableModel().clear();  // Clear the table
-        }
+        }else
+            close();
         // If "No" is selected, the dialog simply closes and no action is taken
     }
     private int currentQuestionIndex = 0; // Pour suivre l'indice de la question actuelle
@@ -220,7 +233,6 @@ public class ViewInstancesView extends DialogWindow {
     private LocalDateTime started ;
     private LocalDateTime complited = null;
     Instance latestInstanceByForm;
-    private int currentUser = 2;
 
     public Instance getLatestInstance(List<Instance> instances) {
         return instances.stream()
@@ -265,7 +277,7 @@ public class ViewInstancesView extends DialogWindow {
         latestInstanceByForm = getLatestInstance(value);
         Instance FirstInstance = getFirstInstance(value);
 
-        User user = User.getByKey(currentUser);
+        User user = User.getByKey(currentUser.getId());
         Form formData = Form.getByKey(currentForm);
 
         // Créer et ajouter les labels principaux (Title, Description, Date)
@@ -366,7 +378,7 @@ public class ViewInstancesView extends DialogWindow {
     // Use this utility method elsewhere to get answers for a specific instance
     public List<Answer> getAnswersForQuestion(Question question) {
         // Retrieve all answers for the specified instance
-        Integer idInstance = getFirstCompletedInstanceIdByUserAndForm(currentUser, currentForm );
+        Integer idInstance = getFirstCompletedInstanceIdByUserAndForm(currentUser.getId(), currentForm );
 
         Instance instance = new Instance();
         instance.setId(idInstance);
