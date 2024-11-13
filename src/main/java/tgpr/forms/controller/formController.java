@@ -75,5 +75,9 @@ public class formController extends Controller<view_form> {
         Controller.navigateTo(new ViewFormsController(logedUser));
     }
 
+    public void versViewInstance(){
+        Controller.navigateTo(new ViewInstancesController(form));
+    }
+
 
 }

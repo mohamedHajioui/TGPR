@@ -218,9 +218,7 @@ public class view_form extends DialogWindow{
 
     private void clearInstances(){
 
-        form.deleteAllInstances();
-        form.save();
-        affichage(normal);
+        controller.versViewInstance();
     }
 
     private void makePublic(){
