@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Form extends Model {
     public enum Fields {
-        Id, Title, Description, Owner, IsPublic;
+        Id, Title, Description, Owner, IsPublic, Name;
     }
 
     public Form() {
