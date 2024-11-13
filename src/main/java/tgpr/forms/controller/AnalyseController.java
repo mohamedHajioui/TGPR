@@ -63,6 +63,6 @@ public class AnalyseController extends Controller<AnalyseView> {
     }
 
     public void viewInstance(){
-        navigateTo(new TestController());
+        navigateTo(new ViewInstancesController(currentForm));
     }
 }
