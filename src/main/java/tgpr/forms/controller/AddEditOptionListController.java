@@ -192,7 +192,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         ManageOptionListsController manageController = new ManageOptionListsController(owner);
         manageController.getOptionLists().add(duplicateList);
         manageController.getView().reloadData();
-        view.close();
+        navigateTo(manageController);
+
     }
     public void cancelOrder() {
         if (originalOptionList != null) {
