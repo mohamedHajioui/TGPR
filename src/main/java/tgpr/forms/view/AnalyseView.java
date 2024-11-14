@@ -126,17 +126,20 @@ public class AnalyseView extends DialogWindow {
 
     public void updateAnswersTable(Question question) {
         answersTable.getTableModel().clear();
+
         Map<String, Long> answerStats = controller.getAnswerStatistics(question);
-        long totalResponses = controller.getTotalResponses(question);
+        long totalInstances = controller.getSubmittedInstancesCount();
+
         answerStats.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEach(entry -> {
                     String answerText = entry.getKey();
                     Long occurrences = entry.getValue();
-                    double ratio = totalResponses > 0 ? (double) occurrences / totalResponses * 100 : 0;
+                    double ratio = totalInstances > 0 ? (double) occurrences / totalInstances * 100 : 0.0;
+
                     answersTable.getTableModel().addRow(
-                            answerText,
-                            "      " + occurrences.toString(),
+                            String.format("%-20s", answerText),
+                            String.format("%7d", occurrences),
                             String.format("   %.1f%%", ratio)
                     );
                 });
