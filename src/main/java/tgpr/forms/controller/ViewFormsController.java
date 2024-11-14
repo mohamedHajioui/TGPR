@@ -1,4 +1,5 @@
 package tgpr.forms.controller;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.model.*;
 import tgpr.forms.view.LoginView;
 import tgpr.forms.view.ViewFormsView;
@@ -149,12 +150,4 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         navigateTo(new AddEditFormController(currentUser, null));
 
     }
-
-
-
-
-
-
-
-
 }
