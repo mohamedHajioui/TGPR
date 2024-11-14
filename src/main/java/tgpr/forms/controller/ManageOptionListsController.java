@@ -24,8 +24,12 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
         return OptionList.getAll();
     }
 
-    public void navigateToOptionList(OptionList optionList){
-        navigateTo(new AddEditOptionListController(currentUser, optionList, optionList.getOptionValues()));
+    public void navigateToOptionList(OptionList optionList) {
+        if (optionList.getOptionValues().isEmpty()){
+            navigateTo(new AddEditOptionListController(currentUser));
+        }else navigateTo(new AddEditOptionListController(currentUser, optionList));
+
+
 
     }
 }

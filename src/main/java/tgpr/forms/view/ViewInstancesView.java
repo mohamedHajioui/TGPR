@@ -12,6 +12,7 @@ import tgpr.forms.controller.ViewInstancesController;
 import tgpr.forms.model.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -76,13 +77,17 @@ public class ViewInstancesView extends DialogWindow {
         List<Instance> completedInstances = form.getCompletedInstances();
         instancesTable.getTableModel().clear();
 
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"); // format souhaité
+
         for (Instance instance : completedInstances) {
             String id = String.valueOf(instance.getId());
             User user = User.getByKey(instance.getUserId());
             String userName = user.getName();
-            String completedDate = instance.getCompleted().toString();
 
-            instancesTable.getTableModel().addRow(id, userName, completedDate);
+            LocalDateTime completedDate = instance.getCompleted(); // Supposons que getCompleted() renvoie un LocalDateTime
+            String formattedCompletedDate = completedDate.format(dateFormatter);
+
+            instancesTable.getTableModel().addRow(id, userName, formattedCompletedDate);
         }
         mainPanel.addComponent(instancesTable);
 
