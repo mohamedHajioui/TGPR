@@ -31,6 +31,8 @@ public class AddEditQuestionView extends DialogWindow {
     private final Label errOptionList;
     private Form form;
 
+
+
     public AddEditQuestionView(AddEditQuestionController controller, Question question,Form form) {
         super((question == null ? "Add " : "Edit ") + "Question");
         this.controller = controller;
@@ -93,6 +95,7 @@ public class AddEditQuestionView extends DialogWindow {
         cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
         cbOption.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> validateOptionList());
 
+
         List<OptionList> optionLists = controller.getOptionLists();
         for (OptionList optionList : optionLists) {
             cbOption.addItem(optionList);
@@ -119,8 +122,9 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem(),
-                    cklRequired.isChecked()
+                    cklRequired.isChecked(),
+                    cbOption.getSelectedItem()
+
 
             );
             close();
@@ -134,8 +138,8 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem(),
-                    cklRequired.isChecked()
+                    cklRequired.isChecked(),
+                    cbOption.getSelectedItem()
             );
         }
         close();

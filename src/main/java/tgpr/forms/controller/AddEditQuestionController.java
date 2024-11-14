@@ -33,14 +33,17 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
     public boolean sameTitle(String title, Form form) {
         for (Question existingQuestion : form.getQuestions()) {
-            if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
-                System.out.println("Titre en doublon");
-                return true;
+            if(existingQuestion.getId() != question.getId()) {
+                if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
+                    System.out.println("Titre en doublon");
+                    return true;
+                }
             }
+
         }
         return false;
     }
-    public void createQuestion(String title, String description, Question.Type type, OptionList optionList, boolean required) {
+    public void createQuestion(String title, String description, Question.Type type, boolean required,OptionList optionList) {
 
         Question newQuestion = new Question();
         newQuestion.setTitle(title);
@@ -60,19 +63,19 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         getView().close();
     }
 
-    public void updateQuestion(Question question, String title, String description, Question.Type type, OptionList optionList, boolean required) {
+    public void updateQuestion(Question question, String title, String description, Question.Type type,  boolean required,OptionList optionList) {
         // Update the existing question
         question.setTitle(title);
         question.setDescription(description);
         question.setType(type);
-
+        question.setRequired(required);
         // Handle optionList if required by the question type
         if (type.requiresOptionList()) {
             question.setOptionListId(optionList != null ? optionList.getId() : null);
         } else {
             question.setOptionListId(null); // Clear option list if not required
         }
-        question.setRequired(required);
+
 
         // Save the updated question in the database
         question.save();
