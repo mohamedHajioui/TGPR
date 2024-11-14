@@ -73,7 +73,6 @@ public class EditInstanceView extends DialogWindow {
 
     private void RequestConfirmation() {
 
-
         User user = User.getByKey(loggedUser.getId());
 
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
@@ -265,6 +264,15 @@ public class EditInstanceView extends DialogWindow {
             case "email":
             case "date":
                 TextBox textBox = addTextBoxInput(45);
+                textBox.setTextChangeListener((newText, changedByUser) -> {
+                    if (question.getRequired() && newText.trim().isEmpty()) {
+                        errorMessageLabel.setText("This question is required");
+                    } else {
+                        errorMessageLabel.setText("");
+                    }
+                });
+                errorMessageLabel = new Label("").setForegroundColor(TextColor.ANSI.RED);
+                questionPanel.addComponent(errorMessageLabel);
                 if (currentAnswer != null && currentAnswer[2] instanceof String ) {
                     textBox.setText((String) currentAnswer[2]);
                 } else {
@@ -273,6 +281,15 @@ public class EditInstanceView extends DialogWindow {
                 break;
             case "long":
                 TextBox longTextBox = addTextBoxInput(55);
+               longTextBox.setTextChangeListener((newText, changedByUser) -> {
+                    if (question.getRequired() && newText.trim().isEmpty()) {
+                        errorMessageLabel.setText("This question is required");
+                    } else {
+                        errorMessageLabel.setText("");
+                    }
+                });
+                errorMessageLabel = new Label("").setForegroundColor(TextColor.ANSI.RED);
+                questionPanel.addComponent(errorMessageLabel);
                 if (currentAnswer != null && currentAnswer[2] instanceof String) {
                     longTextBox.setText((String) currentAnswer[2]);
                 } else {
@@ -415,18 +432,6 @@ public class EditInstanceView extends DialogWindow {
         // Render the appropriate input fields based on question type
         addSpacingLabel(questionPanel, 1);
         renderQuestionInput(question);
-
-        // Display "Input Required" label if the question is required
-        if (question.getRequired()) {
-            Label requiredLabelText = new Label("This question is required").setForegroundColor(TextColor.ANSI.RED);
-            questionPanel.addComponent(requiredLabelText);
-        }
-
-        // Error message label
-        errorMessageLabel = new Label("").setForegroundColor(TextColor.ANSI.RED);
-        questionPanel.addComponent(errorMessageLabel);
-
-        // Refresh and update button visibility for navigation
         questionPanel.invalidate();
         updateButtonPanel(questions.size(), questions);
     }
@@ -714,7 +719,7 @@ public class EditInstanceView extends DialogWindow {
 
 
         nextButton = new Button("Next", () -> {
-            errorMessageLabel.setText(""); // Clear previous error message
+            //errorMessageLabel.setText(""); // Clear previous error message
 
             // Pass the current question to isInputValid
             Question currentQuestion = questions.get(currentQuestionIndex);
@@ -835,7 +840,7 @@ public class EditInstanceView extends DialogWindow {
             // Ajouter "SUBMIT" si c'est la dernière question
             Button saveButton = new Button("Submit", () -> {
                 // Clear any previous error messages
-                errorMessageLabel.setText("");
+                //errorMessageLabel.setText("");
 
                 // Retrieve the current question and component
 

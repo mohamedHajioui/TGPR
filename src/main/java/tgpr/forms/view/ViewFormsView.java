@@ -11,6 +11,8 @@ import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
 import tgpr.framework.Configuration;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -154,14 +156,29 @@ public class ViewFormsView extends BasicWindow {
                     nameOfCreator(formPanel, form);
 
                     var instance = form.getMostRecentInstance(currentUser);
-                    String startDate = (instance != null) ? "Started on " + instance.getStarted().toString() : "Not started";
+                    String startDate;
+
+                    if (instance != null) {
+                        LocalDateTime startedDate = instance.getStarted(); // Supposons que getStarted() renvoie un LocalDateTime
+                        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
+                        startDate = "Started on " + startedDate.format(dateFormatter);
+                    } else {
+                        startDate = "Not started";
+                    }
                     Label startLabel = new Label(startDate);
                     startLabel.center();
                     formPanel.addComponent(startLabel);
 
-                    if (startDate != "Not started") {
-                        String submissionDate = (instance != null && instance.getCompleted() != null) ?
-                                "Submitted on " + instance.getCompleted().toString() : "In Progress";
+                    if (!"Not started".equals(startDate)) {
+                        String submissionDate;
+
+                        if (instance != null && instance.getCompleted() != null) {
+                            LocalDateTime completedDate = instance.getCompleted(); // Supposons que getCompleted() renvoie un LocalDateTime
+                            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
+                            submissionDate = "Submitted on " + completedDate.format(dateFormatter);
+                        } else {
+                            submissionDate = "In Progress";
+                        }
                         Label submissionLabel = new Label(submissionDate);
                         submissionLabel.center();
                         formPanel.addComponent(submissionLabel);
