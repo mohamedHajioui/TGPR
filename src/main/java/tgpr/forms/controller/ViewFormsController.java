@@ -107,11 +107,28 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         if (filter == null || filter.isEmpty()) {
             filteredForms = forms;  // Si le filtre est vide, afficher tous les formulaires
         } else {
+            String lowerCaseFilter = filter.toLowerCase();
             filteredForms = forms.stream()
-                    .filter(form -> (form.getTitle() != null && form.getTitle().toLowerCase().startsWith(filter.toLowerCase())) ||
-                            (form.getDescription() != null && form.getDescription().toLowerCase().startsWith(filter.toLowerCase())))
-                    .collect(Collectors.toList());  // Filtrer la liste en fonction de la clé de recherche
+                    .filter(form -> {
+                        // Filtre sur le titre et la description du formulaire
+                        boolean matchesFormTitle = form.getTitle() != null && form.getTitle().toLowerCase().contains(lowerCaseFilter);
+                        boolean matchesFormDescription = form.getDescription() != null && form.getDescription().toLowerCase().contains(lowerCaseFilter);
+
+                        // Filtre sur le nom du créateur
+                        boolean matchesCreatorName = form.getOwner() != null && form.getOwner().getName().toLowerCase().contains(lowerCaseFilter);
+
+                        // Filtre sur le titre et la description des questions
+                        boolean matchesQuestion = form.getQuestions().stream().anyMatch(question ->
+                                (question.getTitle() != null && question.getTitle().toLowerCase().contains(lowerCaseFilter)) ||
+                                        (question.getDescription() != null && question.getDescription().toLowerCase().contains(lowerCaseFilter))
+                        );
+
+                        // Retourner true si au moins une des conditions est remplie
+                        return matchesFormTitle || matchesFormDescription || matchesCreatorName || matchesQuestion;
+                    })
+                    .collect(Collectors.toList());
         }
+
         // Utiliser la méthode displayForms pour afficher les formulaires filtrés
         view.displayForms(filteredForms, 0, 9);  // Réinitialiser à la page 0 et afficher 9 formulaires par page
     }
