@@ -214,13 +214,13 @@ public class EditInstanceView extends DialogWindow {
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
         Label dateLabel;
         if (latestInstanceByForm != null && latestInstanceByForm.getStarted() != null) {
-            dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().toString());
+            dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().format(formatter));
         } else {
             dateLabel = new Label("Started on: Not started");
         }
-
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(dateLabel);
@@ -1054,6 +1054,10 @@ public class EditInstanceView extends DialogWindow {
 
 
     private void ViewSubmission() {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:m:s");
+
+
         setViewTitle("View Answers"); // Titre spécifique pour AnswerForm
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
@@ -1073,8 +1077,15 @@ public class EditInstanceView extends DialogWindow {
         // Créer et ajouter les labels principaux (Title, Description, Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label startedOn = new Label("Started On: " + (FirstInstance.getStarted() != null ? FirstInstance.getStarted() : "null"));
-        Label dateLabel = new Label("Submitted on: " + (latestInstanceByForm.getCompleted() != null ? latestInstanceByForm.getCompleted() : "null"));
+
+        // Formatage de la date pour 'Started On' et 'Submitted on'
+        String startedDate = (FirstInstance.getStarted() != null)
+                ? FirstInstance.getStarted().format(dateFormatter) : "null";
+        String completedDate = (latestInstanceByForm.getCompleted() != null)
+                ? latestInstanceByForm.getCompleted().format(dateFormatter) : "null";
+
+        Label startedOn = new Label("Started On: " + startedDate);
+        Label dateLabel = new Label("Submitted on: " + completedDate);
         Label submitterLabel = new Label("Submitted by: " + user.getFullName());
 
         mainPanel.addComponent(titleLabel);
@@ -1082,6 +1093,7 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.addComponent(startedOn);
         mainPanel.addComponent(dateLabel);
         mainPanel.addComponent(submitterLabel);
+
 
         // Créer un panneau pour afficher la réponse actuelle
         questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
