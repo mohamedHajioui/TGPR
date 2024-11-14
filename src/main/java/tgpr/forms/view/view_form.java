@@ -142,7 +142,8 @@ public class view_form extends DialogWindow{
         System.out.println("questionList");
         form.reload();
         table = new ObjectTable<Question>(
-                new ColumnSpec<>("index title", Question::getIdx),
+                new ColumnSpec<>("index", Question::getIdx),
+                new ColumnSpec<>("title",Question::getTitle),
                 new ColumnSpec<>("Type", Question::getType),
                 new ColumnSpec<>("Required", Question::getRequired),
                 new ColumnSpec<>("Option List", q -> ifNull(q.getOptionList(),""))
