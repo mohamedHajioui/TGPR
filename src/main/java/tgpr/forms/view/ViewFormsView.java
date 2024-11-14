@@ -76,6 +76,22 @@ public class ViewFormsView extends BasicWindow {
         mainPanel.addComponent(buttonCreateNewForm);    // Panneau de navigation avec "Create a new form"
 
         setComponent(mainPanel);
+        paginationPgUpPgDn(controller);
+    }
+
+    private void paginationPgUpPgDn(ViewFormsController controller) {
+        addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.PageUp) {
+                    controller.goToPreviousPage();
+                    hasBeenHandled.set(true);
+                } else if (keyStroke.getKeyType() == KeyType.PageDown) {
+                    controller.goToNextPage();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
     }
 
     private Panel buttonsFileAndParameters() {
