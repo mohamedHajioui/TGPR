@@ -73,7 +73,6 @@ public class EditInstanceView extends DialogWindow {
 
     private void RequestConfirmation() {
 
-
         User user = User.getByKey(loggedUser.getId());
 
         boolean exists = checkInstanceExists(loggedUser.getId(), idForm);
