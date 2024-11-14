@@ -89,6 +89,9 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     public List<OptionList> getOptionLists() {
         return OptionList.getAll();
     }
+    public void navigatetoAddOptionList(){
+        navigateTo(new AddEditOptionListController(user));
+    }
 
 }
 

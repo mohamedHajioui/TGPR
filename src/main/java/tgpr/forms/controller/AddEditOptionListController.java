@@ -17,24 +17,37 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     private OptionList optionList;
     private User owner;
     private OptionValue optionValue;
-    private List<OptionValue> options;
+    private List<OptionValue> options= new ArrayList<>();;
     List<OptionValue> optionsToDelete = new ArrayList<>();
     List<OptionValue> originalOptionList = new ArrayList<>();
-    private List<OptionValue> tempOptions = new ArrayList<>();
+    private List<OptionValue> tempOptions;
     private boolean isModified = false;
+    //private ManageOptionListsController manageOptionListsController;
 
 
-    public AddEditOptionListController(User owner, OptionList optionList, List<OptionValue> options) {
+    public AddEditOptionListController(User owner, OptionList optionList) {
         this.owner = owner;
         this.optionList = optionList;
-        this.options = (options != null) ? options : (optionList != null ? optionList.getOptionValues() : new ArrayList<>());
-        this.tempOptions = new ArrayList<>(this.options);
-        this.view = new AddEditOptionListView(this, owner, optionList);
+        tempOptions = optionList.getOptionValues();
+        //this.manageOptionListsController = new ManageOptionListsController(owner);
+        //this.tempOptions = new ArrayList<>(this.options);
+         this.view = new AddEditOptionListView(this, owner, optionList);
 
         if (this.optionList != null) {
             view.initialize();
         }
     }
+    public AddEditOptionListController(User owner) {
+        this.owner = owner;
+        this.view = new AddEditOptionListView(this, owner);
+        //this.manageOptionListsController = new ManageOptionListsController(owner);
+        this.tempOptions = new ArrayList<>();
+        if (this.optionList != null) {
+            view.initialize();
+        }
+    }
+
+
 
     @Override
     public AddEditOptionListView getView() {
@@ -72,8 +85,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         return nextId;
     }
 
-    public OptionList createNewOptionList(String name) {  // méthode pour le bouton new List dans Manage Option List
-        OptionList newOptionList = new OptionList(name);
+    public OptionList createNewOptionList() {  // méthode pour le bouton new List dans Manage Option List
+        OptionList newOptionList = new OptionList();
         int nextId = getNextAvailableId();
         newOptionList.setId(nextId);
         newOptionList.setOwnerId(owner.getId());
@@ -88,6 +101,10 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         newOptionList.save();
         this.optionList = newOptionList;
         saveOptionValue();
+        save();
+        optionList.save();
+        view.close();
+
     }
     public void saveOptionValue() {
         for (OptionValue optionValue : tempOptions) {
@@ -192,7 +209,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         ManageOptionListsController manageController = new ManageOptionListsController(owner);
         manageController.getOptionLists().add(duplicateList);
         manageController.getView().reloadData();
-        navigateTo(manageController);
+        view.close();
+
 
     }
     public void cancelOrder() {

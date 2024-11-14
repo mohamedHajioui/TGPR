@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.table.Table;
+import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
 import tgpr.framework.ViewManager;
@@ -17,6 +18,7 @@ public class ManageOptionListsView extends DialogWindow { ;
     private final ManageOptionListsController controller;
     private final Button newListButton;
     private final Button cancelButton;
+    private AddEditOptionListController addEditOptionListController;
 
     public ManageOptionListsView(ManageOptionListsController controller) {
         super("Manage Option Lists");

@@ -5,7 +5,7 @@
 ### Liste des utilisateurs et mots de passe
 
   * login, password, role
-  * A compléter...
+  * A compléter... 
 
 ### Liste des bugs connus
 
@@ -16,5 +16,4 @@
 ### Liste des fonctionnalités supplémentaires
 
 ### Divers
-
 ...

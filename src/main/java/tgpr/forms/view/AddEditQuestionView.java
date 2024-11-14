@@ -68,7 +68,7 @@ public class AddEditQuestionView extends DialogWindow {
         new Label("Option List :").addTo(root);
         Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         cbOption = new ComboBox<OptionList>().addTo(optionPanel);
-        btnAddEdit = new Button("Add").addTo(optionPanel);
+        btnAddEdit = new Button("Add",this::handleAddOptionList).addTo(optionPanel);
         new EmptySpace(new TerminalSize(1,2)).addTo(root);
         errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
@@ -108,7 +108,10 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
 
+    private void handleAddOptionList(){
+        controller.navigatetoAddOptionList();
 
+    }
 
     private void handleCreate() {
         if (validateFields()) {
