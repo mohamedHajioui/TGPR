@@ -224,6 +224,8 @@ public class view_form extends DialogWindow{
 
     private void makePublic(){
         controller.makePublic();
+        form.setIsPublic(true);
+        form.save();
         affichage(normal);
 
     }
