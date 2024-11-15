@@ -110,10 +110,15 @@ public class AddEditQuestionView extends DialogWindow {
         }
     }
 
-
+    public void reloadData(){
+        cbOption.clearItems();
+        OptionList.getAll().forEach(cbOption::addItem);
+        cbOption.invalidate();
+        updateOptionListState();
+    }
     private void handleAddOptionList(){
         controller.navigatetoAddOptionList();
-
+        reloadData();
     }
 
     private void handleCreate() {
@@ -145,10 +150,9 @@ public class AddEditQuestionView extends DialogWindow {
         }
 
     }
-
-
     private void handleDelete() {
         controller.deleteQuestion(question);
+
     }
 
     private void handleCancel() {
