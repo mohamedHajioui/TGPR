@@ -65,11 +65,14 @@ public class ManageOptionListsView extends DialogWindow { ;
     }
     private void handleNewList() {
         controller.navigateToOptionList(new OptionList());
+        reloadData();
     }
     private void handleEditList(OptionList optionList) {
         if(optionList != null) {
             controller.navigateToOptionList(optionList);
         }
+        reloadData();
+
     }
 
 

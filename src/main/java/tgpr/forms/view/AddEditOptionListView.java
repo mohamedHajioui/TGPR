@@ -108,7 +108,7 @@ public class AddEditOptionListView extends DialogWindow {
         namePanel.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
         nameLabel = new Label("Name: ");
         txtName = new TextBox(new TerminalSize(37, 1))
-                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,()-_]{0,25}"))
+                .setValidationPattern(Pattern.compile("[a-z A-Z][a-z A-Z\\d.;:/,()-_]{0,30}"))
                 .setTextChangeListener((txt, byUser) -> validate());
         updateCreateButtonState();
         errName = new Label("").setForegroundColor(TextColor.ANSI.RED);

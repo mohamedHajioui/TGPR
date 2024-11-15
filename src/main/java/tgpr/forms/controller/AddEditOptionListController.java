@@ -105,7 +105,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.save();
 
         view.close();
-        navigateTo(new ManageOptionListsController(owner));
+
 
     }
     public void saveOptionValue() {
@@ -210,9 +210,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         OptionList duplicateList = optionList.duplicate(owner);
         ManageOptionListsController manageController = new ManageOptionListsController(owner);
         manageController.getOptionLists().add(duplicateList);
-        manageController.getView().reloadData();
         view.close();
-        navigateTo(manageController);
+
 
     }
     public void cancelOrder() {
