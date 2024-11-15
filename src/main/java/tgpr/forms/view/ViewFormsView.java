@@ -76,7 +76,25 @@ public class ViewFormsView extends BasicWindow {
         mainPanel.addComponent(buttonCreateNewForm);    // Panneau de navigation avec "Create a new form"
 
         setComponent(mainPanel);
+        addKeyListener(KeyType.PageUp, () -> controller.goToNextPage());
+        addKeyListener(KeyType.PageDown, () -> controller.goToPreviousPage());
+
     }
+
+    private void addKeyListener(KeyType keyType, Runnable action) {
+        this.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == keyType) {
+                    action.run();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
+    }
+
+
+
 
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));

@@ -44,8 +44,10 @@ public class AddEditOptionListView extends DialogWindow {
     private Button btnDelete;
     private List<OptionValue> options = new ArrayList<>();
     private List<OptionValue> optionsToDelete = new ArrayList<>();
+
+
     public AddEditOptionListView(AddEditOptionListController controller, User owner, OptionList optionList) {
-        super((optionList == null ? "Create" : "Update") + " Option List");
+        super("Update" + " Option List");
 
         this.controller = controller;
         this.owner = owner;
@@ -65,7 +67,38 @@ public class AddEditOptionListView extends DialogWindow {
         new EmptySpace().addTo(root);
         affichageDesButtons(normal);
 
-        txtName.setText(optionList != null ? optionList.getName() : "");
+        txtName.setText(optionList.getName());
+
+
+        errAddOption.setVisible(options.isEmpty());
+        updateAddButtonState();
+        updateCreateButtonState();
+    }
+
+    public AddEditOptionListView(AddEditOptionListController controller, User owner) {
+        super("Create" + " Option List");
+
+        this.controller = controller;
+        this.owner = owner;
+        this.optionList = new OptionList();
+
+        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setFixedSize(new TerminalSize(47, 17));
+
+        root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        setComponent(root);
+
+        namePanel = getNamePanel();
+        systemCheckBox = getCheckbox();
+        table = getTable();
+        addOptionPanel = getAddOptionPanel();
+        new EmptySpace().addTo(root);
+        new EmptySpace().addTo(root);
+        affichageDesButtons(normal);
+
+        txtName.setText(optionList.getName());
+
+
         errAddOption.setVisible(options.isEmpty());
         updateAddButtonState();
         updateCreateButtonState();
@@ -103,9 +136,9 @@ public class AddEditOptionListView extends DialogWindow {
         final ObjectTable<OptionValue> table;
         table = new ObjectTable<>(
                 new ColumnSpec<>("Index", OptionValue::getIdx),
-                new ColumnSpec<>("Label", OptionValue::getLabel).setMinWidth(40)
+                new ColumnSpec<>("Label", OptionValue::getLabel).setMaxWidth(40)
         ).addTo(root);
-        table.setPreferredSize(new TerminalSize(getTerminalColumns(), 9));
+        table.add(optionList.getOptionValues());
         table.addSelectionChangeListener(this::change);
         if(!normal){
             reorder();
@@ -166,7 +199,7 @@ public class AddEditOptionListView extends DialogWindow {
         } else {
             btnContainer.removeAllComponents();
         }
-        if (optionList != null) {
+        if (!optionList.getOptionValues().isEmpty()) {
             if (normal) {   // AUTORISATION DE MODIFICATION : ADMIN, LIST PAS SYSTEM
                 if (owner.isAdmin() || !optionList.isSystem()) {   //!!!!!
                     if (!optionList.isUsed()) {     // SI optionList PAS UTILISéE dans une question
@@ -177,7 +210,7 @@ public class AddEditOptionListView extends DialogWindow {
                 }   // TOUJOURS dispo pour consultation
                 new Button("Duplicate", this::duplicate).addTo(btnContainer);
                 new Button("Close", this::closeAll).addTo(btnContainer);
-            } else {    // Mode REORDER
+            } else {// Mode REORDER
                 new Button("Alphabetically", this::alphabetically).addTo(btnContainer);
                 new Button("Confirm order", this::confirmOrder).addTo(btnContainer);
                 new Button("Cancel", this::cancelOrder).addTo(btnContainer);

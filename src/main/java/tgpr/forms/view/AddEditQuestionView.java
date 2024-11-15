@@ -31,6 +31,8 @@ public class AddEditQuestionView extends DialogWindow {
     private final Label errOptionList;
     private Form form;
 
+
+
     public AddEditQuestionView(AddEditQuestionController controller, Question question,Form form) {
         super((question == null ? "Add " : "Edit ") + "Question");
         this.controller = controller;
@@ -68,7 +70,7 @@ public class AddEditQuestionView extends DialogWindow {
         new Label("Option List :").addTo(root);
         Panel optionPanel = new Panel(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         cbOption = new ComboBox<OptionList>().addTo(optionPanel);
-        btnAddEdit = new Button("Add").addTo(optionPanel);
+        btnAddEdit = new Button("Add",this::handleAddOptionList).addTo(optionPanel);
         new EmptySpace(new TerminalSize(1,2)).addTo(root);
         errOptionList = new Label("").addTo(root).setForegroundColor(TextColor.ANSI.RED);
 
@@ -93,6 +95,7 @@ public class AddEditQuestionView extends DialogWindow {
         cbType.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> updateOptionListState());
         cbOption.addListener((selectedIndex, previousSelection, changedByUserInteraction) -> validateOptionList());
 
+
         List<OptionList> optionLists = controller.getOptionLists();
         for (OptionList optionList : optionLists) {
             cbOption.addItem(optionList);
@@ -108,7 +111,10 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
 
+    private void handleAddOptionList(){
+        controller.navigatetoAddOptionList();
 
+    }
 
     private void handleCreate() {
         if (validateFields()) {
@@ -116,8 +122,9 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem(),
-                    cklRequired.isChecked()
+                    cklRequired.isChecked(),
+                    cbOption.getSelectedItem()
+
 
             );
             close();
@@ -131,8 +138,8 @@ public class AddEditQuestionView extends DialogWindow {
                     txtTitle.getText(),
                     txtDescription.getText(),
                     cbType.getSelectedItem(),
-                    cbOption.getSelectedItem(),
-                    cklRequired.isChecked()
+                    cklRequired.isChecked(),
+                    cbOption.getSelectedItem()
             );
         }
         close();

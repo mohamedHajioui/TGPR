@@ -5,7 +5,7 @@
 ### Liste des utilisateurs et mots de passe
 
   * login, password, role
-  * A compléter...
+  * A compléter... 
 
 ### Liste des bugs connus
 
@@ -16,10 +16,4 @@
 ### Liste des fonctionnalités supplémentaires
 
 ### Divers
-
-
-## Les membres du groupe et les cas d'utilisation réalisés par chaque membre
-
-- IHDENE Amine : 1- View edit Instance;
-                 2- View Instances; 
-
+...
