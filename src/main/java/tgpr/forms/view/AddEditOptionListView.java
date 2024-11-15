@@ -70,7 +70,7 @@ public class AddEditOptionListView extends DialogWindow {
         txtName.setText(optionList.getName());
 
 
-        errAddOption.setVisible(options.isEmpty());
+        errAddOption.setVisible(controller.getTempOptions().isEmpty());
         updateAddButtonState();
         updateCreateButtonState();
     }
@@ -99,7 +99,7 @@ public class AddEditOptionListView extends DialogWindow {
         txtName.setText(optionList.getName());
 
 
-        errAddOption.setVisible(options.isEmpty());
+        errAddOption.setVisible(controller.getTempOptions().isEmpty());
         updateAddButtonState();
         updateCreateButtonState();
     }
@@ -154,7 +154,7 @@ public class AddEditOptionListView extends DialogWindow {
 
         errAddOption = new Label("at least one value required") //!!!
                 .setForegroundColor(TextColor.ANSI.RED)
-                .setVisible(controller.getTempOptions().isEmpty());
+                .setVisible(controller.getOptions().isEmpty());
 
         txtAddOption = new TextBox(new TerminalSize(35, 1))
                 .setTextChangeListener((txt, byUser) -> {
@@ -167,6 +167,7 @@ public class AddEditOptionListView extends DialogWindow {
                 txtAddOption.setText("");
                 errAddOption.setVisible(false);
                 updateCreateButtonState();
+                reloadData();
             }
         });
         addOptionPanel.addComponent(errAddOption);
@@ -264,9 +265,11 @@ public class AddEditOptionListView extends DialogWindow {
             controller.addToDeleteList(selectedOption);
             controller.getTempOptions().remove(selectedOption);
             controller.reindexInMemory(controller.getTempOptions());
+            controller.cleanUpDeletedOptions();
             table.clear();
             table.add(controller.getTempOptions());
             table.refresh();
+            errAddOption.setVisible(controller.getTempOptions().isEmpty());
         }
         return true;
     }
@@ -294,12 +297,8 @@ public class AddEditOptionListView extends DialogWindow {
     private void closeAll() {controller.closeAll();}
     private void validate() {
         var errors = controller.validate(txtName.getText());
-        boolean hasOptions = !options.isEmpty();
-        if (!hasOptions) {
-            errAddOption.setVisible(true);
-        } else {
-            errAddOption.setVisible(false);
-        }
+        boolean hasOptions = !controller.getOptions().isEmpty();
+        errAddOption.setVisible(!hasOptions);
         errName.setText(errors.getFirstErrorMessage(Form.Fields.Name));
     }
 
@@ -311,6 +310,8 @@ public class AddEditOptionListView extends DialogWindow {
         }
         table.refresh();
         root.invalidate();
+        errAddOption.setVisible(currentOptions == null || currentOptions.isEmpty());
+        updateCreateButtonState();
 
     }
 
