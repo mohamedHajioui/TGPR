@@ -274,8 +274,10 @@ public class view_form extends DialogWindow{
             //on change juste l'etat de moving pour dire si on bouge ou paS
             moving = !moving;
         }else{
-            controller.versEditQuestion(table.getSelected());
-            affichage(true);
+            if (form.getInstances().isEmpty()){
+                controller.versEditQuestion(table.getSelected());
+                affichage(true);
+            }
         }
         System.out.println("choice");
     }
