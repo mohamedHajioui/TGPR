@@ -265,11 +265,11 @@ public class AddEditOptionListView extends DialogWindow {
             controller.addToDeleteList(selectedOption);
             controller.getTempOptions().remove(selectedOption);
             controller.reindexInMemory(controller.getTempOptions());
+            controller.cleanUpDeletedOptions();
             table.clear();
             table.add(controller.getTempOptions());
             table.refresh();
             errAddOption.setVisible(controller.getTempOptions().isEmpty());
-            updateCreateButtonState();
         }
         return true;
     }
