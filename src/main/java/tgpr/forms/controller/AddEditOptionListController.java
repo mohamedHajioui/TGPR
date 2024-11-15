@@ -105,7 +105,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.save();
 
         view.close();
-        navigateTo(new ManageOptionListsController(owner));
+
 
     }
     public void saveOptionValue() {
@@ -137,21 +137,23 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
     public void save() {
+        optionsToDelete.removeIf(optionValue ->
+                optionValue == null ||
+                        OptionValue.getByKey(optionValue.getIdx(), optionValue.getOptionListId()) == null
+        );
         for (OptionValue optionValue : optionsToDelete) {
             optionValue.delete();
         }
         optionsToDelete.clear();
-
-        reindexOptions();
-
+        reindexInMemory(tempOptions);
+        if (optionList.getId() <= 0) {
+            saveOptionList();
+        }
         optionList.deleteAllValues();
-
         for (OptionValue option : tempOptions) {
             option.setOptionListId(optionList.getId());
             option.save();
         }
-
-        saveOptionList();
         isModified = false;
     }
     private void saveOptionList() {
@@ -190,7 +192,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         isModified = true;
     }
     public void alphabetically() {
-        tempOptions.sort(Comparator.comparing(OptionValue::getLabel));
+        tempOptions.sort(Comparator.comparing(option -> option.getLabel().toLowerCase()));
         reindexInMemory(tempOptions);
         view.reloadData();
     }
@@ -210,9 +212,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         OptionList duplicateList = optionList.duplicate(owner);
         ManageOptionListsController manageController = new ManageOptionListsController(owner);
         manageController.getOptionLists().add(duplicateList);
-        manageController.getView().reloadData();
         view.close();
-        navigateTo(manageController);
+
 
     }
     public void cancelOrder() {
@@ -259,5 +260,10 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     public List<OptionValue> loadOptions(OptionList optionList) {
         return optionList.getOptionValues();
+    }
+    public void cleanUpDeletedOptions() {
+        optionsToDelete.removeIf(optionValue ->
+                OptionValue.getByKey(optionValue.getIdx(), optionValue.getOptionListId()) == null
+        );
     }
 }

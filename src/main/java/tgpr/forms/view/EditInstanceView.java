@@ -214,13 +214,13 @@ public class EditInstanceView extends DialogWindow {
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
         Label dateLabel;
         if (latestInstanceByForm != null && latestInstanceByForm.getStarted() != null) {
-            dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().toString());
+            dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().format(formatter));
         } else {
             dateLabel = new Label("Started on: Not started");
         }
-
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
         mainPanel.addComponent(dateLabel);
@@ -555,8 +555,14 @@ public class EditInstanceView extends DialogWindow {
 
     // Méthode pour afficher un message d'erreur
     private void showError(String message) {
-        errorMessageLabel.setText("Error: " + message); // Update the error message label
+        if (errorMessageLabel != null) {
+            errorMessageLabel.setText("Error: " + message); // Update the error message label
+        } else {
+            System.err.println("Error message label is not initialized.");
+        }
+
     }
+
 
     // Email validation method
     private boolean isValidEmail(String email) {
@@ -903,43 +909,75 @@ public class EditInstanceView extends DialogWindow {
     private void displayAnswerList() {
         System.out.println("----- Submitted Answers -----");
 
+        if (latestInstanceByForm == null){
+            saveInstance(idForm, loggedUser.getId(), started, complited);  // Assuming this creates and saves the instance
 
-        saveInstance(idForm, loggedUser.getId(), started, complited); // Assuming this will set a new instance ID for the latest submission
+            for (Object[] entry : answerList) {
+                int questionId = (int) entry[1];  // Get the question ID
+                Object response = entry[2];  // Get the response
 
-        for (Object[] entry : answerList) {
-            int questionId = (int) entry[1]; // Get the question ID (first element)
-            Object response = entry[2]; // Get the response (second element)
+                System.out.println("Question ID: " + questionId);
 
-            System.out.println("Question ID: " + questionId);
+                if (response instanceof List) {
+                    List<?> responses = (List<?>) response;
+                    String responseString = responses.stream()
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", "));
+                    System.out.println("Responses: " + responseString);
 
-            // Check if the response is a List (as returned by CheckBoxList)
-            if (response instanceof List) {
-                List<?> responses = (List<?>) response;
-                String responseString = responses.stream()
-                        .map(Object::toString) // Convert each item to a String
-                        .collect(Collectors.joining(", ")); // Join responses with a comma
-                System.out.println("Responses: " + responseString);
-
-                // Save each response for CheckBoxList under the same instance ID
-                for (Object res : responses) {
-                    if (res != null) {
-                        saveAnswer(instanceID, questionId, res.toString());
-                    }else {
-                        System.out.println("Null response");
+                    for (Object res : responses) {
+                        if (res != null) {
+                            // Ensure that the instanceId exists in the instances table before saving the answer
+                            saveAnswer(instanceID, questionId, res.toString());
+                        } else {
+                            System.out.println("Null response");
+                        }
+                    }
+                } else {
+                    if (response != null) {
+                        System.out.println("Response: " + response);
+                        saveAnswer(instanceID, questionId, response.toString());  // Save the answer
+                    } else {
+                        System.out.println("Null response " + questionId);
                     }
                 }
-            } else {
-                if (response != null) {
-                // Print response directly (for TextBox, ComboBox, or RadioBoxList)
-                System.out.println("Response: " + response);
-                saveAnswer(instanceID, questionId, response.toString()); // Save response
-               }else {
-                    System.out.println("Null response" + questionId);
-                }
+                System.out.println("Instance ID: " + instanceID);
+                System.out.println("------------------------------");
             }
+        } else {
+            // Similar logic for existing instance
+            for (Object[] entry : answerList) {
+                int questionId = (int) entry[1];
+                Object response = entry[2];
 
-            System.out.println("Instance ID: " + instanceID);
-            System.out.println("------------------------------");
+                System.out.println("Question ID: " + questionId);
+
+                if (response instanceof List) {
+                    List<?> responses = (List<?>) response;
+                    String responseString = responses.stream()
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", "));
+                    System.out.println("Responses: " + responseString);
+
+                    for (Object res : responses) {
+                        if (res != null) {
+                            // Use the ID of the latestInstanceByForm for answers
+                            saveAnswer(latestInstanceByForm.getId(), questionId, res.toString());
+                        } else {
+                            System.out.println("Null response");
+                        }
+                    }
+                } else {
+                    if (response != null) {
+                        System.out.println("Response: " + response);
+                        saveAnswer(latestInstanceByForm.getId(), questionId, response.toString());
+                    } else {
+                        System.out.println("Null response " + questionId);
+                    }
+                }
+                System.out.println("Instance ID: " + instanceID);
+                System.out.println("------------------------------");
+            }
         }
     }
 
@@ -1036,8 +1074,31 @@ public class EditInstanceView extends DialogWindow {
 
     }
     private void ButtonCancelYes() {
+        if(latestInstanceByForm != null) {
+            Instance instance = new Instance();
+            Answer answer = new Answer();
+
+            answer.setInstanceId(latestInstanceByForm.getId());
+            System.out.println("Deleting Answer with instanceId: " + latestInstanceByForm.getId());
+
+            try {
+                answer.delete();
+            } catch (Exception e) {
+                System.err.println("Error deleting answer: " + e.getMessage());
+            }
+
+            instance.setId(latestInstanceByForm.getId());
+            System.out.println("Deleting Instance with id: " + latestInstanceByForm.getId());
+
+            try {
+                instance.delete();
+            } catch (Exception e) {
+                System.err.println("Error deleting instance: " + e.getMessage());
+            }
+        }
         close();
     }
+
     private void ButtonCancelNo() {
         close();
 
@@ -1054,6 +1115,10 @@ public class EditInstanceView extends DialogWindow {
 
 
     private void ViewSubmission() {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:m:s");
+
+
         setViewTitle("View Answers"); // Titre spécifique pour AnswerForm
         mainPanel = new Panel(new LinearLayout(Direction.VERTICAL));
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
@@ -1073,8 +1138,15 @@ public class EditInstanceView extends DialogWindow {
         // Créer et ajouter les labels principaux (Title, Description, Date)
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
-        Label startedOn = new Label("Started On: " + (FirstInstance.getStarted() != null ? FirstInstance.getStarted() : "null"));
-        Label dateLabel = new Label("Submitted on: " + (latestInstanceByForm.getCompleted() != null ? latestInstanceByForm.getCompleted() : "null"));
+
+        // Formatage de la date pour 'Started On' et 'Submitted on'
+        String startedDate = (FirstInstance.getStarted() != null)
+                ? FirstInstance.getStarted().format(dateFormatter) : "null";
+        String completedDate = (latestInstanceByForm.getCompleted() != null)
+                ? latestInstanceByForm.getCompleted().format(dateFormatter) : "null";
+
+        Label startedOn = new Label("Started On: " + startedDate);
+        Label dateLabel = new Label("Submitted on: " + completedDate);
         Label submitterLabel = new Label("Submitted by: " + user.getFullName());
 
         mainPanel.addComponent(titleLabel);
@@ -1082,6 +1154,7 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.addComponent(startedOn);
         mainPanel.addComponent(dateLabel);
         mainPanel.addComponent(submitterLabel);
+
 
         // Créer un panneau pour afficher la réponse actuelle
         questionPanel = new Panel(new LinearLayout(Direction.VERTICAL));
