@@ -74,7 +74,7 @@ public class formController extends Controller<view_form> {
             form.delete();
             view.close();
             form = null;
-            Controller.navigateTo(new ViewFormsController(owner));
+            Controller.navigateTo(new ViewFormsController(logedUser));
         }
     }
 
