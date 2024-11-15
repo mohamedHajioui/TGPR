@@ -17,4 +17,9 @@
 
 ### Divers
 
-...
+
+## Les membres du groupe et les cas d'utilisation réalisés par chaque membre
+
+- IHDENE Amine : 1- View edit Instance;
+                 2- View Instances; 
+
