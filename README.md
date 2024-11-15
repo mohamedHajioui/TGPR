@@ -19,9 +19,10 @@
 
 ### Liste des bugs connus
 
-  * bug 1 : La touche Enter fonctionne pas sur le UC View_Instances
-  * bug 2
-  * ...
+  * La touche Enter fonctionne pas sur le UC View_Instances
+  * le guest peut se login,mais le questionnaire est toujours en not started 
+  * Attention dans le View_forms,page up page down fonctionne bien SAUF lorsque on se place sur open ou manage, auquel cas l'app crash...
+  * 
   * 
 
 ### Liste des fonctionnalités supplémentaires
