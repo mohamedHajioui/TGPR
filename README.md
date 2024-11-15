@@ -7,9 +7,19 @@
   * login, password, role
   * A compléter... 
 
+###  IMPORTANT ###
+ ***  Pour que la fonctionnalite du Guest fonctionne sur View_Edit_Instance 
+      il faut supprimer l'instance de la base de donnees, 
+      l'instance y'est deja dans la base de donnees
+      ( c'est pour ca qu'elle saffiche this instance exists for the guest)
+       mais les forms sont en not started *****
+
+#### FIN IMPORTANT ###
+
+
 ### Liste des bugs connus
 
-  * bug 1 : Si on login as Guest, c'est benoit penelle qui login.
+  * bug 1 : La touche Enter fonctionne pas sur le UC View_Instances
   * bug 2
   * ...
   * 
@@ -33,6 +43,3 @@ Aly Samir Mahmoud : view_form, manage_shares
 
 Amine Ihdene : view_edit_instance, view_instances
 
-### Liste des fonctionnalités no faites : 
-
-- View_instances : La fonctionnalite "Enter" qui affiche les reponses d'une instance
