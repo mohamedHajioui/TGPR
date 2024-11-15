@@ -203,14 +203,14 @@ public class EditInstanceView extends DialogWindow {
         mainPanel.setPreferredSize(new TerminalSize(55, 20));
 
         Form formData = controller.getForm();
-        idForm = formData.getId();
 
+
+        formData.setId(idForm);
         // Récupérer les questions et les instances du formulaire
         List<Question> questions = formData.getQuestions();
         List<Instance> instances = formData.getInstances();
 
         latestInstanceByForm = getLatestInstance(instances);
-
         Label titleLabel = new Label("Title: " + (formData.getTitle() != null ? formData.getTitle() : "null"));
         Label descriptionLabel = new Label("Description: " + (formData.getDescription() != null ? formData.getDescription() : "null"));
 
@@ -219,7 +219,7 @@ public class EditInstanceView extends DialogWindow {
         if (latestInstanceByForm != null && latestInstanceByForm.getStarted() != null) {
             dateLabel = new Label("Started on: " + latestInstanceByForm.getStarted().format(formatter));
         } else {
-            dateLabel = new Label("Started on: Not started");
+            dateLabel = new Label("Started on : " + started.format(formatter));
         }
         mainPanel.addComponent(titleLabel);
         mainPanel.addComponent(descriptionLabel);
@@ -334,6 +334,7 @@ public class EditInstanceView extends DialogWindow {
         questionPanel.invalidate();
     }
 
+
     public void listDistinctAnswersByInstanceId(List<Answer> answers, int instanceId) {
         // Réinitialiser la liste answerList
         answerList.clear();
@@ -435,6 +436,7 @@ public class EditInstanceView extends DialogWindow {
         questionPanel.invalidate();
         updateButtonPanel(questions.size(), questions);
     }
+
 
 
 
@@ -593,95 +595,182 @@ public class EditInstanceView extends DialogWindow {
 
 
     // Méthode pour afficher la valeur actuelle de l'input
+    // Méthode pour afficher la valeur actuelle de l'input
     private void displayCurrentInputValue(List<Question> questions) {
 
+        if (latestInstanceByForm==null){
 
-        Question question = questions.get(currentQuestionIndex);
-        Component currentComponent = questionPanel.getChildren().stream()
-                .filter(component -> component instanceof TextBox || component instanceof ComboBox ||
-                        component instanceof CheckBoxList || component instanceof RadioBoxList)
-                .findFirst().orElse(null);
+            Question question = questions.get(currentQuestionIndex);
+            Component currentComponent = questionPanel.getChildren().stream()
+                    .filter(component -> component instanceof TextBox || component instanceof ComboBox ||
+                            component instanceof CheckBoxList || component instanceof RadioBoxList)
+                    .findFirst().orElse(null);
 
-        // Check if an entry with the same question ID already exists
-        Object[] existingEntry = answerList.stream()
-                .filter(entry -> (int) entry[1] == question.getId())
-                .findFirst()
-                .orElse(null);
+            // Check if an entry with the same question ID already exists
+            Object[] existingEntry = answerList.stream()
+                    .filter(entry -> (int) entry[1] == question.getId())
+                    .findFirst()
+                    .orElse(null);
 
-        if (currentComponent instanceof TextBox) {
-            String inputValue = ((TextBox) currentComponent).getText();
+            if (currentComponent instanceof TextBox) {
+                String inputValue = ((TextBox) currentComponent).getText();
 
-            if (existingEntry != null) {
-                existingEntry[2] = inputValue; // Update response
-            } else {
-                Object[] newEntry = new Object[3];
-                newEntry[0] = (Object) instanceID;        // Instance ID
-                newEntry[1] = (Object) question.getId(); // Question ID
+                if (existingEntry != null) {
+                    existingEntry[2] = inputValue; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) instanceID;        // Instance ID
+                    newEntry[1] = (Object) question.getId(); // Question ID
 
-                newEntry[2] = inputValue;       // Response
-                answerList.add(newEntry);       // Add new entry
+                    newEntry[2] = inputValue;       // Response
+                    answerList.add(newEntry);       // Add new entry
+                }
+
+                System.out.println("Input Value: " + inputValue);
+
+            } else if (currentComponent instanceof ComboBox) {
+                Object selectedOption = ((ComboBox<?>) currentComponent).getSelectedItem();
+
+                if (existingEntry != null) {
+                    existingEntry[2] = selectedOption; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) instanceID;
+                    newEntry[1] = (Object) question.getId();
+
+                    newEntry[2] = selectedOption;
+                    answerList.add(newEntry);
+                }
+
+                System.out.println("Selected Option: " + selectedOption);
+
+            } else if (currentComponent instanceof CheckBoxList) {
+                List<?> selectedItems = ((CheckBoxList<?>) currentComponent).getCheckedItems();
+
+                if (selectedItems.isEmpty()) {
+                    System.out.println("No options selected for question ID: " + question.getId());
+                    return; // Rien à enregistrer si aucune option n'est cochée
+                }
+
+                // Supprime les entrées existantes pour cette question (si nécessaire)
+                answerList.removeIf(entry -> (int) entry[1] == question.getId());
+
+                for (Object selectedItem : selectedItems) {
+                    if (selectedItem != null) {
+                        // Créez une nouvelle entrée pour chaque élément sélectionné
+                        Object[] newEntry = new Object[3];
+                        newEntry[0] = (Object) instanceID; // L'ID de l'instance
+                        newEntry[1] = (Object) question.getId(); // L'ID de la question
+                        newEntry[2] = selectedItem.toString(); // La réponse individuelle
+
+                        answerList.add(newEntry); // Ajoutez la nouvelle entrée à la liste
+                        System.out.println("Saved Option: " + selectedItem + " for Question ID: " + question.getId());
+                    }
+                }
             }
+            else if (currentComponent instanceof RadioBoxList) {
+                Object selectedOption = ((RadioBoxList<?>) currentComponent).getCheckedItem();
 
-            System.out.println("Input Value: " + inputValue);
+                if (existingEntry != null) {
+                    existingEntry[2] = selectedOption; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) instanceID;
+                    newEntry[1] = (Object) question.getId();
 
-        } else if (currentComponent instanceof ComboBox) {
-            Object selectedOption = ((ComboBox<?>) currentComponent).getSelectedItem();
+                    newEntry[2] = selectedOption;
+                    answerList.add(newEntry);
+                }
 
-            if (existingEntry != null) {
-                existingEntry[2] = selectedOption; // Update response
-            } else {
-                Object[] newEntry = new Object[3];
-                newEntry[0] = (Object) instanceID;
-                newEntry[1] = (Object) question.getId();
+                System.out.println("Selected Option: " + selectedOption);
+            }    }else{
 
-                newEntry[2] = selectedOption;
-                answerList.add(newEntry);
+            Question question = questions.get(currentQuestionIndex);
+            Component currentComponent = questionPanel.getChildren().stream()
+                    .filter(component -> component instanceof TextBox || component instanceof ComboBox ||
+                            component instanceof CheckBoxList || component instanceof RadioBoxList)
+                    .findFirst().orElse(null);
+
+            // Check if an entry with the same question ID already exists
+            Object[] existingEntry = answerList.stream()
+                    .filter(entry -> (int) entry[1] == question.getId())
+                    .findFirst()
+                    .orElse(null);
+
+            if (currentComponent instanceof TextBox) {
+                String inputValue = ((TextBox) currentComponent).getText();
+
+                if (existingEntry != null) {
+                    existingEntry[2] = inputValue; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) latestInstanceByForm.getId();        // Instance ID
+                    newEntry[1] = (Object) question.getId(); // Question ID
+
+                    newEntry[2] = inputValue;       // Response
+                    answerList.add(newEntry);       // Add new entry
+                }
+
+                System.out.println("Input Value: " + inputValue);
+
+            } else if (currentComponent instanceof ComboBox) {
+                Object selectedOption = ((ComboBox<?>) currentComponent).getSelectedItem();
+
+                if (existingEntry != null) {
+                    existingEntry[2] = selectedOption; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) latestInstanceByForm.getId();
+                    newEntry[1] = (Object) question.getId();
+
+                    newEntry[2] = selectedOption;
+                    answerList.add(newEntry);
+                }
+
+                System.out.println("Selected Option: " + selectedOption);
+
+            } else if (currentComponent instanceof CheckBoxList) {
+                List<?> selectedItems = ((CheckBoxList<?>) currentComponent).getCheckedItems();
+
+                // Convert selected items to a single string for storage
+                String selectedItemsString = selectedItems.stream()
+                        .map(Object::toString) // Convert each selected item to a String
+                        .collect(Collectors.joining(", ")); // Join them with commas
+
+                if (existingEntry != null) {
+                    // If an entry already exists, update the response with the combined string
+                    existingEntry[2] = selectedItemsString; // Update response with concatenated string
+                } else {
+                    // Create a new entry for the answerList
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) latestInstanceByForm.getId(); // Assuming this is the ID of the instance
+                    newEntry[1] = (Object) question.getId(); // Get the question ID
+
+                    newEntry[2] = selectedItemsString; // Store the concatenated string of selected items
+                    answerList.add(newEntry); // Add the new entry to the list
+                }
+
+                // Print the selected options
+                System.out.println("Selected Options: " + selectedItemsString);
+
+            } else if (currentComponent instanceof RadioBoxList) {
+                Object selectedOption = ((RadioBoxList<?>) currentComponent).getCheckedItem();
+
+                if (existingEntry != null) {
+                    existingEntry[2] = selectedOption; // Update response
+                } else {
+                    Object[] newEntry = new Object[3];
+                    newEntry[0] = (Object) latestInstanceByForm.getId();
+                    newEntry[1] = (Object) question.getId();
+
+                    newEntry[2] = selectedOption;
+                    answerList.add(newEntry);
+                }
+
+                System.out.println("Selected Option: " + selectedOption);
             }
-
-            System.out.println("Selected Option: " + selectedOption);
-
-        } else if (currentComponent instanceof CheckBoxList) {
-            List<?> selectedItems = ((CheckBoxList<?>) currentComponent).getCheckedItems();
-
-            // Convert selected items to a single string for storage
-            String selectedItemsString = selectedItems.stream()
-                    .map(Object::toString) // Convert each selected item to a String
-                    .collect(Collectors.joining(", ")); // Join them with commas
-
-            if (existingEntry != null) {
-                // If an entry already exists, update the response with the combined string
-                existingEntry[2] = selectedItemsString; // Update response with concatenated string
-            } else {
-                // Create a new entry for the answerList
-                Object[] newEntry = new Object[3];
-                newEntry[0] = (Object) instanceID; // Assuming this is the ID of the instance
-                newEntry[1] = (Object) question.getId(); // Get the question ID
-
-                newEntry[2] = selectedItemsString; // Store the concatenated string of selected items
-                answerList.add(newEntry); // Add the new entry to the list
-            }
-
-            // Print the selected options
-            System.out.println("Selected Options: " + selectedItemsString);
-
-        } else if (currentComponent instanceof RadioBoxList) {
-            Object selectedOption = ((RadioBoxList<?>) currentComponent).getCheckedItem();
-
-            if (existingEntry != null) {
-                existingEntry[2] = selectedOption; // Update response
-            } else {
-                Object[] newEntry = new Object[3];
-                newEntry[0] = (Object) instanceID;
-                newEntry[1] = (Object) question.getId();
-
-                newEntry[2] = selectedOption;
-                answerList.add(newEntry);
-            }
-
-            System.out.println("Selected Option: " + selectedOption);
         }
     }
-
 
     public int getMaxInstanceIdInstanceTable(List<Instance> instances) {
         return instances.stream()
@@ -754,18 +843,31 @@ public class EditInstanceView extends DialogWindow {
 
         Button closeButton;
 
-        if ( Security.isGuest() /*!role.equals("Guest" )*/) {
+        if ( !Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
-                displayCurrentInputValue(questions );
-                displayAnswerList(); // Display the answer list
-                close(); // Close the application
+                if (currentQuestionIndex > 0) {
+                    Question currentQuestion = questions.get(currentQuestionIndex);
+                    if(currentQuestion.getRequired()){
+                        if(isInputValid(currentQuestion)){
+                            displayCurrentInputValue(questions);
+                            displayAnswerList(); // Display the answer list
+                            close();
+                        }
+                    }else{
+                        displayCurrentInputValue(questions);
+                        displayAnswerList(); // Display the answer list
+                        close();
+                    }
+                    // Close the application
+                }
             });
         } else {
             // Close the application
             closeButton = new Button("Close", this::close);
         }
+        if (currentQuestionIndex > 0)
+            buttonPanel.addComponent(closeButton);
 
-        buttonPanel.addComponent(closeButton);
 
         buttonPanel.addComponent(cancelButton);
 
@@ -812,27 +914,38 @@ public class EditInstanceView extends DialogWindow {
         buttonPanel.removeAllComponents();
         Button closeButton;
 
-        if (!role.equals("Guest")) {
+        if ( !Security.isGuest() /*!role.equals("Guest" )*/) {
             closeButton = new Button("Close", () -> {
-                displayCurrentInputValue(questions);
-                displayAnswerList(); // Display the answer list
-                close(); // Close the application
+                if (currentQuestionIndex > 0) {
+                    Question currentQuestion = questions.get(currentQuestionIndex);
+                    if(currentQuestion.getRequired()){
+                        if(isInputValid(currentQuestion)){
+                            displayCurrentInputValue(questions);
+                            displayAnswerList(); // Display the answer list
+                            close();
+                        }
+                    }else{
+                        displayCurrentInputValue(questions);
+                        displayAnswerList(); // Display the answer list
+                        close();
+                    }
+                    // Close the application
+                }
             });
         } else {
-            closeButton = new Button("Close", () -> {
-                close(); // Close the application
-            });
+            // Close the application
+            closeButton = new Button("Close", this::close);
         }
-
-        buttonPanel.addComponent(closeButton);
 
 
 
         Button cancelButton = new Button("Cancel", () -> {
             ConfirmationCancel();
         });
+        buttonPanel.addComponent(cancelButton);
+        if (currentQuestionIndex > 0 )
+            buttonPanel.addComponent(closeButton);
 
-        buttonPanel.addComponent(cancelButton); // Ajouter bouton "Cancel"
 
         if (currentQuestionIndex > 0) {
             // Ajouter "Previous" si ce n'est pas la première question
@@ -910,71 +1023,78 @@ public class EditInstanceView extends DialogWindow {
         System.out.println("----- Submitted Answers -----");
 
         if (latestInstanceByForm == null){
-            saveInstance(idForm, loggedUser.getId(), started, complited);  // Assuming this creates and saves the instance
+
+
+            int  idInstance = saveInstance(idForm, loggedUser.getId(), started, complited); // Assuming this will set a new instance ID for the latest submission
 
             for (Object[] entry : answerList) {
-                int questionId = (int) entry[1];  // Get the question ID
-                Object response = entry[2];  // Get the response
+                int questionId = (int) entry[1]; // Get the question ID (first element)
+                Object response = entry[2]; // Get the response (second element)
 
                 System.out.println("Question ID: " + questionId);
 
+                // Check if the response is a List (as returned by CheckBoxList)
                 if (response instanceof List) {
                     List<?> responses = (List<?>) response;
                     String responseString = responses.stream()
-                            .map(Object::toString)
-                            .collect(Collectors.joining(", "));
+                            .map(Object::toString) // Convert each item to a String
+                            .collect(Collectors.joining(", ")); // Join responses with a comma
                     System.out.println("Responses: " + responseString);
 
+                    // Save each response for CheckBoxList under the same instance ID
                     for (Object res : responses) {
                         if (res != null) {
-                            // Ensure that the instanceId exists in the instances table before saving the answer
-                            saveAnswer(instanceID, questionId, res.toString());
-                        } else {
+                            saveAnswer(idInstance, questionId, res.toString());
+                        }else {
                             System.out.println("Null response");
                         }
                     }
                 } else {
                     if (response != null) {
+                        // Print response directly (for TextBox, ComboBox, or RadioBoxList)
                         System.out.println("Response: " + response);
-                        saveAnswer(instanceID, questionId, response.toString());  // Save the answer
-                    } else {
-                        System.out.println("Null response " + questionId);
+                        saveAnswer(idInstance, questionId, response.toString()); // Save response
+                    }else {
+                        System.out.println("Null response" + questionId);
                     }
                 }
-                System.out.println("Instance ID: " + instanceID);
+
+                System.out.println("Instance ID: " + idInstance);
                 System.out.println("------------------------------");
-            }
-        } else {
-            // Similar logic for existing instance
+            }}else{
+
             for (Object[] entry : answerList) {
-                int questionId = (int) entry[1];
-                Object response = entry[2];
+                int questionId = (int) entry[1]; // Get the question ID (first element)
+                Object response = entry[2]; // Get the response (second element)
 
                 System.out.println("Question ID: " + questionId);
 
+                // Check if the response is a List (as returned by CheckBoxList)
                 if (response instanceof List) {
                     List<?> responses = (List<?>) response;
                     String responseString = responses.stream()
-                            .map(Object::toString)
-                            .collect(Collectors.joining(", "));
+                            .map(Object::toString) // Convert each item to a String
+                            .collect(Collectors.joining(", ")); // Join responses with a comma
                     System.out.println("Responses: " + responseString);
 
+                    // Save each response for CheckBoxList under the same instance ID
                     for (Object res : responses) {
                         if (res != null) {
-                            // Use the ID of the latestInstanceByForm for answers
                             saveAnswer(latestInstanceByForm.getId(), questionId, res.toString());
-                        } else {
+                        }else {
                             System.out.println("Null response");
                         }
                     }
                 } else {
                     if (response != null) {
+                        // Print response directly (for TextBox, ComboBox, or RadioBoxList)
                         System.out.println("Response: " + response);
-                        saveAnswer(latestInstanceByForm.getId(), questionId, response.toString());
-                    } else {
-                        System.out.println("Null response " + questionId);
+                        saveAnswer(latestInstanceByForm.getId(), questionId, response.toString()); // Save response
+                    }else {
+                        System.out.println("Null response" + questionId);
                     }
                 }
+
                 System.out.println("Instance ID: " + instanceID);
                 System.out.println("------------------------------");
             }
@@ -992,15 +1112,24 @@ public class EditInstanceView extends DialogWindow {
         answer.save();
     }
 
-    private void saveInstance(int formId, int userId, LocalDateTime started, LocalDateTime completed) {
-        Instance instance = new Instance(); // Create a new Instance object
-        instance.setFormId(formId); // Set form ID
-        instance.setUserId(userId); // Set user ID
-        instance.setStarted(started); // Set started time
-        instance.setCompleted(completed); // Set completed time
+    private int saveInstance(int formId, int userId, LocalDateTime started, LocalDateTime completed) {
+        // Create an Instance object and set its values
+        Instance instance = new Instance();
+        instance.setFormId(formId);
+        instance.setUserId(userId);
+        instance.setStarted(started);
+        instance.setCompleted(completed);
 
-        // Call the save method
-        instance.save();
+        // Save the instance (insert or update logic)
+        instance = instance.save();
+
+        // Return the instance ID after saving
+        if (instance.getId() > 0) {
+            System.out.println("Instance saved successfully with ID: " + instance.getId());
+            return instance.getId();
+        } else {
+            throw new IllegalStateException("Failed to save instance");
+        }
     }
 
 

@@ -31,7 +31,7 @@ public class ViewInstancesView extends DialogWindow {
     private Panel mainPanel;
     private Table<String> instancesTable;
     private int currentForm ;
-    private User currentUser;
+    private User currentUser ;
 
     public ViewInstancesView(ViewInstancesController controller, int currentForm,User currentUser ) {
 
@@ -99,6 +99,7 @@ public class ViewInstancesView extends DialogWindow {
         buttonPanel.addComponent(new Button("Close", this::close));
 
 
+
         int selectedRow = instancesTable.getSelectedRow();
         User user;
         if (selectedRow >= 0 && selectedRow < instancesTable.getTableModel().getRowCount()) {
@@ -148,7 +149,9 @@ public class ViewInstancesView extends DialogWindow {
                     ViewSubmission();
                     hasBeenHandled.set(true);
                 }
+
             }
+
         });
 
     }
