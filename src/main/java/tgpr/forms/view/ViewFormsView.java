@@ -319,6 +319,15 @@ public class ViewFormsView extends BasicWindow {
         fileMenuPanel.addComponent(exitMenu);
 
         fileMenuWindow.setComponent(fileMenuPanel);
+        fileMenuWindow.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    basePane.close();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
         this.getTextGUI().addWindowAndWait(fileMenuWindow);  // Afficher la fenêtre contextuelle
     }
 
