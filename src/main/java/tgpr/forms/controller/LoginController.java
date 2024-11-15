@@ -36,7 +36,7 @@ public class LoginController extends Controller<LoginView> {
     }
 
     public void loginAsGuest() {
-        var guestUser = User.getByEmail(Configuration.get("default.user.mail"));
+        var guestUser = User.getByKey(9);
         if (guestUser != null) {
             guestUser.setRole(User.Role.Guest); // Assure que le rôle est défini sur Guest
             Security.login(guestUser);
