@@ -16,4 +16,3 @@
 ### Liste des fonctionnalités supplémentaires
 
 ### Divers
-...

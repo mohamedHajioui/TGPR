@@ -93,9 +93,6 @@ public class ViewFormsView extends BasicWindow {
         });
     }
 
-
-
-
     private Panel buttonsFileAndParameters() {
         Panel topPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         MenuItem fileButton = new MenuItem("File", () -> openFileMenu());
@@ -104,8 +101,6 @@ public class ViewFormsView extends BasicWindow {
             MenuItem parametersButton = new MenuItem("Parameters", () -> openParameterMenu());
             topPanel.addComponent(parametersButton);
         }
-
-
         return topPanel;
     }
 
@@ -140,7 +135,6 @@ public class ViewFormsView extends BasicWindow {
     // Méthode pour afficher les formulaires
 
     public void displayForms(List<Form> forms, int currentPage, int formsPerPage) {
-
         forms.sort(Comparator.comparing(Form::getTitle, String.CASE_INSENSITIVE_ORDER));
         formsPanel.removeAllComponents();  // Supprimer les anciens composants
 
@@ -325,6 +319,15 @@ public class ViewFormsView extends BasicWindow {
         fileMenuPanel.addComponent(exitMenu);
 
         fileMenuWindow.setComponent(fileMenuPanel);
+        fileMenuWindow.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    basePane.close();
+                    hasBeenHandled.set(true);
+                }
+            }
+        });
         this.getTextGUI().addWindowAndWait(fileMenuWindow);  // Afficher la fenêtre contextuelle
     }
 

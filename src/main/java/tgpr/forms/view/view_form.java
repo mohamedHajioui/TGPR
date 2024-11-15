@@ -220,6 +220,9 @@ public class view_form extends DialogWindow{
     private void clearInstances(){
 
         controller.versViewInstance();
+        if (form.getInstances().isEmpty()){
+            affichage(true);
+        }
     }
 
     private void makePublic(){
