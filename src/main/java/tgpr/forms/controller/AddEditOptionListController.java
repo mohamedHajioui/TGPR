@@ -190,7 +190,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         isModified = true;
     }
     public void alphabetically() {
-        tempOptions.sort(Comparator.comparing(OptionValue::getLabel));
+        tempOptions.sort(Comparator.comparing(option -> option.getLabel().toLowerCase()));
         reindexInMemory(tempOptions);
         view.reloadData();
     }
