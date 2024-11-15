@@ -34,10 +34,16 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     public boolean sameTitle(String title, Form form) {
         for (Question existingQuestion : form.getQuestions()) {
             System.out.println(existingQuestion+" "+title);
-
-            if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
-                return true;
+            if (question == null){
+                if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
+                    return true;
+                }
+            }else{
+                if (existingQuestion.getTitle().equalsIgnoreCase(title) && question.getId() != existingQuestion.getId()) {
+                    return true;
+                }
             }
+
 
 
         }
