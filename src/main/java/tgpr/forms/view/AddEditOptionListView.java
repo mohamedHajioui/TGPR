@@ -137,7 +137,13 @@ public class AddEditOptionListView extends DialogWindow {
         table = new ObjectTable<>(
                 new ColumnSpec<>("Index", OptionValue::getIdx),
                 new ColumnSpec<>("Label", OptionValue::getLabel).setMaxWidth(40)
-        ).addTo(root);
+        );
+        Panel tablePanel = new Panel();
+        tablePanel.setLayoutManager(new GridLayout(2));
+        tablePanel.setPreferredSize(new TerminalSize(45, 10));
+        tablePanel.addComponent(table);
+
+        root.addComponent(tablePanel); // Ajoute le panel à la vue principale
         table.add(optionList.getOptionValues());
         table.addSelectionChangeListener(this::change);
         if(!normal){
