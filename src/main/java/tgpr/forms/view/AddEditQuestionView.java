@@ -110,10 +110,15 @@ public class AddEditQuestionView extends DialogWindow {
         }
     }
 
-
+    public void reloadData(){
+        cbOption.clearItems();
+        OptionList.getAll().forEach(cbOption::addItem);
+        cbOption.invalidate();
+        updateOptionListState();
+    }
     private void handleAddOptionList(){
         controller.navigatetoAddOptionList();
-
+        reloadData();
     }
 
     private void handleCreate() {
@@ -141,13 +146,13 @@ public class AddEditQuestionView extends DialogWindow {
                     cklRequired.isChecked(),
                     cbOption.getSelectedItem()
             );
+            close();
         }
-        close();
+
     }
-
-
     private void handleDelete() {
         controller.deleteQuestion(question);
+
     }
 
     private void handleCancel() {
@@ -166,9 +171,6 @@ public class AddEditQuestionView extends DialogWindow {
 
         } else if (txtTitle.getText().length() < 3) {
             errTitle.setText("min 3 caracters");
-        }
-        else if(controller.sameTitle(txtTitle.getText(),form)){
-            errTitle.setText("Title already exists");
         }
         else {
             errTitle.setText("");
@@ -193,6 +195,10 @@ public class AddEditQuestionView extends DialogWindow {
 
     private boolean validateFields() {
         validateTitle();
+        if(controller.sameTitle(txtTitle.getText(),form)){
+            errTitle.setText("Title already exists");
+            return false;
+        }
         validateDescription();
         validateOptionList();
         return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();

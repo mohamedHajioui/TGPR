@@ -33,12 +33,18 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
     public boolean sameTitle(String title, Form form) {
         for (Question existingQuestion : form.getQuestions()) {
-            if(existingQuestion.getId() != question.getId()) {
+            System.out.println(existingQuestion+" "+title);
+            if (question == null){
                 if (existingQuestion.getTitle().equalsIgnoreCase(title)) {
-                    System.out.println("Titre en doublon");
+                    return true;
+                }
+            }else{
+                if (existingQuestion.getTitle().equalsIgnoreCase(title) && question.getId() != existingQuestion.getId()) {
                     return true;
                 }
             }
+
+
 
         }
         return false;
