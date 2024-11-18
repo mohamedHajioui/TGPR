@@ -93,7 +93,10 @@ public class ManageSharesView extends DialogWindow {
 
 
         cbAccess = new ComboBox<>();
-        cbAccess.addItem(User);
+        System.out.println(form.getIsPublic());
+        if (!form.getIsPublic()){
+            cbAccess.addItem(User);
+        }
         cbAccess.addItem(Editor);
         cbAccess.addTo(panel);
 
