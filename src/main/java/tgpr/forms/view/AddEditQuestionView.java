@@ -172,6 +172,9 @@ public class AddEditQuestionView extends DialogWindow {
         } else if (txtTitle.getText().length() < 3) {
             errTitle.setText("min 3 caracters");
         }
+        else if(controller.sameTitle(txtTitle.getText(),form)){
+            errTitle.setText("Title already exists");
+        }
         else {
             errTitle.setText("");
         }
@@ -195,10 +198,7 @@ public class AddEditQuestionView extends DialogWindow {
 
     private boolean validateFields() {
         validateTitle();
-        if(controller.sameTitle(txtTitle.getText(),form)){
-            errTitle.setText("Title already exists");
-            return false;
-        }
+
         validateDescription();
         validateOptionList();
         return errTitle.getText().isEmpty() && errDescription.getText().isEmpty()  && errOptionList.getText().isEmpty();
