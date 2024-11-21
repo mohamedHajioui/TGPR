@@ -27,7 +27,7 @@ public class formController extends Controller<view_form> {
 
 
     public void makePublic(){
-        if (askConfirmation("Are you sure you want to make  public?", "Make Public")){
+        if (askConfirmation("Are you sure you want to make this public?\n this will delete all existing shares", "confirmation")){
             refrenceList();
         }
     }
@@ -70,7 +70,6 @@ public class formController extends Controller<view_form> {
 
     public void delete(){
         if (askConfirmation("Are you sure you want to delete this form?","Delete Form")){
-            User owner = form.getOwner();
             form.delete();
             view.close();
             form = null;

@@ -14,6 +14,7 @@ import tgpr.framework.ViewManager;
 
 import java.util.List;
 
+import static tgpr.framework.Controller.askConfirmation;
 import static tgpr.framework.Tools.ifNull;
 
 //import static jdk.internal.net.http.common.Utils.close;
@@ -217,13 +218,13 @@ public class view_form extends DialogWindow{
         return panel;
     }
 
-    private void clearInstances(){
-
-        controller.versViewInstance();
-        if (form.getInstances().isEmpty()){
+    private void clearInstances() {
+        if (askConfirmation("Are you sure you want to delete all instances? \n Note: this will also delete instances currently being edited (not submitted).", "Delete All Instances")){
+            form.deleteAllInstances();
             affichage(true);
         }
     }
+
 
     private void makePublic(){
         controller.makePublic();
