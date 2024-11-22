@@ -37,6 +37,9 @@ créer une nouvelle instance pour guest
 si erreur, bloque le next au lieu d'afficher l'erreur : c'est un
 bug et pas une fcté complémentaire
 
+
+view_instances : enter ne marche pas
+
 ### Liste des fonctionnalités supplémentaires
 
 
