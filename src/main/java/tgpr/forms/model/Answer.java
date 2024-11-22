@@ -17,6 +17,7 @@ public class Answer extends Model {
     public Answer() {
     }
 
+
     public Answer(Instance instance, Question question, String value) {
         this.instanceId = instance.getId();
         this.questionId = question.getId();
