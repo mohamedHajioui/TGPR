@@ -19,16 +19,25 @@
 
 ### Liste des bugs connus
 
-  * La touche Enter fonctionne pas sur le UC View_Instances
-  * le guest peut se login,mais le questionnaire est toujours en not started 
-  * Attention dans le View_forms,page up page down fonctionne bien SAUF lorsque on se place sur open ou manage, auquel cas l'app crash...
-  * 
-  * 
+view forms : PgUp et PgDn
+
+
+view_edit_instance : instance pas créée à l'ouverture, ni quand on répond aux
+questions
+submit again : pas d'instance créée en BD, mais réponses
+mises sur la 7
+ne réouvrent pas l'instance en cours mais créent une
+nouvelle à chaque fois
+r/o : check : valeurs en dessous des autres
+stocke pas les idx des option list et un seul record pour une
+seule option
+guest : on l'empèche de répondre s'il y a déjà des instances
+=> pas d'accord avec remarque dans le README : il faut tjrs
+créer une nouvelle instance pour guest
+si erreur, bloque le next au lieu d'afficher l'erreur : c'est un
+bug et pas une fcté complémentaire
 
 ### Liste des fonctionnalités supplémentaires
-
-- Sur le Uc View_edit_instance : - on ne peut pas fermer une instance sans repondre sur une question required.
-                                 - on ne peut pas passer a la suivante si on n'a pas repondu.
 
 
 ### Divers
